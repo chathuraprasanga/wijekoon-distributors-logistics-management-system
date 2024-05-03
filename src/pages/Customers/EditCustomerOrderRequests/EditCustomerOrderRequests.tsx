@@ -29,14 +29,14 @@ function EditCustomerOrderRequests() {
             </Text>
             <Table withRowBorders={false}>
               <Table.Tr>
-                <Table.Td width={'15%'} style={{ fontWeight: 'bold' }}>
+                <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Name:
                 </Table.Td>
-                <Table.Td width={'35%'}>Chathura Prasanga</Table.Td>
-                <Table.Td style={{ fontWeight: 'bold' }} width={'15%'}>
+                <Table.Td width="35%">Chathura Prasanga</Table.Td>
+                <Table.Td style={{ fontWeight: 'bold' }} width="15%">
                   Created Date:
                 </Table.Td>
-                <Table.Td width={'35%'}>
+                <Table.Td width="35%">
                   01/04/2024
                   {/* <DatePickerInput
                     defaultValue={new Date()}

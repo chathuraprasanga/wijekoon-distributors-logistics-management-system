@@ -1,18 +1,18 @@
-import { Badge, Button, Card, Grid, Table, Text } from '@mantine/core';
+import { Grid, Card, Table, Badge, Button, Text, TextInput } from '@mantine/core';
+import { ModalsProvider, modals } from '@mantine/modals';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ModalsProvider, modals } from '@mantine/modals';
 
-function ViewCustomerOrderRequests() {
-  const openCancelRequest = () =>
-    modals.openConfirmModal({
-      title: 'Cancel Order Request',
-      // centered: true,
-      children: <Text size="sm">Please confirm to cancel this customer order request</Text>,
-      confirmProps: { color: 'red' },
-      labels: { confirm: 'Confirm', cancel: 'Cancel' },
-    });
+function ViewSupplierOrderRequests() {
+  //   const openCancelRequest = () =>
+  //     modals.openConfirmModal({
+  //       title: 'Cancel Order Request',
+  //       // centered: true,
+  //       children: <Text size="sm">Please confirm to cancel this customer order request</Text>,
+  //       confirmProps: { color: 'red' },
+  //       labels: { confirm: 'Confirm', cancel: 'Cancel' },
+  //     });
 
   return (
     <>
@@ -25,7 +25,7 @@ function ViewCustomerOrderRequests() {
                   <IconArrowLeft />
                 </Link>
                 <Text size="md" style={{ fontWeight: 'bold' }}>
-                  View Customer Order Requests
+                  View Supplier Order Requests
                 </Text>
               </div>
               <div></div>
@@ -34,14 +34,14 @@ function ViewCustomerOrderRequests() {
           <Grid.Col>
             <Card shadow="sm" padding="lg" radius="md" withBorder>
               <Text size="lg" style={{ fontWeight: 'bold' }}>
-                Customer Details
+                Supplier Details
               </Text>
               <Table withRowBorders={false}>
                 <Table.Tr>
                   <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                     Name:
                   </Table.Td>
-                  <Table.Td width="35%">Chathura Prsanga</Table.Td>
+                  <Table.Td width="35%">Keshara Minerals and Chemicals</Table.Td>
                   <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                     Created Date:
                   </Table.Td>
@@ -53,9 +53,9 @@ function ViewCustomerOrderRequests() {
                   </Table.Td>
                   <Table.Td width="35%">077 9250108 / 075 0943040</Table.Td>
                   <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
-                    Created By:
+                    Purpose:
                   </Table.Td>
-                  <Table.Td width="35%">Customer</Table.Td>
+                  <Table.Td width="35%">For Delivery</Table.Td>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
@@ -94,61 +94,62 @@ function ViewCustomerOrderRequests() {
                   <Table.Th>Product Code</Table.Th>
                   <Table.Th>Product Name</Table.Th>
                   <Table.Th>Product Size</Table.Th>
-                  <Table.Th>Unit Price</Table.Th>
                   <Table.Th>Quantity</Table.Th>
-                  <Table.Th>Discount</Table.Th>
                   <Table.Th>Line Total</Table.Th>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td>KSL-20</Table.Td>
                   <Table.Td>Keshara Super Lime</Table.Td>
                   <Table.Td>20KG</Table.Td>
-                  <Table.Td>550.00</Table.Td>
                   <Table.Td>300</Table.Td>
-                  <Table.Td>3%</Table.Td>
-                  <Table.Td>150000.00</Table.Td>
+                  <Table.Td>6000KG</Table.Td>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td>KTM-25</Table.Td>
                   <Table.Td>Keshara Skim Coat</Table.Td>
                   <Table.Td>25KG</Table.Td>
-                  <Table.Td>1100.00</Table.Td>
                   <Table.Td>300</Table.Td>
-                  <Table.Td>4%</Table.Td>
-                  <Table.Td>330000.00</Table.Td>
+                  <Table.Td>7500KG</Table.Td>
                 </Table.Tr>
                 <Table.Tr>
-                  <Table.Td colSpan={5}></Table.Td>
-                  <Table.Td>Sub Total:</Table.Td>
-                  <Table.Td>480000.00</Table.Td>
+                  <Table.Td colSpan={3}></Table.Td>
+                  <Table.Td>Total Quantity:</Table.Td>
+                  <Table.Td>550</Table.Td>
                 </Table.Tr>
                 <Table.Tr>
-                  <Table.Td colSpan={5}></Table.Td>
-                  <Table.Td>Tax:</Table.Td>
-                  <Table.Td>0.00</Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td colSpan={5}></Table.Td>
-                  <Table.Td>Discount:</Table.Td>
-                  <Table.Td>17700.00</Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td colSpan={5}></Table.Td>
-                  <Table.Td>Net Total:</Table.Td>
-                  <Table.Td>462300.00</Table.Td>
+                  <Table.Td colSpan={3}></Table.Td>
+                  <Table.Td>Total Size:</Table.Td>
+                  <Table.Td>13500KG</Table.Td>
                 </Table.Tr>
               </Table>
             </Card>
           </Grid.Col>
           <Grid.Col>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button color="red" onClick={openCancelRequest}>
-                Cancel Request
+              {/* <TextInput style={{ width: 500 }} placeholder="Input placeholder" /> */}
+              <Button
+                ml={10}
+                color="red"
+                onClick={() => {
+                  modals.open({
+                    title: 'Reject Supplier Order Request',
+                    children: (
+                      <>
+                        <TextInput label="Reason" placeholder="Reason for Reject" data-autofocus />
+                        <Button fullWidth onClick={() => modals.closeAll()} mt="md" color="red">
+                          Reject
+                        </Button>
+                      </>
+                    ),
+                  });
+                }}
+              >
+                Reject Request
               </Button>
               <Button ml={10} color="violet">
-                Confirm Request
+                Create Order
               </Button>
-              {/* <Button ml={10} color='teal'>Create Invoice</Button> */}
+              {/* <Button ml={10} color='teal'>Confirm</Button> */}
             </div>
           </Grid.Col>
         </Grid>
@@ -157,4 +158,4 @@ function ViewCustomerOrderRequests() {
   );
 }
 
-export default ViewCustomerOrderRequests;
+export default ViewSupplierOrderRequests;
