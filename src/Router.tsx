@@ -25,6 +25,10 @@ import EditCustomerOrderRequests from './pages/Customers/EditCustomerOrderReques
 import CustomerPayments from './pages/Customers/CustomerPayments/CustomerPayments';
 import AddCustomerPayments from './pages/Customers/AddCustomerPayments/AddCustomerPayments';
 import ViewCustomerPayments from './pages/Customers/ViewCustomerPayments/ViewCustomerPayments';
+import Suppliers from './pages/Supplier/Suppliers';
+import AddEditSupplier from './pages/Supplier/AddEdit Supplier/AddEditSupplier';
+import ViewSupplier from './pages/Supplier/ViewSupplier/ViewSupplier';
+import SupplierOrderRequests from './pages/Supplier/SupplierOrderRequests/SupplierOrderRequests';
 
 const router = createBrowserRouter([
   {
@@ -94,6 +98,22 @@ const router = createBrowserRouter([
       {
         path: 'customers/view-payments',
         element: <ViewCustomerPayments />,
+      },
+      {
+        path: 'suppliers',
+        element: <Suppliers />,
+      },
+      {
+        path: 'suppliers/add-edit',
+        element: <AddEditSupplier />,
+      },
+      {
+        path: 'suppliers/view',
+        element: <ViewSupplier />,
+      },
+      {
+        path: 'suppliers/order-requests',
+        element: <SupplierOrderRequests />,
       },
       {
         path: 'settings',
