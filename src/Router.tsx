@@ -29,6 +29,10 @@ import Suppliers from './pages/Supplier/Suppliers';
 import AddEditSupplier from './pages/Supplier/AddEdit Supplier/AddEditSupplier';
 import ViewSupplier from './pages/Supplier/ViewSupplier/ViewSupplier';
 import SupplierOrderRequests from './pages/Supplier/SupplierOrderRequests/SupplierOrderRequests';
+import SupplierOrders from './pages/Supplier/SupplierOrders/SupplierOrders';
+import AddSupplierOrderRequests from './pages/Supplier/AddSupplierOrderRequests/AddSupplierOrderRequests';
+import EditSupplierOrderRequests from './pages/Supplier/EditSupplierOrderRequests/EditSupplierOrderRequests';
+import ViewSupplierOrderRequests from './pages/Supplier/ViewSupplierOrderRequests/ViewSupplierOrderRequests';
 
 const router = createBrowserRouter([
   {
@@ -114,6 +118,22 @@ const router = createBrowserRouter([
       {
         path: 'suppliers/order-requests',
         element: <SupplierOrderRequests />,
+      },
+      {
+        path: 'suppliers/add-order-requests',
+        element: <AddSupplierOrderRequests />,
+      },
+      {
+        path: 'suppliers/edit-order-requests',
+        element: <EditSupplierOrderRequests />,
+      },
+      {
+        path: 'suppliers/view-order-requests',
+        element: <ViewSupplierOrderRequests />,
+      },
+      {
+        path: 'suppliers/orders',
+        element: <SupplierOrders />,
       },
       {
         path: 'settings',
