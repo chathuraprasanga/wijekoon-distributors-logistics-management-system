@@ -39,6 +39,28 @@ function NavBarTesting() {
     '/admin',
   ];
 
+  const suppleirActivePaths = [
+    '/admin/suppliers',
+    '/admin/suppliers/add-edit',
+    '/admin/suppliers/view',
+    '/admin/suppliers/order-requests',
+    '/admin/suppliers/add-order-requests',
+    '/admin/suppliers/edit-order-requests',
+    '/admin/suppliers/view-order-requests',
+    '/admin/suppliers/orders',
+    '/admin/suppliers/add-orders',
+    '/admin/suppliers/edit-orders',
+    '/admin/suppliers/view-orders',
+    '/admin/suppliers/payments',
+    '/admin/suppliers/add-payments',
+    '/admin/suppliers/edit-payments',
+    '/admin/suppliers/view-payments',
+    '/admin/suppliers/products',
+    '/admin/suppliers/add-edit-products',
+    '/admin/suppliers/view-products',
+    '/admin',
+  ];
+
   return (
     <>
       <div
@@ -48,7 +70,7 @@ function NavBarTesting() {
           padding: 10,
           // backgroundColor: '#5E1588',
           fontWeight: 'bold',
-          color: 'black'
+          color: 'black',
         }}
       >
         <Link to="/admin/dashboard" style={{ textDecoration: 'none' }}>
@@ -131,20 +153,47 @@ function NavBarTesting() {
             variant="filled"
             color="violet"
             childrenOffset={28}
+            active={suppleirActivePaths.includes(activePath)}
           >
             <Link to="/admin/suppliers" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Suppliers" />
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Suppliers"
+                active={
+                  activePath === '/admin/suppliers' ||
+                  activePath === '/admin/suppliers/add-edit' ||
+                  activePath === '/admin/suppliers/view'
+                }
+              />
             </Link>
-            <Link to="/admin/products" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Products" />
+            <Link to="/admin/suppliers/products" style={{ textDecoration: 'none' }}>
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Products"
+                active={
+                  activePath === '/admin/suppliers/products' ||
+                  activePath === '/admin/suppliers/add-edit-products' ||
+                  activePath === '/admin/suppliers/view-products'
+                }
+              />
             </Link>
-            <Link to="/admin/supplier-order-requests" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Supplier Order Requests" color="violet" />
+            <Link to="/admin/suppliers/order-requests" style={{ textDecoration: 'none' }}>
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Supplier Order Requests"
+                color="violet"
+                active={
+                  activePath === '/admin/suppliers/order-requests' ||
+                  activePath === '/admin/suppliers/add-order-requests' ||
+                  activePath === '/admin/suppliers/view-products' ||
+                  activePath === '/admin/suppliers/view-order-requests'
+                }
+              />
             </Link>
-            <Link to="/admin/supplier-orders" style={{ textDecoration: 'none' }}>
+            <Link to="/admin/suppliers/orders" style={{ textDecoration: 'none' }}>
               <NavLink style={{ borderRadius: 5 }} label="Supplier Orders" color="violet" />
             </Link>
-            <Link to="/admin/supplier-payments" style={{ textDecoration: 'none' }}>
+            <Link to="/admin/suppliers/payments" style={{ textDecoration: 'none' }}>
               <NavLink style={{ borderRadius: 5 }} label="Supplier Payments" color="violet" />
             </Link>
           </NavLink>

@@ -3,7 +3,7 @@ import { IconArrowLeft, IconMailForward } from '@tabler/icons-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function ViewCustomers() {
+function ViewSupplier() {
   return (
     <>
       <Grid>
@@ -14,7 +14,7 @@ function ViewCustomers() {
                 <IconArrowLeft />
               </Link>
               <Text size="md" style={{ fontWeight: 'bold' }}>
-                View Customer
+                View Supplier
               </Text>
             </div>
             <div></div>
@@ -29,7 +29,7 @@ function ViewCustomers() {
               <Text>Name</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Chathura Prasanga</Text>
+              <Text>Keshara Minerals and Chemicals</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -37,7 +37,7 @@ function ViewCustomers() {
               <Text>Email</Text>
             </Table.Td>
             <Table.Td style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Text>chathuraprasanga98@gmail.com</Text>
+              <Text>kesharamineralsandc@gmail.com</Text>
               <Link to="">
                 <ActionIcon variant="filled" aria-label="Settings">
                   <IconMailForward style={{ width: '70%', height: '70%' }} stroke={1.5} />
@@ -50,16 +50,8 @@ function ViewCustomers() {
               <Text>Phone</Text>
             </Table.Td>
             <Table.Td>
-              <Text>077 9250108</Text>
-              <Text>075 0943040</Text>
-            </Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td width={200}>
-              <Text>Hardware Name</Text>
-            </Table.Td>
-            <Table.Td>
-              <Text>N/A</Text>
+              <Text>081 5236987</Text>
+              <Text>077 7123456</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -84,10 +76,10 @@ function ViewCustomers() {
           </Table.Tr>
           <Table.Tr>
             <Table.Td width={200}>
-              <Text>Registration Type</Text>
+              <Text>Cheque Payment Destination</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Self Registration</Text>
+              <Text>Keshara Minerals and Chemicals (PVT) Ltd.</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -102,7 +94,7 @@ function ViewCustomers() {
 
         <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between' }}>
           <div></div>
-          <Link to="/admin/customers/add-edit">
+          <Link to="/admin/suppliers/add-edit">
             <Button>Edit Record</Button>
           </Link>
         </div>
@@ -113,4 +105,4 @@ function ViewCustomers() {
   );
 }
 
-export default ViewCustomers;
+export default ViewSupplier;
