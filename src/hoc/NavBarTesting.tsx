@@ -191,7 +191,17 @@ function NavBarTesting() {
               />
             </Link>
             <Link to="/admin/suppliers/orders" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Supplier Orders" color="violet" />
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Supplier Orders"
+                color="violet"
+                active={
+                  activePath === '/admin/suppliers/orders' ||
+                  activePath === '/admin/suppliers/add-orders' ||
+                  activePath === '/admin/suppliers/edit-orders' ||
+                  activePath === '/admin/suppliers/view-orders'
+                }
+              />
             </Link>
             <Link to="/admin/suppliers/payments" style={{ textDecoration: 'none' }}>
               <NavLink style={{ borderRadius: 5 }} label="Supplier Payments" color="violet" />

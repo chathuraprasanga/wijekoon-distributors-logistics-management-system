@@ -185,10 +185,10 @@ function SupplierOrderRequests() {
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Link to="/admin/Suppliers/view-order-requests" style={{ textDecoration: 'none' }}>
+              <Link to="/admin/suppliers/view-order-requests" style={{ textDecoration: 'none' }}>
                 <Menu.Item>View</Menu.Item>
               </Link>
-              <Link to="/admin/Suppliers/edit-order-requests" style={{ textDecoration: 'none' }}>
+              <Link to="/admin/suppliers/edit-order-requests" style={{ textDecoration: 'none' }}>
                 <Menu.Item>Edit</Menu.Item>
               </Link>
             </Menu.Dropdown>
@@ -256,7 +256,7 @@ function SupplierOrderRequests() {
         <Table.Td>{element.email}</Table.Td>
         <Table.Td>{element.address}</Table.Td>
         <Table.Td>
-          <Link to="/admin/Suppliers/add-order-requests">
+          <Link to="/admin/suppliers/add-order-requests">
             <Button size="xs">Select</Button>
           </Link>
         </Table.Td>
