@@ -181,11 +181,10 @@ function NavBarTesting() {
               <NavLink
                 style={{ borderRadius: 5 }}
                 label="Supplier Order Requests"
-                color="violet"
                 active={
                   activePath === '/admin/suppliers/order-requests' ||
                   activePath === '/admin/suppliers/add-order-requests' ||
-                  activePath === '/admin/suppliers/view-products' ||
+                  activePath === '/admin/suppliers/edit-order-requests' ||
                   activePath === '/admin/suppliers/view-order-requests'
                 }
               />
@@ -194,7 +193,6 @@ function NavBarTesting() {
               <NavLink
                 style={{ borderRadius: 5 }}
                 label="Supplier Orders"
-                color="violet"
                 active={
                   activePath === '/admin/suppliers/orders' ||
                   activePath === '/admin/suppliers/add-orders' ||
@@ -204,7 +202,16 @@ function NavBarTesting() {
               />
             </Link>
             <Link to="/admin/suppliers/payments" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Supplier Payments" color="violet" />
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Supplier Payments"
+                active={
+                  activePath === '/admin/suppliers/payments' ||
+                  activePath === '/admin/suppliers/add-payments' ||
+                  activePath === '/admin/suppliers/edit-payments' ||
+                  activePath === '/admin/suppliers/view-payments'
+                }
+              />
             </Link>
           </NavLink>
         </Link>
