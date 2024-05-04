@@ -33,6 +33,12 @@ import SupplierOrders from './pages/Supplier/SupplierOrders/SupplierOrders';
 import AddSupplierOrderRequests from './pages/Supplier/AddSupplierOrderRequests/AddSupplierOrderRequests';
 import EditSupplierOrderRequests from './pages/Supplier/EditSupplierOrderRequests/EditSupplierOrderRequests';
 import ViewSupplierOrderRequests from './pages/Supplier/ViewSupplierOrderRequests/ViewSupplierOrderRequests';
+import AddSupplierOrders from './pages/Supplier/AddSupplierOrders/AddSupplierOrders';
+import SupplierPayments from './pages/Supplier/SupplierPayments/SupplierPayments';
+import ViewSupplierPayments from './pages/Supplier/ViewSupplierPayments.tsx/ViewSupplierPayments';
+import Products from './pages/Supplier/Products/Products';
+import AddEditProducts from './pages/Supplier/AddEditProducts/AddEditProducts';
+import ViewProducts from './pages/Supplier/ViewProducts/ViewProducts';
 
 const router = createBrowserRouter([
   {
@@ -134,6 +140,30 @@ const router = createBrowserRouter([
       {
         path: 'suppliers/orders',
         element: <SupplierOrders />,
+      },
+      {
+        path: 'suppliers/add-orders',
+        element: <AddSupplierOrders />,
+      },
+      {
+        path: 'suppliers/payments',
+        element: <SupplierPayments />,
+      },
+      {
+        path: 'suppliers/view-payments',
+        element: <ViewSupplierPayments />,
+      },
+      {
+        path: 'suppliers/products',
+        element: <Products />,
+      },
+      {
+        path: 'suppliers/add-edit-products',
+        element: <AddEditProducts />,
+      },
+      {
+        path: 'suppliers/view-products',
+        element: <ViewProducts />,
       },
       {
         path: 'settings',
