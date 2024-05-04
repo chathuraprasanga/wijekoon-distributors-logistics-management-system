@@ -163,13 +163,15 @@ function ViewCustomerPayments() {
                 <Table.Td>25000.00</Table.Td>
               </Table.Tr>
               <Table.Tr>
-                <Table.Td colSpan={3}></Table.Td>
+                <Table.Td colSpan={3}>
+                  <Button size="xs">New Payment Details</Button>
+                </Table.Td>
                 <Table.Td>Outstanding</Table.Td>
                 <Table.Td>25000.00</Table.Td>
               </Table.Tr>
             </Table>
             <div>
-              <Button style={{ width: '15%', marginTop: 10, float: 'right' }}>New Payment</Button>
+              {/* <Button style={{ width: '15%', marginTop: 10, float: 'right' }}>Update</Button> */}
             </div>
           </Card>
         </Grid.Col>

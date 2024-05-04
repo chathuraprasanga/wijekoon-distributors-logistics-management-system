@@ -3,7 +3,7 @@ import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function AddCustomerPayments() {
+function ViewSupplierPayments() {
   return (
     <>
       <Grid>
@@ -14,7 +14,7 @@ function AddCustomerPayments() {
                 <IconArrowLeft />
               </Link>
               <Text size="md" style={{ fontWeight: 'bold' }}>
-                Make Payment
+                View Payment Details
               </Text>
             </div>
             <div></div>
@@ -171,7 +171,7 @@ function AddCustomerPayments() {
               </Table.Tr>
             </Table>
             <div>
-              {/* <Button style={{ width: '15%', marginTop: 10, float: 'right' }}>New Payment</Button> */}
+              {/* <Button style={{ width: '15%', marginTop: 10, float: 'right' }}>Update</Button> */}
             </div>
           </Card>
         </Grid.Col>
@@ -180,4 +180,4 @@ function AddCustomerPayments() {
   );
 }
 
-export default AddCustomerPayments;
+export default ViewSupplierPayments;

@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { IconArrowLeft, IconCalendar, IconTrash } from '@tabler/icons-react';
+import { IconArrowLeft, IconTrash } from '@tabler/icons-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -75,7 +75,7 @@ function AddCustomerOrders() {
           </Table.Tr>
           <Table.Tr>
             <Table.Td colSpan={4}>
-              <Button size="xs">New Payment Method</Button>
+              <Button size="xs">New Payment Detail</Button>
             </Table.Td>
             <Table.Td>
               <Text size="xs">Outstanding:</Text>
