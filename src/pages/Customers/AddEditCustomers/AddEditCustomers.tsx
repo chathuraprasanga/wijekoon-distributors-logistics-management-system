@@ -2,7 +2,6 @@ import {
   Button,
   Card,
   Grid,
-  Modal,
   Select,
   Switch,
   Table,
