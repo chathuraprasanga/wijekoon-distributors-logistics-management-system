@@ -61,6 +61,19 @@ function NavBarTesting() {
     '/admin',
   ];
 
+  const assetsActivePaths = [
+    '/admin/assets/warehouses',
+    '/admin/assets/add-edit-warehouses',
+    '/admin/assets/view-warehouses',
+    '/admin/assets/warehouses/stock-receive',
+    '/admin/assets/warehouses/stock-dispatch',
+    '/admin/assets/warehouses/add-edit-orders',
+    '/admin/vehicles',
+    '/admin/vehicles/add-edit',
+    '/admin/vehicles/view',
+    '/admin',
+  ];
+
   return (
     <>
       <div
@@ -224,12 +237,31 @@ function NavBarTesting() {
             variant="filled"
             color="violet"
             childrenOffset={28}
+            active={assetsActivePaths.includes(activePath)}
           >
-            <Link to="/admin/warehouses" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Warehouses" color="violet" />
+            <Link to="/admin/assets/warehouses" style={{ textDecoration: 'none' }}>
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Warehouses"
+                active={
+                  activePath === '/admin/assets/warehouses' ||
+                  activePath === '/admin/assets/view-warehouses' ||
+                  activePath === '/admin/assets/warehouses/stock-receive' ||
+                  activePath === '/admin/assets/warehouses/stock-dispatch' ||
+                  activePath === '/admin/assets/warehouses/add-edit-orders'
+                }
+              />
             </Link>
             <Link to="/admin/vehicles" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Vehicles" color="violet" />
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Vehicles"
+                active={
+                  activePath === '/admin/vehicles' ||
+                  activePath === '/admin/vehicles/add-edit' ||
+                  activePath === '/admin/vehicles/view'
+                }
+              />
             </Link>
           </NavLink>
         </Link>
