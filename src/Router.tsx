@@ -39,6 +39,14 @@ import ViewSupplierPayments from './pages/Supplier/ViewSupplierPayments.tsx/View
 import Products from './pages/Supplier/Products/Products';
 import AddEditProducts from './pages/Supplier/AddEditProducts/AddEditProducts';
 import ViewProducts from './pages/Supplier/ViewProducts/ViewProducts';
+import Warehouses from './pages/Assets/Warehouses';
+import ViewWarehouse from './pages/Assets/ViewWarehouse/ViewWarehouse';
+import StockReceiveWarehouse from './pages/Assets/StockReeiveWarehouse/StockReceiveWarehouse';
+import StockDispatchWarehouse from './pages/Assets/StockDispatchWarehouse/StockDispatchWarehouse';
+import AddEditWarehouseOrder from './pages/Assets/AddEditWarehouseOrder/AddEditWarehouseOrder';
+import Vehicles from './pages/Assets/Vehicles/Vehicles';
+import AddEditVehicles from './pages/Assets/AddEditVehicles/AddEditVehicles';
+import ViewVehicles from './pages/Assets/ViewVehicles/ViewVehicles';
 
 const router = createBrowserRouter([
   {
@@ -164,6 +172,38 @@ const router = createBrowserRouter([
       {
         path: 'suppliers/view-products',
         element: <ViewProducts />,
+      },
+      {
+        path: 'assets/warehouses',
+        element: <Warehouses />,
+      },
+      {
+        path: 'assets/view-warehouses',
+        element: <ViewWarehouse />,
+      },
+      {
+        path: 'assets/warehouses/stock-receive',
+        element: <StockReceiveWarehouse />,
+      },
+      {
+        path: 'assets/warehouses/stock-dispatch',
+        element: <StockDispatchWarehouse />,
+      },
+      {
+        path: 'assets/warehouses/add-edit-orders',
+        element: <AddEditWarehouseOrder />,
+      },
+      {
+        path: 'vehicles',
+        element: <Vehicles />,
+      },
+      {
+        path: 'vehicles/add-edit',
+        element: <AddEditVehicles />,
+      },
+      {
+        path: 'vehicles/view',
+        element: <ViewVehicles />,
       },
       {
         path: 'settings',
