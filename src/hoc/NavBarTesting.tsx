@@ -74,6 +74,19 @@ function NavBarTesting() {
     '/admin',
   ];
 
+  const employeesActivePaths = [
+    '/admin/employees',
+    '/admin/employees/add-edit',
+    '/admin/employees/view',
+    '/admin/jobRoles',
+    '/admin/jobRoles/add',
+    '/admin/jobRoles/view',
+    '/admin/jobRoles',
+    '/admin/jobRoles/add',
+    '/admin/jobRoles/view',
+    '/admin',
+  ];
+
   return (
     <>
       <div
@@ -274,12 +287,30 @@ function NavBarTesting() {
             variant="filled"
             color="violet"
             childrenOffset={28}
+            active={employeesActivePaths.includes(activePath)}
           >
             <Link to="/admin/employees" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Employees" color="violet" />
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Employees"
+                active={
+                  activePath === '/admin/employees' ||
+                  activePath === '/admin/employees/add-edit' ||
+                  activePath === '/admin/employees/view'
+                }
+              />
             </Link>
-            <Link to="/admin/job-roles" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Job Roles" color="violet" />
+            <Link to="/admin/jobRoles" style={{ textDecoration: 'none' }}>
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Job Roles"
+                color="violet"
+                active={
+                  activePath === '/admin/jobRoles' ||
+                  activePath === '/admin/jobRoles/add' ||
+                  activePath === '/admin/jobRoles/view'
+                }
+              />
             </Link>
           </NavLink>
         </Link>

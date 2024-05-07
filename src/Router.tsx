@@ -47,6 +47,12 @@ import AddEditWarehouseOrder from './pages/Assets/AddEditWarehouseOrder/AddEditW
 import Vehicles from './pages/Assets/Vehicles/Vehicles';
 import AddEditVehicles from './pages/Assets/AddEditVehicles/AddEditVehicles';
 import ViewVehicles from './pages/Assets/ViewVehicles/ViewVehicles';
+import Employees from './pages/Employees/Employees';
+import AddEditEmployees from './pages/Employees/AddEditEmployee/AddEditEmployees';
+import ViewEmployees from './pages/Employees/viewEmployees/ViewEmployees';
+import JobRoles from './pages/Employees/JobRoles/JobRoles';
+import AddJobRoles from './pages/Employees/AddJobRole/AddJobRoles';
+import ViewJobRoles from './pages/Employees/ViewJobRoles/ViewJobRoles';
 
 const router = createBrowserRouter([
   {
@@ -204,6 +210,30 @@ const router = createBrowserRouter([
       {
         path: 'vehicles/view',
         element: <ViewVehicles />,
+      },
+      {
+        path: 'employees',
+        element: <Employees />,
+      },
+      {
+        path: 'employees/add-edit',
+        element: <AddEditEmployees />,
+      },
+      {
+        path: 'employees/view',
+        element: <ViewEmployees />,
+      },
+      {
+        path: 'joRoles',
+        element: <JobRoles />,
+      },
+      {
+        path: 'jobRoles/view',
+        element: <AddJobRoles />,
+      },
+      {
+        path: 'jobRoles/add',
+        element: <ViewJobRoles />,
       },
       {
         path: 'settings',
