@@ -224,16 +224,16 @@ const router = createBrowserRouter([
         element: <ViewEmployees />,
       },
       {
-        path: 'joRoles',
+        path: 'jobRoles',
         element: <JobRoles />,
       },
       {
         path: 'jobRoles/view',
-        element: <AddJobRoles />,
+        element: <ViewJobRoles />,
       },
       {
-        path: 'jobRoles/add',
-        element: <ViewJobRoles />,
+        path: 'jobRoles/add-edit',
+        element: <AddJobRoles />,
       },
       {
         path: 'settings',
