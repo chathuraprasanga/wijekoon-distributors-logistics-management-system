@@ -82,7 +82,7 @@ function NavBarTesting() {
     '/admin/jobRoles/add',
     '/admin/jobRoles/view',
     '/admin/jobRoles',
-    '/admin/jobRoles/add',
+    '/admin/jobRoles/add-edit',
     '/admin/jobRoles/view',
     '/admin',
   ];
@@ -307,7 +307,7 @@ function NavBarTesting() {
                 color="violet"
                 active={
                   activePath === '/admin/jobRoles' ||
-                  activePath === '/admin/jobRoles/add' ||
+                  activePath === '/admin/jobRoles/add-edit' ||
                   activePath === '/admin/jobRoles/view'
                 }
               />
