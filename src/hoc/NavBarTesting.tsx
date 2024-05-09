@@ -87,6 +87,8 @@ function NavBarTesting() {
     '/admin',
   ];
 
+  const tripsActivePaths = ['/admin/trips', '/admin/trips/add-edit', '/admin/trips/view'];
+
   return (
     <>
       <div
@@ -304,7 +306,6 @@ function NavBarTesting() {
               <NavLink
                 style={{ borderRadius: 5 }}
                 label="Job Roles"
-                color="violet"
                 active={
                   activePath === '/admin/jobRoles' ||
                   activePath === '/admin/jobRoles/add-edit' ||
@@ -322,10 +323,19 @@ function NavBarTesting() {
             leftSection={<IconTruck size="1rem" stroke={1.5} />}
             variant="filled"
             color="violet"
+            active={tripsActivePaths.includes(activePath)}
             childrenOffset={28}
           >
             <Link to="/admin/trips" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Trips" color="violet" />
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Trips"
+                active={
+                  activePath === '/admin/trips' ||
+                  activePath === '/admin/trips/add-edit' ||
+                  activePath === '/admin/trips/view'
+                }
+              />
             </Link>
             <Link to="/admin/expenses" style={{ textDecoration: 'none' }}>
               <NavLink style={{ borderRadius: 5 }} label="Expenses" color="violet" />

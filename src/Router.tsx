@@ -53,6 +53,9 @@ import ViewEmployees from './pages/Employees/viewEmployees/ViewEmployees';
 import JobRoles from './pages/Employees/JobRoles/JobRoles';
 import AddJobRoles from './pages/Employees/AddJobRole/AddJobRoles';
 import ViewJobRoles from './pages/Employees/ViewJobRoles/ViewJobRoles';
+import Trips from './pages/Trips/Trips';
+import AddEditTrips from './pages/Trips/AddEditTrips/AddEditTrips';
+import ViewTrips from './pages/Trips/ViewTrips/ViewTrips';
 
 const router = createBrowserRouter([
   {
@@ -234,6 +237,18 @@ const router = createBrowserRouter([
       {
         path: 'jobRoles/add-edit',
         element: <AddJobRoles />,
+      },
+      {
+        path: 'trips',
+        element: <Trips />,
+      },
+      {
+        path: 'trips/add-edit',
+        element: <AddEditTrips />,
+      },
+      {
+        path: 'trips/view',
+        element: <ViewTrips />,
       },
       {
         path: 'settings',
