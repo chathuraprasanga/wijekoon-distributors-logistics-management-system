@@ -87,7 +87,16 @@ function NavBarTesting() {
     '/admin',
   ];
 
-  const tripsActivePaths = ['/admin/trips', '/admin/trips/add-edit', '/admin/trips/view'];
+  const tripsActivePaths = [
+    '/admin/trips',
+    '/admin/trips/add-edit',
+    '/admin/trips/view',
+    '/admin/expenses',
+    '/admin/expenses/add-edit',
+    '/admin/expenses/view',
+    '/admin/expenses',
+    '/admin',
+  ];
 
   return (
     <>
@@ -338,7 +347,15 @@ function NavBarTesting() {
               />
             </Link>
             <Link to="/admin/expenses" style={{ textDecoration: 'none' }}>
-              <NavLink style={{ borderRadius: 5 }} label="Expenses" color="violet" />
+              <NavLink
+                style={{ borderRadius: 5 }}
+                label="Expenses"
+                active={
+                  activePath === '/admin/expenses/add-edit' ||
+                  activePath === '/admin/expenses/view' ||
+                  activePath === '/admin/expenses'
+                }
+              />
             </Link>
           </NavLink>
         </Link>
