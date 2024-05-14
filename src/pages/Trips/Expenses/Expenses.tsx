@@ -61,7 +61,9 @@ function Expenses() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Expenses</Text>
             </div>
-            <Link to="/admin/expenses/add-edit"><Button size="sm">Add Expenses</Button></Link>
+            <Link to="/admin/expenses/add-edit">
+              <Button size="sm">Add Expenses</Button>
+            </Link>
           </div>
         </Grid.Col>
       </Grid>
@@ -78,7 +80,7 @@ function Expenses() {
               <TextInput size="xs" ml={10} rightSection={<IconSearch />} placeholder="Search" />
             </div>
             <Divider my="md" />
-            <Table>
+            <Table striped highlightOnHover>
               <Table.Tr>
                 <Table.Th>Trip ID</Table.Th>
                 <Table.Th>Date</Table.Th>

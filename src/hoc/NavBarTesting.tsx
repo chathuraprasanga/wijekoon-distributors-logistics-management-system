@@ -98,6 +98,13 @@ function NavBarTesting() {
     '/admin',
   ];
 
+  const chequesActivePaths = [
+    '/admin/cheques',
+    '/admin/cheques/add-edit',
+    '/admin/cheques/view',
+    '/admin',
+  ];
+
   return (
     <>
       <div
@@ -367,6 +374,7 @@ function NavBarTesting() {
             color="violet"
             leftSection={<IconCash size="1rem" stroke={1.5} />}
             variant="filled"
+            active={chequesActivePaths.includes(activePath)}
           />
         </Link>
         <div>
