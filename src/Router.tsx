@@ -59,6 +59,9 @@ import ViewTrips from './pages/Trips/ViewTrips/ViewTrips';
 import Expenses from './pages/Trips/Expenses/Expenses';
 import ViewExpenses from './pages/Trips/ViewExpenses/ViewExpenses';
 import AddEditExpenses from './pages/Trips/AddEditExpenses/AddEditExpenses';
+import Cheques from './pages/Cheques/Cheques';
+import ViewCheques from './pages/Cheques/ViewCheques/ViewCheques';
+import AddEditCheques from './pages/Cheques/AddEditCheques/AddEditCheques';
 
 const router = createBrowserRouter([
   {
@@ -264,6 +267,18 @@ const router = createBrowserRouter([
       {
         path: 'expenses/add-edit',
         element: <AddEditExpenses />,
+      },
+      {
+        path: 'cheques',
+        element: <Cheques />,
+      },
+      {
+        path: 'cheques/add-edit',
+        element: <AddEditCheques />,
+      },
+      {
+        path: 'cheques/view',
+        element: <ViewCheques />,
       },
       {
         path: 'settings',
