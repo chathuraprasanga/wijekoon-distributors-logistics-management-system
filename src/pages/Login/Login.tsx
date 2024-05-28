@@ -1,14 +1,51 @@
+/* eslint-disable no-console */
 import React, { useState } from 'react';
 import { Card, Center, TextInput, Text, rem, PasswordInput, Button } from '@mantine/core';
 import { IconCopyright, IconUser } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from '@mantine/form';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '@/redux/slices/authSlice';
+import { AppDispatch, RootState } from '@/redux/store';
+import { tosNotify } from '@/helpers/utils/showNotificatio';
 
 function Login() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [opened, setOpened] = useState(false);
-  const [value, setValue] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const valid = value.trim().length >= 6;
+  const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+  const { error } = useSelector((state: RootState) => state.auth);
+
+  const handleLogin = () => {
+    dispatch(login(loginForm.values))
+      .then(() => {
+        navigate('/admin/dashboard');
+      })
+      .catch((e: any) => {
+        if (e instanceof Error) {
+          tosNotify('Error', `${error}`, 'ERROR');
+        } else {
+          tosNotify('Error', `${error}`, 'ERROR');
+        }
+      });
+  };
+  const loginForm = useForm({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+
+    validate: {
+      email: (value) => {
+        if (!/^\S+@\S+$/.test(value)) {
+          return 'Email is not valid';
+        }
+        return null;
+      },
+    },
+  });
+
   const rightSection = (
     <Text component="div" c="dimmed">
       <Center>
@@ -26,7 +63,6 @@ function Login() {
         height: '100%',
       }}
     >
-      {' '}
       <img
         src="./src/assets/bg.jpg"
         alt=""
@@ -49,35 +85,44 @@ function Login() {
             <img src="./src/assets/logo1.png" alt="" style={{ width: 150 }} />
           </div>
 
-          <TextInput
-            rightSection={rightSection}
-            label="User Email"
-            placeholder="Your email"
-            withAsterisk
-            required
-          />
+          <form onSubmit={loginForm.onSubmit((values) => console.log(values))}>
+            <TextInput
+              rightSection={rightSection}
+              label="User Email"
+              placeholder="Your email"
+              withAsterisk
+              required
+              key={loginForm.key('email')}
+              {...loginForm.getInputProps('email')}
+            />
 
-          <PasswordInput
-            label="Password"
-            required
-            placeholder="Your password"
-            onFocus={() => setOpened(true)}
-            onBlur={() => setOpened(false)}
-            mt="md"
-            value={value}
-            onChange={(event) => setValue(event.currentTarget.value)}
-          />
+            <PasswordInput
+              label="Password"
+              required
+              placeholder="Your password"
+              onFocus={() => setOpened(true)}
+              onBlur={() => setOpened(false)}
+              mt="md"
+              key={loginForm.key('password')}
+              {...loginForm.getInputProps('password')}
+            />
 
-          <Link to="/admin/dashboard">
-            <Button variant="filled" color="violet" style={{ marginTop: 20, width: '100%' }}>
+            <Button
+              type="submit"
+              variant="filled"
+              color="violet"
+              style={{ marginTop: 20, width: '100%' }}
+              onClick={handleLogin}
+            >
               Login
             </Button>
-          </Link>
 
-          <p style={{ fontSize: 12 }}>
-            Forgot Password? <Link to="/forgot-password">Click Here</Link>
-          </p>
+            <p style={{ fontSize: 12 }}>
+              Forgot Password? <Link to="/forgot-password">Click Here</Link>
+            </p>
+          </form>
         </Card>
+
         <p
           style={{
             justifyContent: 'center',

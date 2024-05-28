@@ -2,9 +2,12 @@ import { Button, Card, Grid, Select, Switch, Table, Text, TextInput } from '@man
 import { DatePickerInput } from '@mantine/dates';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function AddEditEmployees() {
+  const location = useLocation();
+  const { employee } = location.state || {};
+
   const [value, setValue] = useState<Date | null>(null);
   return (
     <>
@@ -16,7 +19,7 @@ function AddEditEmployees() {
                 <IconArrowLeft />
               </Link>
               <Text size="md" style={{ fontWeight: 'bold' }}>
-                Add Employees
+                {employee ? 'Edit Employee' : 'Add Employee'}
               </Text>
             </div>
             <div></div>

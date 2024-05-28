@@ -1,6 +1,7 @@
 import { Card, Grid, Select, Text, Divider } from '@mantine/core';
+import { useSelector } from 'react-redux';
 import { BarChart } from '@mantine/charts';
-import React, { useState } from 'react';
+import React from 'react';
 import { MonthPickerInput } from '@mantine/dates';
 import {
   IconBuildingBank,
@@ -8,8 +9,11 @@ import {
   IconCreditCard,
   IconWallet,
 } from '@tabler/icons-react';
+import { RootState } from '@/redux/store';
 
 function Dashboard() {
+  const userDetails = useSelector((state: RootState) => state.auth.user);
+
   const data = [
     { month: 'January', DirectSales: 1200, WarehoseSales: 900 },
     { month: 'February', DirectSales: 1900, WarehoseSales: 1200 },
@@ -26,9 +30,10 @@ function Dashboard() {
             fontSize: 20,
             display: 'flex',
             flexDirection: 'column',
+            textTransform: 'capitalize',
           }}
         >
-          Hello Chathura
+          Hello {userDetails?.name}
         </Text>
 
         <div>
