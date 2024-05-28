@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { AppShell, Burger, Group, ScrollArea, ScrollAreaAutosize } from '@mantine/core';
+import { AppShell, Burger, Group, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { UserButton } from './UserButton';
 import NavBarTesting from './NavBarTesting';

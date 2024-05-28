@@ -12,101 +12,62 @@ import {
   Text,
 } from '@mantine/core';
 import { IconDots, IconSearch } from '@tabler/icons-react';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { fetchEmployees } from '@/redux/slices/employeeSlice';
+import { AppDispatch, RootState } from '@/redux/store';
 
 function Employees() {
   const [activePage, setPage] = useState(1);
-  const elements = [
-    {
-      id: 'WDE-001',
-      name: 'Chathura Prasanga',
-      phone: '077 9250108',
-      email: 'chathuraprasanga98@gmail.com',
-      address: 'godawele watta, kotikapola, mawathagama',
-      jobRole: 'Super Admin',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'WDE-002',
-      name: 'Priayngana Wijekoon',
-      phone: '077 4139758',
-      email: 'priyanganawijekoon66@gmail.com',
-      address: 'godawele watta, kotikapola, mawathagama',
-      jobRole: 'Super Admin',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'WDE-003',
-      name: 'Umega Bentharamudali',
-      phone: '077 3023238',
-      email: 'umega03@gmail.com',
-      address: 'kongoda, barandana',
-      jobRole: 'Sales Rep',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'WDE-004',
-      name: 'indika Kumara',
-      phone: '077 1345789',
-      email: 'indika09@gmail.com',
-      address: 'Kotikapola, Mawathagama',
-      jobRole: 'Driver',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'WDE-005',
-      name: 'indika Kumara',
-      phone: '077 1345789',
-      email: 'indika09@gmail.com',
-      address: 'Kotikapola, Mawathagama',
-      jobRole: 'Driver',
-      status: 'ACTIVE',
-    },
-    {
-      id: 'WDE-006',
-      name: 'Chaminda Kumara',
-      phone: '077 3456789',
-      email: 'chamindakumara@gmail.com',
-      address: 'Kotikapola, Mawathagama',
-      jobRole: 'Sales Rep',
-      status: 'DEACTIVE',
-    },
-  ];
 
-  const rows = elements.slice(0, 10).map((element) => (
-    <>
-      <Table.Tr key={element.id}>
-        <Table.Td>{element.id}</Table.Td>
-        <Table.Td>{element.name}</Table.Td>
-        <Table.Td>{element.phone}</Table.Td>
-        <Table.Td>{element.email}</Table.Td>
-        <Table.Td>{element.address}</Table.Td>
-        <Table.Td>{element.jobRole}</Table.Td>
-        <Table.Td>
-          <Badge color={element.status === 'ACTIVE' ? 'green' : 'red'} radius="xs" size="xs">
-            {element.status}
-          </Badge>
-        </Table.Td>
-        <Table.Td>
-          <Menu shadow="md" width={100}>
-            <Menu.Target>
-              <IconDots style={{ cursor: 'pointer' }} />
-            </Menu.Target>
+  const dispatch: AppDispatch = useDispatch(); // Type the dispatch correctly
+  const employees = useSelector((state: RootState) => state.employees.employees);
+  const status = useSelector((state: RootState) => state.employees.status);
+  // const error = useSelector((state: RootState) => state.employees.error);
 
-            <Menu.Dropdown>
-              <Link to="/admin/employees/view" style={{ textDecoration: 'none' }}>
-                <Menu.Item>View</Menu.Item>
-              </Link>
-              <Link to="/admin/employees/add-edit" style={{ textDecoration: 'none' }}>
-                <Menu.Item>Edit</Menu.Item>
-              </Link>
-              <Menu.Item color="red">Delete</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Table.Td>
-      </Table.Tr>
-    </>
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchEmployees());
+    }
+  }, [status, dispatch]);
+
+  const rows = employees.slice(0, 10).map((element) => (
+    <Table.Tr key={element.id}>
+      <Table.Td>{element._id}</Table.Td>
+      <Table.Td>{element.firstName} {element.lastName}</Table.Td>
+      <Table.Td>{element.phone}</Table.Td>
+      <Table.Td>{element.email}</Table.Td>
+      <Table.Td>{element.address}</Table.Td>
+      <Table.Td>{element.jobRole}</Table.Td>
+      <Table.Td>
+        <Badge color={element.status === 'ACTIVE' ? 'green' : 'red'} radius="xs" size="xs">
+          {element.status}
+        </Badge>
+      </Table.Td>
+      <Table.Td>
+        <Menu shadow="md" width={100}>
+          <Menu.Target>
+            <IconDots style={{ cursor: 'pointer' }} />
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Link to="/admin/employees/view" style={{ textDecoration: 'none' }}>
+              <Menu.Item>View</Menu.Item>
+            </Link>
+            <Link
+              to={{
+                pathname: '/admin/employees/add-edit',
+              }}
+              style={{ textDecoration: 'none' }}
+            >
+              <Menu.Item>Edit</Menu.Item>
+            </Link>
+            <Menu.Item color="red">Delete</Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Table.Td>
+    </Table.Tr>
   ));
 
   const ths = (
@@ -121,6 +82,7 @@ function Employees() {
       <Table.Th>Action</Table.Th>
     </Table.Tr>
   );
+
   return (
     <>
       <Grid>
@@ -151,7 +113,7 @@ function Employees() {
               <Table.Tbody>{rows}</Table.Tbody>
             </Table>
             <Pagination
-              total={elements.length / 10}
+              total={Math.ceil(employees.length / 10)}
               value={activePage}
               onChange={setPage}
               mt={10}

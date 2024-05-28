@@ -168,7 +168,9 @@ function Trips() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Trips</Text>
             </div>
-            <Button size="sm" onClick={open}>Create Trip</Button>
+            <Button size="sm" onClick={open}>
+              Create Trip
+            </Button>
           </div>
         </Grid.Col>
 
