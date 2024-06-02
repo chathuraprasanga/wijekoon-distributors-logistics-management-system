@@ -168,7 +168,6 @@ function AddEditCustomerOrderRequests() {
       });
       customerOrderRequestAddEditForm.reset();
       dispatch(setCustomer(null));
-      dispatch(fetchCustomerOrderRequests());
       navigate('/admin/customers/order-requests');
     } catch (error) {
       Notifications.show({

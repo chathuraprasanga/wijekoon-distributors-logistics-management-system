@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 import React, { useState } from 'react';
+import { Notifications } from '@mantine/notifications';
 import { Card, Center, TextInput, Text, rem, PasswordInput, Button } from '@mantine/core';
-import { IconCopyright, IconUser } from '@tabler/icons-react';
+import { IconCheck, IconCopyright, IconUser } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,26 +11,13 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { tosNotify } from '@/helpers/utils/showNotificatio';
 
 function Login() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [opened, setOpened] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const { error } = useSelector((state: RootState) => state.auth);
+  const status = useSelector((state: RootState) => state.auth.status);
+  console.log(error);
 
-  const handleLogin = () => {
-    dispatch(login(loginForm.values))
-      .then(() => {
-        navigate('/admin/dashboard');
-      })
-      .catch((e: any) => {
-        if (e instanceof Error) {
-          tosNotify('Error', `${error}`, 'ERROR');
-        } else {
-          tosNotify('Error', `${error}`, 'ERROR');
-        }
-      });
-  };
   const loginForm = useForm({
     initialValues: {
       email: '',
@@ -45,6 +33,17 @@ function Login() {
       },
     },
   });
+
+  const handleLogin = async (values: typeof loginForm.values) => {
+    try {
+      await dispatch(login(values)).unwrap();
+      if (error === null) {
+        navigate('/admin/dashboard');
+      }
+    } catch (e: any) {
+      tosNotify('Error', `${e.message || 'An error occurred'}`, 'ERROR');
+    }
+  };
 
   const rightSection = (
     <Text component="div" c="dimmed">
@@ -85,7 +84,7 @@ function Login() {
             <img src="./src/assets/logo1.png" alt="" style={{ width: 150 }} />
           </div>
 
-          <form onSubmit={loginForm.onSubmit((values) => console.log(values))}>
+          <form onSubmit={loginForm.onSubmit(handleLogin)}>
             <TextInput
               rightSection={rightSection}
               label="User Email"
@@ -112,7 +111,6 @@ function Login() {
               variant="filled"
               color="violet"
               style={{ marginTop: 20, width: '100%' }}
-              onClick={handleLogin}
             >
               Login
             </Button>
