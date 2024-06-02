@@ -10,72 +10,140 @@ import {
   Divider,
   Pagination,
   Text,
+  rem,
+  Group,
+  Modal,
 } from '@mantine/core';
-import { IconDots, IconSearch } from '@tabler/icons-react';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { IconCheck, IconDots, IconSearch, IconX } from '@tabler/icons-react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { Notifications } from '@mantine/notifications';
+import {
+  deleteSupplier,
+  fetchProducts,
+  fetchSupplierOrderRequests,
+  fetchSupplierOrders,
+  fetchSupplierPayments,
+  fetchSuppliers,
+  setSupplier,
+} from '@/redux/slices/supplierSlice';
+import { RootState } from '@/redux/store';
 
 function Suppliers() {
+  const [opened, setOpened] = useState(false);
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const suppliers = useSelector((state: RootState) => state.suppliers.suppliers);
+  const status = useSelector((state: RootState) => state.suppliers.status);
+
+  // for pagination
   const [activePage, setPage] = useState(1);
-  const elements = [
-    {
-      id: 1,
-      name: 'Keshara Minerals & Chemicals ',
-      phone: '+1 1234567890',
-      email: 'kesharaminerals@gmail.com',
-      address: 'Pallekale, Digana, Kandy',
-      status: 'ACTIVE',
-    },
-    {
-      id: 2,
-      name: 'Tokyo Cement',
-      phone: '+1 2345678901',
-      email: 'tokyoc@gmail.com',
-      address: '4-B, Puttalama',
-      status: 'DEACTIVE',
-    },
-    {
-      id: 3,
-      name: 'Swisstex PVT LTD',
-      phone: '+1 3456789012',
-      email: 'swisstex@sw.io',
-      address: '3-B, Colombo',
-      status: 'ACTIVE',
-    },
-  ];
+  const suppliersPerPage = 10;
 
-  const rows = elements.slice(0, 10).map((element) => (
-    <>
-      <Table.Tr key={element.id}>
-        <Table.Td width="5%">{element.id}</Table.Td>
-        <Table.Td width="25%">{element.name}</Table.Td>
-        <Table.Td width="15%">{element.phone}</Table.Td>
-        <Table.Td width="20%">{element.email}</Table.Td>
-        <Table.Td width="20%">{element.address}</Table.Td>
-        <Table.Td width="10%">
-          <Badge color={(element.status === 'ACTIVE' ? 'green' : 'red')} radius="xs" size="xs">
-            {element.status}
-          </Badge>
-        </Table.Td>
-        <Table.Td width="5%">
-          <Menu shadow="md" width={100}>
-            <Menu.Target>
-              <IconDots style={{ cursor: 'pointer' }} />
-            </Menu.Target>
+  // for search
+  const [searchSegment, setSearchSegment] = useState('Email');
+  const [searchTerm, setSearchTerm] = useState('');
 
-            <Menu.Dropdown>
-              <Link to="/admin/suppliers/view" style={{ textDecoration: 'none' }}>
-                <Menu.Item>View</Menu.Item>
-              </Link>
-              <Link to="/admin/suppliers/add-edit" style={{ textDecoration: 'none' }}>
-                <Menu.Item>Edit</Menu.Item>
-              </Link>
-              <Menu.Item color="red">Delete</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Table.Td>
-      </Table.Tr>
-    </>
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchSuppliers());
+      dispatch(fetchSupplierOrderRequests());
+      dispatch(fetchSupplierOrders());
+      dispatch(fetchSupplierPayments());
+      dispatch(fetchProducts());
+    }
+  }, [status, dispatch]);
+
+  // pagination
+  const handlePageChange = (newPage: any) => {
+    setPage(newPage);
+  };
+
+  const start = (activePage - 1) * suppliersPerPage;
+  const end = start + suppliersPerPage;
+
+  // filtering Suppliers based on search
+  const filteredSupplier = suppliers.filter((supplier: any) => {
+    const value =
+      searchSegment === 'Name'
+        ? supplier.name
+        : searchSegment === 'Phone'
+          ? supplier.phone
+          : supplier.email;
+    return value.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  const handleViewEdit = (supplier: any, action: any) => {
+    if (action === 'delete') {
+      setSupplierToDelete(supplier);
+      setOpened(true);
+    } else {
+      dispatch(setSupplier(supplier));
+      if (action === 'view') {
+        navigate('/admin/suppliers/view');
+      } else if (action === 'edit') {
+        navigate('/admin/suppliers/add-edit');
+      }
+    }
+  };
+
+  const handleAddSupplierBtn = () => {
+    dispatch(setSupplier(null));
+    navigate('/admin/suppliers/add-edit');
+  };
+
+  const handleDeleteSupplier = async (SupplierId: string) => {
+    try {
+      await dispatch(deleteSupplier(SupplierId)).unwrap();
+      Notifications.show({
+        title: 'Successful',
+        message: 'Supplier Deleted Successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      setOpened(false);
+      dispatch(fetchSuppliers());
+    } catch (e: any) {
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error deleting the Supplier',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
+  };
+
+  const displayedSuppliers = filteredSupplier.slice(start, end);
+
+  const rows = displayedSuppliers.map((supplier: any, index: any) => (
+    <Table.Tr key={supplier._id}>
+      <Table.Td>{start + index + 1}</Table.Td>
+      <Table.Td>{supplier.name}</Table.Td>
+      <Table.Td>{supplier.phone}</Table.Td>
+      <Table.Td>{supplier.email}</Table.Td>
+      <Table.Td>{supplier.address}</Table.Td>
+      <Table.Td>
+        <Badge color={supplier.status === 'ACTIVE' ? 'green' : 'red'} radius="xs" size="xs">
+          {supplier.status}
+        </Badge>
+      </Table.Td>
+      <Table.Td>
+        <Menu shadow="md" width={100}>
+          <Menu.Target>
+            <IconDots style={{ cursor: 'pointer' }} />
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item onClick={() => handleViewEdit(supplier, 'view')}>View</Menu.Item>
+            <Menu.Item onClick={() => handleViewEdit(supplier, 'edit')}>Edit</Menu.Item>
+            <Menu.Item onClick={() => handleViewEdit(supplier, 'delete')} color="red">
+              Delete
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Table.Td>
+    </Table.Tr>
   ));
 
   const ths = (
@@ -89,6 +157,7 @@ function Suppliers() {
       <Table.Th>Action</Table.Th>
     </Table.Tr>
   );
+
   return (
     <>
       <Grid>
@@ -97,9 +166,9 @@ function Suppliers() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Suppliers</Text>
             </div>
-            <Link to="/admin/suppliers/add-edit">
-              <Button size="sm">Create Supplier</Button>
-            </Link>
+            <Button size="sm" onClick={handleAddSupplierBtn}>
+              Create Supplier
+            </Button>
           </div>
         </Grid.Col>
         <Grid.Col span={12}>
@@ -110,8 +179,16 @@ function Suppliers() {
                 color="violet"
                 data={['Name', 'Phone', 'Email']}
                 defaultValue="Email"
+                onChange={setSearchSegment}
               />
-              <TextInput size="xs" ml={10} rightSection={<IconSearch />} placeholder="Search" />
+              <TextInput
+                size="xs"
+                ml={10}
+                rightSection={<IconSearch />}
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.currentTarget.value)}
+              />
             </div>
             <Divider my="md" />
             <Table striped highlightOnHover>
@@ -119,7 +196,7 @@ function Suppliers() {
               <Table.Tbody>{rows}</Table.Tbody>
             </Table>
             <Pagination
-              total={elements.length / 10}
+              total={Math.ceil(suppliers.length / suppliersPerPage)}
               value={activePage}
               onChange={setPage}
               mt={10}
@@ -129,6 +206,18 @@ function Suppliers() {
           </Card>
         </Grid.Col>
       </Grid>
+
+      <Modal opened={opened} onClose={() => setOpened(false)} title="Confirm Deletion">
+        <Text>Are you sure you want to delete the supplier {supplierToDelete?.name}?</Text>
+        <Group position="right" mt="md">
+          <Button variant="outline" onClick={() => setOpened(false)}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={() => handleDeleteSupplier(supplierToDelete._id)}>
+            Confirm
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 }

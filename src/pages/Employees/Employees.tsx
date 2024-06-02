@@ -11,18 +11,20 @@ import {
   Pagination,
   Text,
 } from '@mantine/core';
+import { isNotEmpty, useForm } from '@mantine/form';
 import { IconDots, IconSearch } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { fetchEmployees } from '@/redux/slices/employeeSlice';
+import { Link, useNavigate } from 'react-router-dom';
+import { fetchEmployees, setEmployee } from '@/redux/slices/employeeSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 
 function Employees() {
   const [activePage, setPage] = useState(1);
-
+  const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch(); // Type the dispatch correctly
   const employees = useSelector((state: RootState) => state.employees.employees);
+  const selectedEmployee = useSelector((state: RootState) => state.employees.employee);
   const status = useSelector((state: RootState) => state.employees.status);
   // const error = useSelector((state: RootState) => state.employees.error);
 
@@ -35,7 +37,9 @@ function Employees() {
   const rows = employees.slice(0, 10).map((element) => (
     <Table.Tr key={element.id}>
       <Table.Td>{element._id}</Table.Td>
-      <Table.Td>{element.firstName} {element.lastName}</Table.Td>
+      <Table.Td>
+        {element.firstName} {element.lastName}
+      </Table.Td>
       <Table.Td>{element.phone}</Table.Td>
       <Table.Td>{element.email}</Table.Td>
       <Table.Td>{element.address}</Table.Td>
@@ -83,6 +87,11 @@ function Employees() {
     </Table.Tr>
   );
 
+  const handleCreateBtn = () => {
+    dispatch(setEmployee(null));
+    navigate('/admin/employees/add-edit');
+  };
+
   return (
     <>
       <Grid>
@@ -91,9 +100,11 @@ function Employees() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Employees</Text>
             </div>
-            <Link to="/admin/employees/add-edit">
-              <Button size="sm">Create Employees</Button>
-            </Link>
+            {/* <Link to="/admin/employees/add-edit"> */}
+            <Button size="sm" onClick={handleCreateBtn}>
+              Create Employees
+            </Button>
+            {/* </Link> */}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

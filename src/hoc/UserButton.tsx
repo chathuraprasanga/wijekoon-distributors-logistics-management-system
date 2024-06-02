@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { UnstyledButton, Group, Avatar, Text, rem, Menu } from '@mantine/core';
@@ -8,7 +7,7 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { logout } from '@/redux/slices/authSlice';
 
 export function UserButton() {
-  const dispatch: AppDispatch = useDispatch(); // Type the dispatch correctly
+  const dispatch: AppDispatch = useDispatch();
   const userDetails = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
 
@@ -21,22 +20,24 @@ export function UserButton() {
     <UnstyledButton className={classes.user} style={{ cursor: 'default' }}>
       <Group>
         <Menu>
-          <Avatar
-            style={{ cursor: 'default' }}
-            src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png"
-            radius="xl"
-          />
           <Menu.Target>
-            <div style={{ flex: 1, color: 'white', cursor: 'pointer' }}>
-              <Text size="sm" fw={500} style={{ textTransform: 'capitalize' }}>
-                {userDetails?.name}
-              </Text>
-            </div>
+            <Group>
+              <Avatar
+                style={{ cursor: 'default' }}
+                src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png"
+                radius="xl"
+              />
+              <div style={{ flex: 1, color: 'white', cursor: 'pointer' }}>
+                <Text size="sm" fw={500} style={{ textTransform: 'capitalize' }}>
+                  {userDetails?.name}
+                </Text>
+              </div>
+              <IconChevronRight
+                style={{ width: rem(14), height: rem(14), color: 'white' }}
+                stroke={1.5}
+              />
+            </Group>
           </Menu.Target>
-          <IconChevronRight
-            style={{ width: rem(14), height: rem(14), color: 'white' }}
-            stroke={1.5}
-          />
 
           <Menu.Dropdown>
             <Link to="/admin/settings" style={{ textDecoration: 'none' }}>
@@ -47,12 +48,8 @@ export function UserButton() {
 
             <Menu.Item
               color="red"
-              leftSection={
-                <IconLogout2
-                  style={{ width: rem(14), height: rem(14) }}
-                  onClick={handleLogout}
-                />
-              }
+              leftSection={<IconLogout2 style={{ width: rem(14), height: rem(14) }} />}
+              onClick={handleLogout}
             >
               Logout
             </Menu.Item>

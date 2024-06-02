@@ -1,9 +1,14 @@
 import { ActionIcon, Badge, Button, Card, Divider, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft, IconMailForward } from '@tabler/icons-react';
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { RootState } from '@/redux/store';
 
 function ViewCustomers() {
+  const dispatch = useDispatch();
+  const customer = useSelector((state: RootState) => state.customers.customer);
+
   return (
     <>
       <Grid>
@@ -29,7 +34,7 @@ function ViewCustomers() {
               <Text>Name</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Chathura Prasanga</Text>
+              <Text>{customer.fullName}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -37,7 +42,7 @@ function ViewCustomers() {
               <Text>Email</Text>
             </Table.Td>
             <Table.Td style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Text>chathuraprasanga98@gmail.com</Text>
+              <Text>{customer.email}</Text>
               <Link to="">
                 <ActionIcon variant="filled" aria-label="Settings">
                   <IconMailForward style={{ width: '70%', height: '70%' }} stroke={1.5} />
@@ -50,8 +55,8 @@ function ViewCustomers() {
               <Text>Phone</Text>
             </Table.Td>
             <Table.Td>
-              <Text>077 9250108</Text>
-              <Text>075 0943040</Text>
+              <Text>{customer.phone}</Text>
+              <Text>{customer?.phoneSecondary || '-'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -59,7 +64,7 @@ function ViewCustomers() {
               <Text>Hardware Name</Text>
             </Table.Td>
             <Table.Td>
-              <Text>N/A</Text>
+              <Text>{customer?.hardwareName || 'N/A'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -67,7 +72,7 @@ function ViewCustomers() {
               <Text>Address</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Godawele Watta, Kotikapola, Mawathagama, Kurunegala</Text>
+              <Text>{customer?.address}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -76,26 +81,27 @@ function ViewCustomers() {
             </Table.Td>
             <Table.Td>
               <Text>
-                <Badge color="green" radius="sm">
-                  ACTIVE
+                <Badge color={customer?.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                  {customer?.status}
                 </Badge>
               </Text>
             </Table.Td>
           </Table.Tr>
-          <Table.Tr>
+          {/* improvements */}
+          {/* <Table.Tr>
             <Table.Td width={200}>
               <Text>Registration Type</Text>
             </Table.Td>
             <Table.Td>
               <Text>Self Registration</Text>
             </Table.Td>
-          </Table.Tr>
+          </Table.Tr> */}
           <Table.Tr>
             <Table.Td width={200}>
               <Text>Notes</Text>
             </Table.Td>
             <Table.Td rowSpan={2}>
-              <Text>-</Text>
+              <Text>{customer?.notes}</Text>
             </Table.Td>
           </Table.Tr>
         </Table>

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 interface User {
@@ -6,7 +6,7 @@ interface User {
   email: string;
   role: {
     name: string;
-    permissions: string[]; // Assuming permissions is an array of strings
+    permissions: string[];
   };
 }
 
@@ -21,24 +21,51 @@ interface AuthState {
 const initialState: AuthState = {
   accessToken: localStorage.getItem('accessToken'),
   refreshToken: localStorage.getItem('refreshToken'),
-  user: localStorage.getItem('user')
-    ? JSON.parse(localStorage.getItem('user')!)
-    : null,
+  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
   status: 'idle',
   error: null,
 };
+
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    fullName: string;
+    email: string;
+    role: {
+      name: string;
+      permissions: string[];
+    };
+  };
+}
 
 export const login = createAsyncThunk(
   'auth/login',
   async ({ email, password }: { email: string; password: string }, thunkAPI) => {
     try {
-      const response = await axios.post('http://localhost:3000/login', { email, password });
+      const response = await axios.post<LoginResponse>('http://localhost:3000/login', {
+        email,
+        password,
+      });
       return response.data;
-    } catch (error:any) {
-      return thunkAPI.rejectWithValue(error.response.data);
+    } catch (error: any) {
+      if (error.response) {
+        return thunkAPI.rejectWithValue(error.response.data.message || 'Something went wrong');
+      } else if (error.request) {
+        return thunkAPI.rejectWithValue('No response from server');
+      } else {
+        return thunkAPI.rejectWithValue(error.message);
+      }
     }
   }
 );
+
+const storeTokens = (state: AuthState, payload: { accessToken: string; refreshToken: string }) => {
+  state.accessToken = payload.accessToken;
+  state.refreshToken = payload.refreshToken;
+  localStorage.setItem('accessToken', payload.accessToken);
+  localStorage.setItem('refreshToken', payload.refreshToken);
+};
 
 const authSlice = createSlice({
   name: 'auth',
@@ -52,6 +79,15 @@ const authSlice = createSlice({
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
     },
+    setTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
+      storeTokens(state, action.payload);
+    },
+    clearTokens: (state) => {
+      state.accessToken = null;
+      state.refreshToken = null;
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -59,10 +95,12 @@ const authSlice = createSlice({
         state.status = 'loading';
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(login.fulfilled, (state, action: PayloadAction<LoginResponse>) => {
         state.status = 'succeeded';
-        state.accessToken = action.payload.accessToken;
-        state.refreshToken = action.payload.refreshToken;
+        storeTokens(state, {
+          accessToken: action.payload.accessToken,
+          refreshToken: action.payload.refreshToken,
+        });
         state.user = {
           name: action.payload.user.fullName,
           email: action.payload.user.email,
@@ -72,24 +110,42 @@ const authSlice = createSlice({
           },
         };
 
-        localStorage.setItem('accessToken', action.payload.accessToken);
-        localStorage.setItem('refreshToken', action.payload.refreshToken);
-        localStorage.setItem('user', JSON.stringify({
-          name: action.payload.user.fullName,
-          email: action.payload.user.email,
-          role: {
-            name: action.payload.user.role.name,
-            permissions: action.payload.user.role.permissions,
-          },
-        }));
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            name: action.payload.user.fullName,
+            email: action.payload.user.email,
+            role: {
+              name: action.payload.user.role.name,
+              permissions: action.payload.user.role.permissions,
+            },
+          })
+        );
       })
-      .addCase(login.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || 'Login failed';
-      });
+      .addCase(
+        login.rejected,
+        (
+          state,
+          action: PayloadAction<
+            unknown,
+            string,
+            {
+              arg: { email: string; password: string };
+              requestId: string;
+              requestStatus: 'rejected';
+              aborted: boolean;
+              condition: boolean;
+            } & ({ rejectedWithValue: true } | ({ rejectedWithValue: false } & {})),
+            SerializedError
+          >
+        ) => {
+          state.status = 'failed';
+          state.error = action.error.message || 'Login failed';
+        }
+      );
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setTokens, clearTokens } = authSlice.actions;
 
 export default authSlice.reducer;

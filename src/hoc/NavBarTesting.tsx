@@ -10,15 +10,18 @@ import {
   IconUserScan,
 } from '@tabler/icons-react';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 
 function NavBarTesting() {
+  const dispatch = useDispatch();
   const [activePath, setActivePath] = useState(window.location.pathname);
   const location = useLocation();
+  const userDetails = localStorage.getItem('permissions');
 
   useEffect(() => {
     setActivePath(location.pathname);
-  }, [location.pathname]);
+  }, [location.pathname, dispatch]);
 
   const customerActivePaths = [
     '/admin/customers',
@@ -128,267 +131,281 @@ function NavBarTesting() {
           />
         </Link>
 
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <NavLink
-            style={{ borderRadius: 5 }}
-            label="Customers"
-            leftSection={<IconUser size="1rem" stroke={1.5} />}
-            variant="filled"
-            color="violet"
-            childrenOffset={28}
-            active={customerActivePaths.includes(activePath)}
-          >
-            <Link to="/admin/customers" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Customers"
-                variant="light"
-                active={
-                  activePath === '/admin/customers' ||
-                  activePath === '/admin/customers/add-edit' ||
-                  activePath === '/admin/customers/view'
-                }
-              />
-            </Link>
-            <Link to="/admin/customers/order-requests" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Customer Order Requests"
-                active={
-                  activePath === '/admin/customers/order-requests' ||
-                  activePath === '/admin/customers/add-order-requests' ||
-                  activePath === '/admin/customers/edit-order-requests' ||
-                  activePath === '/admin/customers/view-order-requests'
-                }
-              />
-            </Link>
-            <Link to="/admin/customers/orders" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Customer Orders"
-                active={
-                  activePath === '/admin/customers/orders' ||
-                  activePath === '/admin/customers/add-orders' ||
-                  activePath === '/admin/customers/edit-orders' ||
-                  activePath === '/admin/customers/view-orders'
-                }
-              />
-            </Link>
-            <Link to="/admin/customers/payments" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Customer Payments"
-                active={
-                  activePath === '/admin/customers/payments' ||
-                  activePath === '/admin/customers/add-payments' ||
-                  activePath === '/admin/customers/edit-payments' ||
-                  activePath === '/admin/customers/view-payments'
-                }
-              />
-            </Link>
-          </NavLink>
-        </Link>
+        {userDetails?.includes('customers') && (
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <NavLink
+              style={{ borderRadius: 5 }}
+              label="Customers"
+              leftSection={<IconUser size="1rem" stroke={1.5} />}
+              variant="filled"
+              color="violet"
+              childrenOffset={28}
+              active={customerActivePaths.includes(activePath)}
+            >
+              <Link to="/admin/customers" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Customers"
+                  variant="light"
+                  active={
+                    activePath === '/admin/customers' ||
+                    activePath === '/admin/customers/add-edit' ||
+                    activePath === '/admin/customers/view'
+                  }
+                />
+              </Link>
+              <Link to="/admin/customers/order-requests" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Customer Order Requests"
+                  active={
+                    activePath === '/admin/customers/order-requests' ||
+                    activePath === '/admin/customers/add-order-requests' ||
+                    activePath === '/admin/customers/edit-order-requests' ||
+                    activePath === '/admin/customers/view-order-requests'
+                  }
+                />
+              </Link>
+              <Link to="/admin/customers/orders" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Customer Orders"
+                  active={
+                    activePath === '/admin/customers/orders' ||
+                    activePath === '/admin/customers/add-orders' ||
+                    activePath === '/admin/customers/edit-orders' ||
+                    activePath === '/admin/customers/view-orders'
+                  }
+                />
+              </Link>
+              <Link to="/admin/customers/payments" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Customer Payments"
+                  active={
+                    activePath === '/admin/customers/payments' ||
+                    activePath === '/admin/customers/add-payments' ||
+                    activePath === '/admin/customers/edit-payments' ||
+                    activePath === '/admin/customers/view-payments'
+                  }
+                />
+              </Link>
+            </NavLink>
+          </Link>
+        )}
 
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <NavLink
-            style={{ borderRadius: 5 }}
-            label="Suppliers"
-            leftSection={<IconShoppingCart size="1rem" stroke={1.5} />}
-            variant="filled"
-            color="violet"
-            childrenOffset={28}
-            active={suppleirActivePaths.includes(activePath)}
-          >
-            <Link to="/admin/suppliers" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Suppliers"
-                active={
-                  activePath === '/admin/suppliers' ||
-                  activePath === '/admin/suppliers/add-edit' ||
-                  activePath === '/admin/suppliers/view'
-                }
-              />
-            </Link>
-            <Link to="/admin/suppliers/products" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Products"
-                active={
-                  activePath === '/admin/suppliers/products' ||
-                  activePath === '/admin/suppliers/add-edit-products' ||
-                  activePath === '/admin/suppliers/view-products'
-                }
-              />
-            </Link>
-            <Link to="/admin/suppliers/order-requests" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Supplier Order Requests"
-                active={
-                  activePath === '/admin/suppliers/order-requests' ||
-                  activePath === '/admin/suppliers/add-order-requests' ||
-                  activePath === '/admin/suppliers/edit-order-requests' ||
-                  activePath === '/admin/suppliers/view-order-requests'
-                }
-              />
-            </Link>
-            <Link to="/admin/suppliers/orders" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Supplier Orders"
-                active={
-                  activePath === '/admin/suppliers/orders' ||
-                  activePath === '/admin/suppliers/add-orders' ||
-                  activePath === '/admin/suppliers/edit-orders' ||
-                  activePath === '/admin/suppliers/view-orders'
-                }
-              />
-            </Link>
-            <Link to="/admin/suppliers/payments" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Supplier Payments"
-                active={
-                  activePath === '/admin/suppliers/payments' ||
-                  activePath === '/admin/suppliers/add-payments' ||
-                  activePath === '/admin/suppliers/edit-payments' ||
-                  activePath === '/admin/suppliers/view-payments'
-                }
-              />
-            </Link>
-          </NavLink>
-        </Link>
+        {userDetails?.includes('suppliers') && (
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <NavLink
+              style={{ borderRadius: 5 }}
+              label="Suppliers"
+              leftSection={<IconShoppingCart size="1rem" stroke={1.5} />}
+              variant="filled"
+              color="violet"
+              childrenOffset={28}
+              active={suppleirActivePaths.includes(activePath)}
+            >
+              <Link to="/admin/suppliers" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Suppliers"
+                  active={
+                    activePath === '/admin/suppliers' ||
+                    activePath === '/admin/suppliers/add-edit' ||
+                    activePath === '/admin/suppliers/view'
+                  }
+                />
+              </Link>
+              <Link to="/admin/suppliers/products" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Products"
+                  active={
+                    activePath === '/admin/suppliers/products' ||
+                    activePath === '/admin/suppliers/add-edit-products' ||
+                    activePath === '/admin/suppliers/view-products'
+                  }
+                />
+              </Link>
+              <Link to="/admin/suppliers/order-requests" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Supplier Order Requests"
+                  active={
+                    activePath === '/admin/suppliers/order-requests' ||
+                    activePath === '/admin/suppliers/add-order-requests' ||
+                    activePath === '/admin/suppliers/edit-order-requests' ||
+                    activePath === '/admin/suppliers/view-order-requests'
+                  }
+                />
+              </Link>
+              <Link to="/admin/suppliers/orders" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Supplier Orders"
+                  active={
+                    activePath === '/admin/suppliers/orders' ||
+                    activePath === '/admin/suppliers/add-orders' ||
+                    activePath === '/admin/suppliers/edit-orders' ||
+                    activePath === '/admin/suppliers/view-orders'
+                  }
+                />
+              </Link>
+              <Link to="/admin/suppliers/payments" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Supplier Payments"
+                  active={
+                    activePath === '/admin/suppliers/payments' ||
+                    activePath === '/admin/suppliers/add-payments' ||
+                    activePath === '/admin/suppliers/edit-payments' ||
+                    activePath === '/admin/suppliers/view-payments'
+                  }
+                />
+              </Link>
+            </NavLink>
+          </Link>
+        )}
 
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <NavLink
-            style={{ borderRadius: 5 }}
-            label="Assets"
-            leftSection={<IconBuilding size="1rem" stroke={1.5} />}
-            variant="filled"
-            color="violet"
-            childrenOffset={28}
-            active={assetsActivePaths.includes(activePath)}
-          >
-            <Link to="/admin/assets/warehouses" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Warehouses"
-                active={
-                  activePath === '/admin/assets/warehouses' ||
-                  activePath === '/admin/assets/view-warehouses' ||
-                  activePath === '/admin/assets/warehouses/stock-receive' ||
-                  activePath === '/admin/assets/warehouses/stock-dispatch' ||
-                  activePath === '/admin/assets/warehouses/add-edit-orders'
-                }
-              />
-            </Link>
-            <Link to="/admin/vehicles" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Vehicles"
-                active={
-                  activePath === '/admin/vehicles' ||
-                  activePath === '/admin/vehicles/add-edit' ||
-                  activePath === '/admin/vehicles/view'
-                }
-              />
-            </Link>
-          </NavLink>
-        </Link>
+        {userDetails?.includes('assets') && (
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <NavLink
+              style={{ borderRadius: 5 }}
+              label="Assets"
+              leftSection={<IconBuilding size="1rem" stroke={1.5} />}
+              variant="filled"
+              color="violet"
+              childrenOffset={28}
+              active={assetsActivePaths.includes(activePath)}
+            >
+              <Link to="/admin/assets/warehouses" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Warehouses"
+                  active={
+                    activePath === '/admin/assets/warehouses' ||
+                    activePath === '/admin/assets/view-warehouses' ||
+                    activePath === '/admin/assets/warehouses/stock-receive' ||
+                    activePath === '/admin/assets/warehouses/stock-dispatch' ||
+                    activePath === '/admin/assets/warehouses/add-edit-orders'
+                  }
+                />
+              </Link>
+              <Link to="/admin/vehicles" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Vehicles"
+                  active={
+                    activePath === '/admin/vehicles' ||
+                    activePath === '/admin/vehicles/add-edit' ||
+                    activePath === '/admin/vehicles/view'
+                  }
+                />
+              </Link>
+            </NavLink>
+          </Link>
+        )}
 
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <NavLink
-            style={{ borderRadius: 5 }}
-            label="Employees"
-            leftSection={<IconUserScan size="1rem" stroke={1.5} />}
-            variant="filled"
-            color="violet"
-            childrenOffset={28}
-            active={employeesActivePaths.includes(activePath)}
-          >
-            <Link to="/admin/employees" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Employees"
-                active={
-                  activePath === '/admin/employees' ||
-                  activePath === '/admin/employees/add-edit' ||
-                  activePath === '/admin/employees/view'
-                }
-              />
-            </Link>
-            <Link to="/admin/jobRoles" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Job Roles"
-                active={
-                  activePath === '/admin/jobRoles' ||
-                  activePath === '/admin/jobRoles/add-edit' ||
-                  activePath === '/admin/jobRoles/view'
-                }
-              />
-            </Link>
-          </NavLink>
-        </Link>
+        {userDetails?.includes('employees') && (
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <NavLink
+              style={{ borderRadius: 5 }}
+              label="Employees"
+              leftSection={<IconUserScan size="1rem" stroke={1.5} />}
+              variant="filled"
+              color="violet"
+              childrenOffset={28}
+              active={employeesActivePaths.includes(activePath)}
+            >
+              <Link to="/admin/employees" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Employees"
+                  active={
+                    activePath === '/admin/employees' ||
+                    activePath === '/admin/employees/add-edit' ||
+                    activePath === '/admin/employees/view'
+                  }
+                />
+              </Link>
+              <Link to="/admin/jobRoles" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Job Roles"
+                  active={
+                    activePath === '/admin/jobRoles' ||
+                    activePath === '/admin/jobRoles/add-edit' ||
+                    activePath === '/admin/jobRoles/view'
+                  }
+                />
+              </Link>
+            </NavLink>
+          </Link>
+        )}
 
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <NavLink
-            style={{ borderRadius: 5 }}
-            label="Trips"
-            leftSection={<IconTruck size="1rem" stroke={1.5} />}
-            variant="filled"
-            color="violet"
-            active={tripsActivePaths.includes(activePath)}
-            childrenOffset={28}
-          >
-            <Link to="/admin/trips" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Trips"
-                active={
-                  activePath === '/admin/trips' ||
-                  activePath === '/admin/trips/add-edit' ||
-                  activePath === '/admin/trips/view'
-                }
-              />
-            </Link>
-            <Link to="/admin/expenses" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Expenses"
-                active={
-                  activePath === '/admin/expenses/add-edit' ||
-                  activePath === '/admin/expenses/view' ||
-                  activePath === '/admin/expenses'
-                }
-              />
-            </Link>
-          </NavLink>
-        </Link>
+        {userDetails?.includes('trips') && (
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <NavLink
+              style={{ borderRadius: 5 }}
+              label="Trips"
+              leftSection={<IconTruck size="1rem" stroke={1.5} />}
+              variant="filled"
+              color="violet"
+              active={tripsActivePaths.includes(activePath)}
+              childrenOffset={28}
+            >
+              <Link to="/admin/trips" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Trips"
+                  active={
+                    activePath === '/admin/trips' ||
+                    activePath === '/admin/trips/add-edit' ||
+                    activePath === '/admin/trips/view'
+                  }
+                />
+              </Link>
+              <Link to="/admin/expenses" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Expenses"
+                  active={
+                    activePath === '/admin/expenses/add-edit' ||
+                    activePath === '/admin/expenses/view' ||
+                    activePath === '/admin/expenses'
+                  }
+                />
+              </Link>
+            </NavLink>
+          </Link>
+        )}
 
-        <Link to="/admin/cheques" style={{ textDecoration: 'none' }}>
-          <NavLink
-            style={{ borderRadius: 5 }}
-            label="Cheques"
-            color="violet"
-            leftSection={<IconCash size="1rem" stroke={1.5} />}
-            variant="filled"
-            active={chequesActivePaths.includes(activePath)}
-          />
-        </Link>
+        {userDetails?.includes('cheques') && (
+          <Link to="/admin/cheques" style={{ textDecoration: 'none' }}>
+            <NavLink
+              style={{ borderRadius: 5 }}
+              label="Cheques"
+              color="violet"
+              leftSection={<IconCash size="1rem" stroke={1.5} />}
+              variant="filled"
+              active={chequesActivePaths.includes(activePath)}
+            />
+          </Link>
+        )}
         <div>
           <hr style={{ color: 'gray' }} />
           <div>
-            <Link to="/admin/settings" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Settings"
-                color="violet"
-                leftSection={<IconSettings size="1rem" stroke={1.5} />}
-                variant="filled"
-              />
-            </Link>
+            {userDetails?.includes('settings') && (
+              <Link to="/admin/settings" style={{ textDecoration: 'none' }}>
+                <NavLink
+                  style={{ borderRadius: 5 }}
+                  label="Settings"
+                  color="violet"
+                  leftSection={<IconSettings size="1rem" stroke={1.5} />}
+                  variant="filled"
+                />
+              </Link>
+            )}
           </div>
         </div>
       </div>

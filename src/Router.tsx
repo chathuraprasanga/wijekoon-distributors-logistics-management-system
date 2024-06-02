@@ -1,9 +1,6 @@
 import {
   createBrowserRouter,
   RouterProvider,
-  createRoutesFromElements,
-  Route,
-  Routes,
 } from 'react-router-dom';
 import { AppLayout } from './hoc/AppLayout';
 import Login from './pages/Login/Login';
@@ -11,7 +8,6 @@ import { HomePage } from './pages/Home.page';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Customers from './pages/Customers/Customers';
-import App from './App';
 import AddEditCustomers from './pages/Customers/AddEditCustomers/AddEditCustomers';
 import Settings from './pages/Settings/Settings';
 import ViewCustomers from './pages/Customers/ViewCustomers/ViewCustomers';
@@ -62,6 +58,7 @@ import AddEditExpenses from './pages/Trips/AddEditExpenses/AddEditExpenses';
 import Cheques from './pages/Cheques/Cheques';
 import ViewCheques from './pages/Cheques/ViewCheques/ViewCheques';
 import AddEditCheques from './pages/Cheques/AddEditCheques/AddEditCheques';
+import AddEditWarehouse from './pages/Assets/AddEditWarehouse/AddEditWarehouse';
 
 const router = createBrowserRouter([
   {
@@ -191,6 +188,10 @@ const router = createBrowserRouter([
       {
         path: 'assets/warehouses',
         element: <Warehouses />,
+      },
+      {
+        path: 'assets/add-edit-warehouses',
+        element: <AddEditWarehouse />,
       },
       {
         path: 'assets/view-warehouses',

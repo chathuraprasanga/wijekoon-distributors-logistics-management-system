@@ -1,34 +1,28 @@
+import { RootState } from '@/redux/store';
 import { Grid, Card, Table, Text, Badge, Button } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 function ViewWarehouse() {
-  const elements = [
-    {
-      id: 'KSL-15',
-      name: 'Keshara Super Lime',
-      size: '15KG',
-      price: '550.00',
-      quantity: '400',
-    },
-    {
-      id: 'KSL-20',
-      name: 'Keshara Super Lime',
-      size: '20KG',
-      price: '620.00',
-      quantity: '500',
-    },
-  ];
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const selectedWarehouse = useSelector((state: RootState) => state.assets.warehouse);
+  const error = useSelector((state: RootState) => state.assets.error);
+  const status = useSelector((state: RootState) => state.assets.status);
 
-  const rows = elements.slice(0, 10).map((element) => (
+  console.log(selectedWarehouse);
+  const stockDetails = selectedWarehouse?.stockDetails;
+
+  const rows = stockDetails?.map((item) => (
     <>
-      <Table.Tr key={element.id}>
-        <Table.Td width="20%">{element.id}</Table.Td>
-        <Table.Td width="35%">{element.name}</Table.Td>
-        <Table.Td width="15%">{element.size}</Table.Td>
-        <Table.Td width="15%">{element.price}</Table.Td>
-        <Table.Td width="15%">{element.quantity}</Table.Td>
+      <Table.Tr key={item?._id}>
+        <Table.Td width="20%">{item.product.code}</Table.Td>
+        <Table.Td width="35%">{item.product.name}</Table.Td>
+        <Table.Td width="15%">{item.product.size} KG</Table.Td>
+        <Table.Td width="15%">{item.product.sellingPrice}</Table.Td>
+        <Table.Td width="15%">{item.quantity}</Table.Td>
       </Table.Tr>
     </>
   ));

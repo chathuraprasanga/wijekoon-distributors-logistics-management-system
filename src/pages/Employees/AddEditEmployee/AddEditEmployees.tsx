@@ -1,14 +1,58 @@
-import { Button, Card, Grid, Select, Switch, Table, Text, TextInput } from '@mantine/core';
+import {
+  Button,
+  Card,
+  Grid,
+  Select,
+  Switch,
+  Table,
+  Text,
+  TextInput,
+  Textarea,
+} from '@mantine/core';
+import { isNotEmpty, useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { RootState } from '@/redux/store';
 
 function AddEditEmployees() {
-  const location = useLocation();
-  const { employee } = location.state || {};
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const selectedEmployee = useSelector((state: RootState) => state.employees.employee);
+  const jobRoles = useSelector((state: RootState) => state.employees.jobRoles);
 
   const [value, setValue] = useState<Date | null>(null);
+
+  const employeeAddEditForm = useForm({
+    initialValues: {
+      employeeId: selectedEmployee?.employeeId || '',
+      name: selectedEmployee?.name || '',
+      phone: selectedEmployee?.phone || '',
+      phoneSecondary: selectedEmployee?.phoneSecondary || '',
+      email: selectedEmployee?.email || '',
+      jobRole: selectedEmployee?.jobRole?.name || '',
+      dateOfBirth: selectedEmployee?.dateOfBirth ? new Date(selectedEmployee.dateOfBirth) : null,
+      nic: selectedEmployee?.nic || '',
+      address: selectedEmployee?.address || '',
+      status: selectedEmployee?.status || '',
+    },
+    validate: {
+      name: isNotEmpty('Name is required'),
+      phone: isNotEmpty('Phone is required'),
+      email: isNotEmpty('Email is required'),
+      jobRole: isNotEmpty('Job Role is required'),
+      nic: isNotEmpty('NIC is required'),
+      dateOfBirth: isNotEmpty('Date of birth is required'),
+    },
+  });
+
+  const handleSave = () => {
+    const payload = employeeAddEditForm.values;
+    console.log(payload);
+  };
+
   return (
     <>
       <Grid>
@@ -19,7 +63,7 @@ function AddEditEmployees() {
                 <IconArrowLeft />
               </Link>
               <Text size="md" style={{ fontWeight: 'bold' }}>
-                {employee ? 'Edit Employee' : 'Add Employee'}
+                {selectedEmployee ? 'Edit Employee' : 'Add Employee'}
               </Text>
             </div>
             <div></div>
@@ -27,21 +71,34 @@ function AddEditEmployees() {
         </Grid.Col>
       </Grid>
 
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <form action="">
+      <form
+        action=""
+        onSubmit={
+          !selectedEmployee
+            ? () => employeeAddEditForm.onSubmit(handleSave)
+            : () => employeeAddEditForm.onSubmit(handleUpdate)
+        }
+      >
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Table withRowBorders={false}>
             <Table.Tr>
-              <Table.Td width="50%">
-                <TextInput label="Employee Name" withAsterisk placeholder="Enter the name" />
+              <Table.Td width="50%" colSpan={2}>
+                <TextInput
+                  label="Employee Name"
+                  withAsterisk
+                  placeholder="Enter the name"
+                  key={employeeAddEditForm.key('name')}
+                  {...employeeAddEditForm.getInputProps('name')}
+                />
               </Table.Td>
-              <Table.Td width="50%">
+              {/* <Table.Td width="50%">
                 <TextInput
                   label="Employee ID"
                   disabled
                   placeholder="Input placeholder"
                   value="WDE-007"
                 />
-              </Table.Td>
+              </Table.Td> */}
             </Table.Tr>
             <Table.Tr>
               <Table.Td width="50%">
@@ -49,19 +106,49 @@ function AddEditEmployees() {
                   label="Employee Phone"
                   withAsterisk
                   placeholder="Enter the phone number"
+                  key={employeeAddEditForm.key('phone')}
+                  {...employeeAddEditForm.getInputProps('phone')}
                 />
               </Table.Td>
               <Table.Td width="50%">
-                <TextInput label="Employee Email" withAsterisk placeholder="Enter Email" />
+                <TextInput
+                  label="Employee Phone 02"
+                  // withAsterisk
+                  placeholder="Enter secondary phone number"
+                  key={employeeAddEditForm.key('phoneSecondary')}
+                  {...employeeAddEditForm.getInputProps('phoneSecondary')}
+                />
               </Table.Td>
             </Table.Tr>
             <Table.Tr>
+              <Table.Td width="50%">
+                <TextInput
+                  label="Employee Email"
+                  withAsterisk
+                  placeholder="Enter Email"
+                  key={employeeAddEditForm.key('email')}
+                  {...employeeAddEditForm.getInputProps('email')}
+                />
+              </Table.Td>
               <Table.Td width="50%">
                 <Select
                   withAsterisk
                   label="Employee job Role"
                   placeholder="Select a Role"
                   data={['Admin', 'Sales Rep', 'Driver', 'Helper']}
+                  key={employeeAddEditForm.key('jobRole')}
+                  {...employeeAddEditForm.getInputProps('jobRole')}
+                />
+              </Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Td width="50%">
+                <TextInput
+                  label="Employee NIC"
+                  withAsterisk
+                  placeholder="Enter the NIC"
+                  key={employeeAddEditForm.key('nic')}
+                  {...employeeAddEditForm.getInputProps('nic')}
                 />
               </Table.Td>
               <Table.Td width="50%">
@@ -70,27 +157,42 @@ function AddEditEmployees() {
                   label="Date of Birth"
                   placeholder="Pick date"
                   value={value}
-                  onChange={setValue}
+                  key={employeeAddEditForm.key('dateOfBirth')}
+                  {...employeeAddEditForm.getInputProps('dateOfBirth')}
                 />
               </Table.Td>
             </Table.Tr>
             <Table.Tr>
-              <Table.Td width="50%">
-                <TextInput label="Employee NIC" withAsterisk placeholder="Enter the NIC" />
-              </Table.Td>
-              <Table.Td width="50%">
-                <TextInput label="Employee Address" placeholder="Enter the Address" />
+              <Table.Td width="50%" colSpan={2}>
+                <Textarea
+                  label="Employee Address"
+                  placeholder="Enter the Address"
+                  key={employeeAddEditForm.key('address')}
+                  {...employeeAddEditForm.getInputProps('address')}
+                />
               </Table.Td>
             </Table.Tr>
-            <Table.Tr mt={5}>
-              <Switch defaultChecked color="violet" labelPosition="left" label="Status" />
+            <Table.Tr>
+              <Table.Td mt={5}>
+                {selectedEmployee && (
+                  <Select
+                    color="violet"
+                    size="xs"
+                    radius="sm"
+                    data={['ACTIVE', 'DEACTIVE']}
+                    // {...customerAddEditForm.getInputProps('status')}
+                  />
+                )}
+              </Table.Td>
             </Table.Tr>
           </Table>
-        </form>
-      </Card>
-      <div style={{ marginTop: 10 }}>
-        <Button style={{ float: 'right' }}>Save</Button>
-      </div>
+        </Card>
+        <div style={{ marginTop: 10 }}>
+          <Button style={{ float: 'right' }} type="submit">
+            Save
+          </Button>
+        </div>
+      </form>
     </>
   );
 }
