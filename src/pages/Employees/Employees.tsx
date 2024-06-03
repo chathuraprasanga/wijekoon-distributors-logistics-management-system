@@ -10,40 +10,90 @@ import {
   Divider,
   Pagination,
   Text,
+  Group,
+  Modal,
+  rem,
 } from '@mantine/core';
 import { isNotEmpty, useForm } from '@mantine/form';
-import { IconDots, IconSearch } from '@tabler/icons-react';
+import { IconCheck, IconDots, IconSearch, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { fetchEmployees, setEmployee } from '@/redux/slices/employeeSlice';
+import {
+  deleteEmployee,
+  fetchEmployees,
+  fetchJobRoles,
+  setEmployee,
+} from '@/redux/slices/employeeSlice';
 import { AppDispatch, RootState } from '@/redux/store';
+import { Notifications } from '@mantine/notifications';
 
 function Employees() {
-  const [activePage, setPage] = useState(1);
+  const [opened, setOpened] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [activePage, setActivePage] = useState(1);
   const navigate = useNavigate();
-  const dispatch: AppDispatch = useDispatch(); // Type the dispatch correctly
+  const dispatch: AppDispatch = useDispatch();
+
   const employees = useSelector((state: RootState) => state.employees.employees);
-  const selectedEmployee = useSelector((state: RootState) => state.employees.employee);
   const status = useSelector((state: RootState) => state.employees.status);
-  // const error = useSelector((state: RootState) => state.employees.error);
 
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchEmployees());
+      dispatch(fetchJobRoles());
     }
   }, [status, dispatch]);
 
-  const rows = employees.slice(0, 10).map((element) => (
+  const handleEditBtn = (element: any, type: string) => {
+    dispatch(setEmployee(element));
+    if (type === 'view') {
+      dispatch(fetchJobRoles);
+      navigate('/admin/employees/view');
+    }
+    if (type === 'edit') {
+      dispatch(fetchJobRoles);
+      navigate('/admin/employees/add-edit');
+    }
+
+    if (type === 'delete') {
+      setEmployeeToDelete(element);
+      setOpened(true);
+    }
+  };
+
+  const handleDeleteEmployee = async () => {
+    try {
+      if (employeeToDelete) {
+        await dispatch(deleteEmployee(employeeToDelete?._id)).unwrap();
+        Notifications.show({
+          title: 'Successful',
+          message: 'Employee deleted successfully',
+          icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+        });
+        setOpened(false);
+        dispatch(fetchEmployees());
+      }
+    } catch (e: any) {
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error deleting the employee',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+      setOpened(false);
+      dispatch(fetchEmployees());
+    }
+  };
+
+  const rows = employees.slice((activePage - 1) * 10, activePage * 10).map((element) => (
     <Table.Tr key={element.id}>
-      <Table.Td>{element._id}</Table.Td>
-      <Table.Td>
-        {element.firstName} {element.lastName}
-      </Table.Td>
+      <Table.Td>{element.employeeId}</Table.Td>
+      <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.phone}</Table.Td>
       <Table.Td>{element.email}</Table.Td>
       <Table.Td>{element.address}</Table.Td>
-      <Table.Td>{element.jobRole}</Table.Td>
+      <Table.Td>{element.jobRole.name}</Table.Td>
       <Table.Td>
         <Badge color={element.status === 'ACTIVE' ? 'green' : 'red'} radius="xs" size="xs">
           {element.status}
@@ -56,18 +106,11 @@ function Employees() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Link to="/admin/employees/view" style={{ textDecoration: 'none' }}>
-              <Menu.Item>View</Menu.Item>
-            </Link>
-            <Link
-              to={{
-                pathname: '/admin/employees/add-edit',
-              }}
-              style={{ textDecoration: 'none' }}
-            >
-              <Menu.Item>Edit</Menu.Item>
-            </Link>
-            <Menu.Item color="red">Delete</Menu.Item>
+            <Menu.Item onClick={() => handleEditBtn(element, 'view')}>View</Menu.Item>
+            <Menu.Item onClick={() => handleEditBtn(element, 'edit')}>Edit</Menu.Item>
+            <Menu.Item color="red" onClick={() => handleEditBtn(element, 'delete')}>
+              Delete
+            </Menu.Item>
           </Menu.Dropdown>
         </Menu>
       </Table.Td>
@@ -100,11 +143,9 @@ function Employees() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Employees</Text>
             </div>
-            {/* <Link to="/admin/employees/add-edit"> */}
             <Button size="sm" onClick={handleCreateBtn}>
               Create Employees
             </Button>
-            {/* </Link> */}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>
@@ -126,7 +167,7 @@ function Employees() {
             <Pagination
               total={Math.ceil(employees.length / 10)}
               value={activePage}
-              onChange={setPage}
+              onChange={setActivePage}
               mt={10}
               style={{ display: 'flex', justifyContent: 'flex-end' }}
               size="xs"
@@ -134,6 +175,18 @@ function Employees() {
           </Card>
         </Grid.Col>
       </Grid>
+
+      <Modal opened={opened} onClose={() => setOpened(false)} title="Confirm Deletion">
+        <Text>Are you sure you want to delete the employee {employeeToDelete?.name}?</Text>
+        <Group position="right" mt="md">
+          <Button variant="outline" onClick={() => setOpened(false)}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={handleDeleteEmployee}>
+            Confirm
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 }

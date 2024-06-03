@@ -63,7 +63,7 @@ export const getPagedEmployees = createAsyncThunk(
 export const deleteEmployee = createAsyncThunk(
   'employees/deleteEmployee',
   async (employeeId: string) => {
-    await axios.delete(`http://localhost:3000/employees/${employeeId}`);
+    await axios.delete(`http://localhost:3000/employee/${employeeId}`);
     return employeeId;
   }
 );
@@ -71,7 +71,7 @@ export const deleteEmployee = createAsyncThunk(
 export const updateEmployee = createAsyncThunk(
   'employees/updateEmployee',
   async (employee: any) => {
-    const response = await axios.put(`http://localhost:3000/employees/${employee.id}`, employee, {
+    const response = await axios.put(`http://localhost:3000/employee/${employee.id}`, employee, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

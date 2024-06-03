@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Notifications } from '@mantine/notifications';
 import { Card, Center, TextInput, Text, rem, PasswordInput, Button } from '@mantine/core';
-import { IconCheck, IconCopyright, IconUser } from '@tabler/icons-react';
+import { IconCheck, IconCopyright, IconUser, IconX } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,7 +41,12 @@ function Login() {
         navigate('/admin/dashboard');
       }
     } catch (e: any) {
-      tosNotify('Error', `${e.message || 'An error occurred'}`, 'ERROR');
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error login. Contact System Admin',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
     }
   };
 

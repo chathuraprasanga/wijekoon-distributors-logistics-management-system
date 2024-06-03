@@ -1,9 +1,21 @@
 import { ActionIcon, Badge, Button, Card, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft, IconMail } from '@tabler/icons-react';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { RootState } from '@/redux/store';
+import { fetchJobRoles, setEmployee } from '@/redux/slices/employeeSlice';
 
 function ViewEmployees() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const selectedEmployee = useSelector((state: RootState) => state.employees.employee);
+
+  const handleUpdate = (employee:any) => {
+    dispatch(setEmployee(employee));
+    dispatch(fetchJobRoles());
+    navigate('/admin/employees/add-edit');
+  };
+
   return (
     <>
       <Grid>
@@ -31,7 +43,7 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="40%">
-              <Text size="sm">WDE-001</Text>
+              <Text size="sm">{selectedEmployee?.employeeId}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -41,7 +53,7 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="40%">
-              <Text size="sm">Chathura Prasanga</Text>
+              <Text size="sm">{selectedEmployee?.name}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -51,7 +63,9 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="40%">
-              <Text size="sm">077 9250108</Text>
+              <Text size="sm">
+                {selectedEmployee?.phone} | {selectedEmployee?.phoneSecondary}
+              </Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -61,7 +75,7 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="100%" display="flex" style={{ justifyContent: 'space-between' }}>
-              <Text size="sm">chathuraprasanga98@gmail.com</Text>
+              <Text size="sm">{selectedEmployee?.email}</Text>
               <Text size="sm">
                 <ActionIcon size="sm">
                   <IconMail size="xs" />
@@ -76,7 +90,7 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="100%" display="flex" style={{ justifyContent: 'space-between' }}>
-              <Text size="sm">982833310V</Text>
+              <Text size="sm">{selectedEmployee?.nic}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -86,7 +100,7 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="100%" display="flex" style={{ justifyContent: 'space-between' }}>
-              <Text size="sm">09.10.1998</Text>
+              <Text size="sm">{selectedEmployee?.dateOfBirth?.split('T')[0]}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -96,7 +110,7 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="100%" display="flex" style={{ justifyContent: 'space-between' }}>
-              <Text size="sm">godawele watta, kotikapola, mawathagama</Text>
+              <Text size="sm">{selectedEmployee?.address}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -106,7 +120,7 @@ function ViewEmployees() {
               </Text>
             </Table.Td>
             <Table.Td width="100%" display="flex" style={{ justifyContent: 'space-between' }}>
-              <Text size="sm">Super Admin</Text>
+              <Text size="sm">{selectedEmployee?.jobRole?.name}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -117,8 +131,8 @@ function ViewEmployees() {
             </Table.Td>
             <Table.Td width="100%" display="flex" style={{ justifyContent: 'space-between' }}>
               <Text size="sm">
-                <Badge color="green" radius="sm">
-                  ACTIVE
+                <Badge color={selectedEmployee?.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                  {selectedEmployee?.status}
                 </Badge>
               </Text>
             </Table.Td>
@@ -126,7 +140,9 @@ function ViewEmployees() {
         </Table>
       </Card>
       <div style={{ marginTop: 10 }}>
-        <Link to="/admin/employees/add-edit"><Button style={{ float: 'right' }}>Update Record</Button></Link>
+        <Button style={{ float: 'right' }} onClick={() => handleUpdate(selectedEmployee)}>
+          Update Record
+        </Button>
       </div>
     </>
   );
