@@ -46,7 +46,7 @@ function CustomerOrders() {
   }, [dispatch]);
 
   // pagination for main
-  const requestsPerPage = 10;
+  const requestsPerPage = 5;
   const handlePageChange = (newPage: any) => {
     setPage(newPage);
   };

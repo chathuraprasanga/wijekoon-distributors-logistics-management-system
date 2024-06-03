@@ -9,6 +9,7 @@ import { logout } from '@/redux/slices/authSlice';
 export function UserButton() {
   const dispatch: AppDispatch = useDispatch();
   const userDetails = useSelector((state: RootState) => state.auth.user);
+  const permissions = localStorage.getItem('permissions');
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -40,11 +41,15 @@ export function UserButton() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Link to="/admin/settings" style={{ textDecoration: 'none' }}>
-              <Menu.Item leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>
-                Settings
-              </Menu.Item>
-            </Link>
+            {permissions?.includes('settings') && (
+              <Link to="/admin/settings" style={{ textDecoration: 'none' }}>
+                <Menu.Item
+                  leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
+                >
+                  Settings
+                </Menu.Item>
+              </Link>
+            )}
 
             <Menu.Item
               color="red"

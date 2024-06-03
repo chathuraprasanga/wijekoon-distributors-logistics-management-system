@@ -1,42 +1,58 @@
-import {
-  Button,
-  Card,
-  Grid,
-  Select,
-  Switch,
-  Table,
-  Text,
-  TextInput,
-  Textarea,
-} from '@mantine/core';
+import { Button, Card, Grid, Select, Table, Text, TextInput, Textarea, rem } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import { isNotEmpty, useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
-import { IconArrowLeft } from '@tabler/icons-react';
-import React, { useState } from 'react';
+import { IconArrowLeft, IconCheck, IconX } from '@tabler/icons-react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { RootState } from '@/redux/store';
+import { AppDispatch, RootState } from '@/redux/store';
+import {
+  createEmployee,
+  fetchEmployees,
+  fetchJobRoles,
+  updateEmployee,
+} from '@/redux/slices/employeeSlice';
+
+interface EmployeeFormValues {
+  employeeId: string;
+  name: string;
+  phone: string;
+  phoneSecondary: string;
+  email: string;
+  jobRole: string;
+  dateOfBirth: Date | null;
+  nic: string;
+  address: string;
+  status: string;
+}
 
 function AddEditEmployees() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const selectedEmployee = useSelector((state: RootState) => state.employees.employee);
   const jobRoles = useSelector((state: RootState) => state.employees.jobRoles);
-
+  const status = useSelector((state: RootState) => state.employees.status);
   const [value, setValue] = useState<Date | null>(null);
 
-  const employeeAddEditForm = useForm({
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchJobRoles());
+    }
+  }, [status, dispatch]);
+
+  const employeeAddEditForm = useForm<EmployeeFormValues>({
     initialValues: {
       employeeId: selectedEmployee?.employeeId || '',
       name: selectedEmployee?.name || '',
       phone: selectedEmployee?.phone || '',
       phoneSecondary: selectedEmployee?.phoneSecondary || '',
       email: selectedEmployee?.email || '',
-      jobRole: selectedEmployee?.jobRole?.name || '',
+      jobRole: selectedEmployee?.jobRole?._id || '',
       dateOfBirth: selectedEmployee?.dateOfBirth ? new Date(selectedEmployee.dateOfBirth) : null,
       nic: selectedEmployee?.nic || '',
       address: selectedEmployee?.address || '',
-      status: selectedEmployee?.status || '',
+      status: selectedEmployee?.status || 'ACTIVE',
     },
     validate: {
       name: isNotEmpty('Name is required'),
@@ -48,9 +64,50 @@ function AddEditEmployees() {
     },
   });
 
-  const handleSave = () => {
-    const payload = employeeAddEditForm.values;
-    console.log(payload);
+  const handleSave = async (values: EmployeeFormValues) => {
+    try {
+      await dispatch(createEmployee(values)).unwrap();
+      Notifications.show({
+        title: 'Successful',
+        message: 'Employee created successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      employeeAddEditForm.reset();
+      dispatch(fetchEmployees());
+      navigate('/admin/employees');
+    } catch (e: any) {
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error creating the employee',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
+  };
+
+  const handleUpdate = async (values: EmployeeFormValues) => {
+    const payload = {
+      ...values,
+      id: selectedEmployee?._id,
+    };
+    try {
+      await dispatch(updateEmployee(payload)).unwrap();
+      Notifications.show({
+        title: 'Successful',
+        message: 'Employee updated successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      employeeAddEditForm.reset();
+      dispatch(fetchEmployees());
+      navigate('/admin/employees');
+    } catch (e: any) {
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error updating the employee',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
   };
 
   return (
@@ -72,11 +129,10 @@ function AddEditEmployees() {
       </Grid>
 
       <form
-        action=""
         onSubmit={
           !selectedEmployee
-            ? () => employeeAddEditForm.onSubmit(handleSave)
-            : () => employeeAddEditForm.onSubmit(handleUpdate)
+            ? employeeAddEditForm.onSubmit(handleSave)
+            : employeeAddEditForm.onSubmit(handleUpdate)
         }
       >
         <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -87,18 +143,9 @@ function AddEditEmployees() {
                   label="Employee Name"
                   withAsterisk
                   placeholder="Enter the name"
-                  key={employeeAddEditForm.key('name')}
                   {...employeeAddEditForm.getInputProps('name')}
                 />
               </Table.Td>
-              {/* <Table.Td width="50%">
-                <TextInput
-                  label="Employee ID"
-                  disabled
-                  placeholder="Input placeholder"
-                  value="WDE-007"
-                />
-              </Table.Td> */}
             </Table.Tr>
             <Table.Tr>
               <Table.Td width="50%">
@@ -106,16 +153,13 @@ function AddEditEmployees() {
                   label="Employee Phone"
                   withAsterisk
                   placeholder="Enter the phone number"
-                  key={employeeAddEditForm.key('phone')}
                   {...employeeAddEditForm.getInputProps('phone')}
                 />
               </Table.Td>
               <Table.Td width="50%">
                 <TextInput
                   label="Employee Phone 02"
-                  // withAsterisk
                   placeholder="Enter secondary phone number"
-                  key={employeeAddEditForm.key('phoneSecondary')}
                   {...employeeAddEditForm.getInputProps('phoneSecondary')}
                 />
               </Table.Td>
@@ -126,17 +170,18 @@ function AddEditEmployees() {
                   label="Employee Email"
                   withAsterisk
                   placeholder="Enter Email"
-                  key={employeeAddEditForm.key('email')}
                   {...employeeAddEditForm.getInputProps('email')}
                 />
               </Table.Td>
               <Table.Td width="50%">
                 <Select
                   withAsterisk
-                  label="Employee job Role"
+                  label="Employee Job Role"
                   placeholder="Select a Role"
-                  data={['Admin', 'Sales Rep', 'Driver', 'Helper']}
-                  key={employeeAddEditForm.key('jobRole')}
+                  data={jobRoles.map((role) => ({
+                    label: role.name,
+                    value: role._id,
+                  }))}
                   {...employeeAddEditForm.getInputProps('jobRole')}
                 />
               </Table.Td>
@@ -147,7 +192,6 @@ function AddEditEmployees() {
                   label="Employee NIC"
                   withAsterisk
                   placeholder="Enter the NIC"
-                  key={employeeAddEditForm.key('nic')}
                   {...employeeAddEditForm.getInputProps('nic')}
                 />
               </Table.Td>
@@ -157,7 +201,7 @@ function AddEditEmployees() {
                   label="Date of Birth"
                   placeholder="Pick date"
                   value={value}
-                  key={employeeAddEditForm.key('dateOfBirth')}
+                  onChange={setValue}
                   {...employeeAddEditForm.getInputProps('dateOfBirth')}
                 />
               </Table.Td>
@@ -167,7 +211,6 @@ function AddEditEmployees() {
                 <Textarea
                   label="Employee Address"
                   placeholder="Enter the Address"
-                  key={employeeAddEditForm.key('address')}
                   {...employeeAddEditForm.getInputProps('address')}
                 />
               </Table.Td>
@@ -180,7 +223,7 @@ function AddEditEmployees() {
                     size="xs"
                     radius="sm"
                     data={['ACTIVE', 'DEACTIVE']}
-                    // {...customerAddEditForm.getInputProps('status')}
+                    {...employeeAddEditForm.getInputProps('status')}
                   />
                 )}
               </Table.Td>

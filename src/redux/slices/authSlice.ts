@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction, SerializedError } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 interface User {
@@ -16,6 +16,7 @@ interface AuthState {
   user: User | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  permissions: string[] | null; // New state to hold permissions
 }
 
 const initialState: AuthState = {
@@ -24,6 +25,7 @@ const initialState: AuthState = {
   user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
   status: 'idle',
   error: null,
+  permissions: localStorage.getItem('permissions') ? JSON.parse(localStorage.getItem('permissions')!) : null,
 };
 
 interface LoginResponse {
@@ -41,7 +43,7 @@ interface LoginResponse {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: { email: string; password: string }, thunkAPI) => {
+  async ({ email, password }: { email: string; password: string }) => {
     try {
       const response = await axios.post<LoginResponse>('http://localhost:3000/login', {
         email,
@@ -49,13 +51,7 @@ export const login = createAsyncThunk(
       });
       return response.data;
     } catch (error: any) {
-      if (error.response) {
-        return thunkAPI.rejectWithValue(error.response.data.message || 'Something went wrong');
-      } else if (error.request) {
-        return thunkAPI.rejectWithValue('No response from server');
-      } else {
-        return thunkAPI.rejectWithValue(error.message);
-      }
+      return error.response?.data || 'Something went wrong';
     }
   }
 );
@@ -75,18 +71,11 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       state.user = null;
+      state.permissions = null; // Clear permissions on logout
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
-    },
-    setTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
-      storeTokens(state, action.payload);
-    },
-    clearTokens: (state) => {
-      state.accessToken = null;
-      state.refreshToken = null;
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('permissions');
     },
   },
   extraReducers: (builder) => {
@@ -110,6 +99,7 @@ const authSlice = createSlice({
           },
         };
 
+        state.permissions = action.payload.user.role.permissions; // Set permissions in state
         localStorage.setItem(
           'user',
           JSON.stringify({
@@ -121,31 +111,15 @@ const authSlice = createSlice({
             },
           })
         );
+        localStorage.setItem('permissions', JSON.stringify(action.payload.user.role.permissions));
       })
-      .addCase(
-        login.rejected,
-        (
-          state,
-          action: PayloadAction<
-            unknown,
-            string,
-            {
-              arg: { email: string; password: string };
-              requestId: string;
-              requestStatus: 'rejected';
-              aborted: boolean;
-              condition: boolean;
-            } & ({ rejectedWithValue: true } | ({ rejectedWithValue: false } & {})),
-            SerializedError
-          >
-        ) => {
-          state.status = 'failed';
-          state.error = action.error.message || 'Login failed';
-        }
-      );
+      .addCase(login.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Login failed';
+      });
   },
 });
 
-export const { logout, setTokens, clearTokens } = authSlice.actions;
+export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;
