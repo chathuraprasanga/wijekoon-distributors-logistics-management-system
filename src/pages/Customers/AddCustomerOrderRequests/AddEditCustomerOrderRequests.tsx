@@ -57,7 +57,7 @@ function AddEditCustomerOrderRequests() {
         quantity: '',
         discount: '',
         tax: '',
-        lineTotal: '',
+        lineTotal: (0).toFixed(2), // Set initial line total to 0.0
       },
     ]);
   };
@@ -68,7 +68,7 @@ function AddEditCustomerOrderRequests() {
   const customerOrderRequestAddEditForm = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      customer: customer ? customer._id : '',
+      customer: customer ? customer?._id : '',
       orderId: selectedCustomerOrderRequest?.orderId || '',
       expectedDate: selectedCustomerOrderRequest?.expectedDate || new Date(),
       order: [
@@ -100,18 +100,16 @@ function AddEditCustomerOrderRequests() {
   const handleProductChange = (code: string, index: number) => {
     const product = products.find((p) => p.code === code);
     if (product) {
-      const updatedRows = rows.map((row, rowIndex) =>
+      const updatedRows = rows?.map((row, rowIndex) =>
         rowIndex === index
           ? {
               ...row,
-              product: product._id,
+              product: product?._id,
               productCode: product.code,
               productName: product.name,
               productSize: product.size,
               unitPrice: product.sellingPrice,
-              lineTotal: (
-                parseFloat(product.sellingPrice) * (parseFloat(row.quantity) || 1)
-              ).toFixed(2),
+              lineTotal: (0).toFixed(2), // Set initial line total to 0.0
             }
           : row
       );
@@ -120,7 +118,7 @@ function AddEditCustomerOrderRequests() {
   };
 
   const handleChange = (value: string, field: keyof RowData, index: number) => {
-    const updatedRows = rows.map((row, rowIndex) => {
+    const updatedRows = rows?.map((row, rowIndex) => {
       if (rowIndex === index) {
         const updatedRow = { ...row, [field]: value };
         if (field === 'quantity' || field === 'discount' || field === 'tax') {
@@ -150,7 +148,7 @@ function AddEditCustomerOrderRequests() {
       }
 
       const formData = customerOrderRequestAddEditForm.values;
-      formData.customer = customer._id;
+      formData.customer = customer?._id;
       formData.expectedDate = value;
       formData.status = 'CONFIRMED';
       formData.order = rows;
@@ -190,7 +188,7 @@ function AddEditCustomerOrderRequests() {
       formData.totalTax = calculateTotal('tax').toFixed(2);
       formData.netTotal = calculateTotal('lineTotal').toFixed(2);
 
-      const payload = { ...formData, id: selectedCustomerOrderRequest._id };
+      const payload = { ...formData, id: selectedCustomerOrderRequest?._id };
       console.log('PAYLOAD', payload);
 
       await dispatch(updateCustomerOrderRequest(payload)).unwrap();
@@ -214,15 +212,15 @@ function AddEditCustomerOrderRequests() {
   useEffect(() => {
     if (selectedCustomerOrderRequest) {
       customerOrderRequestAddEditForm.setValues({
-        customer: selectedCustomerOrderRequest.customer._id,
+        customer: selectedCustomerOrderRequest.customer?._id,
         orderId: selectedCustomerOrderRequest.orderId,
         expectedDate: new Date(selectedCustomerOrderRequest.expectedDate),
-        order: selectedCustomerOrderRequest.order.map((item) => ({
-          product: item.product._id,
-          quantity: item.quantity.toString(),
-          discount: item.lineDiscount.toString(),
-          tax: item.lineTax.toString(),
-          lineTotal: item.lineTotal.toString(),
+        order: selectedCustomerOrderRequest.order?.map((item) => ({
+          product: item.product?._id,
+          quantity: item.quantity?.toString(),
+          discount: item.lineDiscount?.toString(),
+          tax: item.lineTax?.toString(),
+          lineTotal: item.lineTotal?.toString(),
         })),
         subTotal: selectedCustomerOrderRequest.subTotal.toString(),
         totalDiscount: selectedCustomerOrderRequest.totalDiscount.toString(),
@@ -231,16 +229,16 @@ function AddEditCustomerOrderRequests() {
         status: selectedCustomerOrderRequest.status,
       });
       setRows(
-        selectedCustomerOrderRequest.order.map((item) => ({
-          product: item.product._id,
+        selectedCustomerOrderRequest.order?.map((item) => ({
+          product: item.product?._id,
           productCode: item.product.code,
           productName: item.product.name,
-          productSize: item.product.size.toString(),
-          unitPrice: item.product.sellingPrice.toString(),
-          quantity: item.quantity.toString(),
-          discount: item.lineDiscount.toString(),
-          tax: item.lineTax.toString(),
-          lineTotal: item.lineTotal.toString(),
+          productSize: item.product.size?.toString(),
+          unitPrice: item.product.sellingPrice?.toString(),
+          quantity: item.quantity?.toString(),
+          discount: item.lineDiscount?.toString(),
+          tax: item.lineTax?.toString(),
+          lineTotal: item.lineTotal?.toString(),
         }))
       );
     }
@@ -304,7 +302,7 @@ function AddEditCustomerOrderRequests() {
                         Created Date:
                       </Table.Td>
                       <Table.Td>
-                        {selectedCustomerOrderRequest?.createdAt.split('T')[0] || 'N/A'}
+                        {selectedCustomerOrderRequest?.createdAt?.split('T')[0] || 'N/A'}
                       </Table.Td>
                     </>
                   )}
@@ -327,9 +325,10 @@ function AddEditCustomerOrderRequests() {
                           size="xs"
                           placeholder="Pick expected date"
                           value={
-                            value === null
+                            value ||
+                            (selectedCustomerOrderRequest?.expectedDate
                               ? new Date(selectedCustomerOrderRequest.expectedDate)
-                              : value
+                              : null)
                           }
                           onChange={(date) => setValue(date)}
                         />
@@ -366,13 +365,13 @@ function AddEditCustomerOrderRequests() {
                   <Table.Th>Line Total</Table.Th>
                   <Table.Th></Table.Th>
                 </Table.Tr>
-                {rows.map((row, index) => (
+                {rows?.map((row, index) => (
                   <Table.Tr key={index}>
                     <Table.Td>
                       <Select
                         size="xs"
                         placeholder="Select Product"
-                        data={products.map((product) => ({
+                        data={products?.map((product) => ({
                           value: product.code,
                           label: product.code,
                         }))}
