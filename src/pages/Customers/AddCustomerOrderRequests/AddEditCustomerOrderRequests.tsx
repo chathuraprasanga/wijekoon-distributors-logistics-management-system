@@ -432,7 +432,7 @@ function AddEditCustomerOrderRequests() {
                     </Button>
                   </Table.Td>
                 </Table.Tr>
-                <Table.Tr>
+                {/* <Table.Tr>
                   <Table.Td colSpan={6}></Table.Td>
                   <Table.Td>
                     <Text size="md" style={{ fontWeight: 'bold' }}>
@@ -444,8 +444,8 @@ function AddEditCustomerOrderRequests() {
                       {calculateTotal('lineTotal').toFixed(2)}
                     </Text>
                   </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
+                </Table.Tr> */}
+                {/* <Table.Tr>
                   <Table.Td colSpan={6}></Table.Td>
                   <Table.Td>
                     <Text size="sm" style={{ fontWeight: 'bold' }}>
@@ -457,8 +457,8 @@ function AddEditCustomerOrderRequests() {
                       {calculateTotal('discount').toFixed(2)}
                     </Text>
                   </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
+                </Table.Tr> */}
+                {/* <Table.Tr>
                   <Table.Td colSpan={6}></Table.Td>
                   <Table.Td>
                     <Text size="sm" style={{ fontWeight: 'bold' }}>
@@ -470,7 +470,7 @@ function AddEditCustomerOrderRequests() {
                       {calculateTotal('tax').toFixed(2)}
                     </Text>
                   </Table.Td>
-                </Table.Tr>
+                </Table.Tr> */}
                 <Table.Tr>
                   <Table.Td colSpan={6}></Table.Td>
                   <Table.Td>

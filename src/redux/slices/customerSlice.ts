@@ -150,7 +150,7 @@ export const fetchCustomerOrders = createAsyncThunk('customers/fetchCustomerOrde
 export const createCustomerOrder = createAsyncThunk(
   'customers/createCustomerOrder',
   async (customerOrder: any) => {
-    const response = await axios.post('http://localhost:3000/customerOrders', customerOrder, {
+    const response = await axios.post('http://localhost:3000/customerOrder', customerOrder, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -163,7 +163,7 @@ export const updateCustomerOrder = createAsyncThunk(
   'customers/updateCustomerOrder',
   async (customerOrder: any) => {
     const response = await axios.put(
-      `http://localhost:3000/customerOrders/${customerOrder.id}`,
+      `http://localhost:3000/customerOrder/${customerOrder.id}`,
       customerOrder,
       {
         headers: {
@@ -178,7 +178,7 @@ export const updateCustomerOrder = createAsyncThunk(
 export const deleteCustomerOrder = createAsyncThunk(
   'customers/deleteCustomerOrder',
   async (customerOrderId: string) => {
-    await axios.delete(`http://localhost:3000/customerOrders/${customerOrderId}`, {
+    await axios.delete(`http://localhost:3000/customerOrder/${customerOrderId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
