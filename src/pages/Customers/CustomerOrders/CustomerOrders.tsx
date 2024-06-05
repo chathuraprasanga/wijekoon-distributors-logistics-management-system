@@ -22,6 +22,7 @@ import {
   fetchCustomerOrderRequests,
   fetchCustomerOrders,
   setCustomerOrderRequest,
+  setCustomerPayment,
 } from '@/redux/slices/customerSlice';
 import { RootState } from '@/redux/store';
 
@@ -46,7 +47,7 @@ function CustomerOrders() {
   }, [dispatch]);
 
   // pagination for main
-  const requestsPerPage = 5;
+  const requestsPerPage = 10;
   const handlePageChange = (newPage: any) => {
     setPage(newPage);
   };
@@ -91,6 +92,7 @@ function CustomerOrders() {
 
   const handleSelect = (request) => {
     dispatch(setCustomerOrderRequest(request));
+    dispatch(setCustomerPayment(null));
     navigate('/admin/customers/add-orders');
   };
 
@@ -99,10 +101,15 @@ function CustomerOrders() {
       <Table.Tr key={element.orderId}>
         <Table.Td>{element.orderId}</Table.Td>
         <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
-        <Table.Td>{element?.customer?.fullName}</Table.Td>
-        <Table.Td>{element.products}</Table.Td>
-        <Table.Td>{element.qty}</Table.Td>
-        <Table.Td>{element.amount}</Table.Td>
+        <Table.Td>{element?.customerOrderRequest?.customer?.fullName}</Table.Td>
+        <Table.Td>{element?.customerOrderRequest?.order?.length}</Table.Td>
+        <Table.Td>
+          {element?.customerOrderRequest?.order?.reduce(
+            (sum: any, item: any) => sum + item.quantity,
+            0
+          )}
+        </Table.Td>{' '}
+        <Table.Td>{element.netTotal.toFixed(2)}</Table.Td>
         <Table.Td>
           <Badge color={element.status === 'PAID' ? 'green' : 'red'} radius="xs" size="xs">
             {element.status}

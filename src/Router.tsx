@@ -1,7 +1,4 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppLayout } from './hoc/AppLayout';
 import Login from './pages/Login/Login';
 import { HomePage } from './pages/Home.page';
@@ -59,6 +56,7 @@ import Cheques from './pages/Cheques/Cheques';
 import ViewCheques from './pages/Cheques/ViewCheques/ViewCheques';
 import AddEditCheques from './pages/Cheques/AddEditCheques/AddEditCheques';
 import AddEditWarehouse from './pages/Assets/AddEditWarehouse/AddEditWarehouse';
+import PaymentModal from './pages/Customers/AddCustomerOrders/PaymentModal/PaymentModal';
 
 const router = createBrowserRouter([
   {
@@ -285,6 +283,10 @@ const router = createBrowserRouter([
         path: 'settings',
         element: <Settings />,
       },
+      // {
+      //   path: 'customerOrder/addPayment',
+      //   element: <PaymentModal opened close={false} modalRows />,
+      // },
       {
         path: '*',
         element: <HomePage />,
