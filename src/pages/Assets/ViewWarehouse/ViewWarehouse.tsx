@@ -57,7 +57,7 @@ function ViewWarehouse() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">WDW-01</Text>
+                  <Text size="sm">{selectedWarehouse?.warehouseId}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text size="sm" fw="bold">
@@ -65,7 +65,7 @@ function ViewWarehouse() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">05</Text>
+                  <Text size="sm">{selectedWarehouse?.stockDetails?.length}</Text>
                 </Table.Td>
               </Table.Tr>
 
@@ -76,7 +76,7 @@ function ViewWarehouse() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">Mawathagama</Text>
+                  <Text size="sm">{selectedWarehouse.city}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text size="sm" fw="bold">
@@ -84,7 +84,12 @@ function ViewWarehouse() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">1500</Text>
+                  <Text size="sm">
+                    {selectedWarehouse?.stockDetails?.reduce(
+                      (total: any, product: any) => total + product.quantity,
+                      0
+                    )}
+                  </Text>
                 </Table.Td>
               </Table.Tr>
 
@@ -95,7 +100,7 @@ function ViewWarehouse() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">BOI Junction, Kandy rd</Text>
+                  <Text size="sm">{selectedWarehouse?.address}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text size="sm" fw="bold">
@@ -105,7 +110,7 @@ function ViewWarehouse() {
                 <Table.Td width="35%">
                   <Text size="sm">
                     <Badge size="sm" radius="sm" color="green">
-                      ACTIVE
+                      {selectedWarehouse?.status}
                     </Badge>
                   </Text>
                 </Table.Td>

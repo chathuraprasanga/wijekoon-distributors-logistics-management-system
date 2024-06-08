@@ -14,6 +14,7 @@ import {
   Modal,
   rem,
 } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import { isNotEmpty, useForm } from '@mantine/form';
 import { IconCheck, IconDots, IconSearch, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -26,7 +27,6 @@ import {
   setEmployee,
 } from '@/redux/slices/employeeSlice';
 import { AppDispatch, RootState } from '@/redux/store';
-import { Notifications } from '@mantine/notifications';
 
 function Employees() {
   const [opened, setOpened] = useState(false);
@@ -37,6 +37,7 @@ function Employees() {
 
   const employees = useSelector((state: RootState) => state.employees.employees);
   const status = useSelector((state: RootState) => state.employees.status);
+  console.log(employees);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -88,12 +89,12 @@ function Employees() {
 
   const rows = employees.slice((activePage - 1) * 10, activePage * 10).map((element) => (
     <Table.Tr key={element.id}>
-      <Table.Td>{element.employeeId}</Table.Td>
-      <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.phone}</Table.Td>
-      <Table.Td>{element.email}</Table.Td>
-      <Table.Td>{element.address}</Table.Td>
-      <Table.Td>{element.jobRole.name}</Table.Td>
+      <Table.Td>{element?.employeeId}</Table.Td>
+      <Table.Td>{element?.name}</Table.Td>
+      <Table.Td>{element?.phone}</Table.Td>
+      <Table.Td>{element?.email}</Table.Td>
+      <Table.Td>{element?.address}</Table.Td>
+      <Table.Td>{element?.jobRole?.name}</Table.Td>
       <Table.Td>
         <Badge color={element.status === 'ACTIVE' ? 'green' : 'red'} radius="xs" size="xs">
           {element.status}

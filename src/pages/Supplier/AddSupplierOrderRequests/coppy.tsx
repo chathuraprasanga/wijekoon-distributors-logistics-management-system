@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { isNotEmpty, useForm } from '@mantine/form';
-import { ActionIcon, Button, Card, Grid, Select, Table, Text, TextInput, rem } from '@mantine/core';
+import { Grid, Card, Table, Button, TextInput, Text, Select, rem, ActionIcon } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { IconArrowLeft, IconCalendar, IconCheck, IconTrash, IconX } from '@tabler/icons-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useForm, isNotEmpty } from '@mantine/form';
 import { Notifications } from '@mantine/notifications';
-import { RootState } from '@/redux/store';
-import { fetchProducts } from '@/redux/slices/supplierSlice';
+import { IconArrowLeft, IconCalendar, IconCheck, IconTrash, IconX } from '@tabler/icons-react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  createCustomerOrderRequest,
-  fetchCustomerOrderRequests,
-  setCustomer,
-  updateCustomerOrderRequest,
-} from '@/redux/slices/customerSlice';
+  createSupplierOrderRequest,
+  setSupplier,
+  fetchSupplierOrderRequests,
+  updateSupplierOrderRequest,
+  fetchProducts,
+} from '@/redux/slices/supplierSlice';
+import { RootState } from '@/redux/store';
 
 interface RowData {
   product: string;
@@ -27,17 +27,17 @@ interface RowData {
   lineTotal: string;
 }
 
-function AddEditCustomerOrderRequests() {
+function AddSupplierOrderRequests() {
   const [value, setValue] = useState<Date | null>(null);
   const [rows, setRows] = useState<RowData[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const status = useSelector((state: RootState) => state.customers.status);
-  const error = useSelector((state: RootState) => state.customers.error);
-  const customer = useSelector((state: RootState) => state.customers.customer);
+  const status = useSelector((state: RootState) => state.suppliers.status);
+  const error = useSelector((state: RootState) => state.suppliers.error);
+  const supplier = useSelector((state: RootState) => state.suppliers.supplier);
   const products = useSelector((state: RootState) => state.suppliers.products);
-  const selectedCustomerOrderRequest = useSelector(
-    (state: RootState) => state.customers.customerOrderRequest
+  const selectedSupplierOrderRequest = useSelector(
+    (state: RootState) => state.suppliers.SupplierOrderRequest
   );
 
   useEffect(() => {
@@ -65,31 +65,28 @@ function AddEditCustomerOrderRequests() {
   const calculateTotal = (field: keyof RowData) =>
     rows.reduce((acc, row) => acc + parseFloat(row[field] || '0'), 0);
 
-  const customerOrderRequestAddEditForm = useForm({
+  const supplierOrderRequestAddEditForm = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      customer: customer ? customer?._id : '',
-      orderId: selectedCustomerOrderRequest?.orderId || '',
-      expectedDate: selectedCustomerOrderRequest?.expectedDate || new Date(),
-      order: [
+      Supplier: supplier ? supplier?._id : '',
+      orderId: selectedSupplierOrderRequest?.orderId || '',
+      expectedDate: selectedSupplierOrderRequest?.expectedDate || new Date(),
+      purpose: '', // Add purpose field here
+      orderDetails: [
         {
           product: '',
           quantity: '',
-          lineDiscount: '',
-          lineTax: '',
           lineTotal: '',
         },
       ],
-      subTotal: calculateTotal('lineTotal').toFixed(2),
-      totalDiscount: calculateTotal('lineDiscount').toFixed(2),
-      totalTax: calculateTotal('lineTax').toFixed(2),
-      netTotal: calculateTotal('lineTotal').toFixed(2),
-      status: selectedCustomerOrderRequest?.status || '',
+      totalQuantity: calculateTotal('quantity').toFixed(2),
+      totalSize: calculateTotal('lineTotal').toFixed(2),
+      status: selectedSupplierOrderRequest?.status || '',
     },
     validate: {
-      customer: isNotEmpty('Customer is Required'),
+      Supplier: isNotEmpty('Supplier is Required'),
       expectedDate: isNotEmpty('Expected date is required'),
-      netTotal: isNotEmpty('Grand total is required'),
+      purpose: isNotEmpty('Purpose is required'),
     },
   });
 
@@ -108,7 +105,7 @@ function AddEditCustomerOrderRequests() {
               productCode: product.code,
               productName: product.name,
               productSize: product.size,
-              unitPrice: product.sellingPrice,
+              unitPrice: product.buyingPrice,
               lineTotal: (0).toFixed(2), // Set initial line total to 0.0
             }
           : row
@@ -122,16 +119,11 @@ function AddEditCustomerOrderRequests() {
       if (rowIndex === index) {
         const updatedRow = { ...row, [field]: value };
         if (field === 'quantity' || field === 'lineDiscount' || field === 'lineTax') {
-          const unitPrice = parseFloat(updatedRow.unitPrice) || 0;
+          const size = parseFloat(updatedRow.productSize) || 0;
+
           const quantity = parseFloat(updatedRow.quantity) || 0;
-          const discount = parseFloat(updatedRow.lineDiscount) || 0;
-          const tax = parseFloat(updatedRow.lineTax) || 0;
-          updatedRow.lineTotal = (
-            unitPrice *
-            quantity *
-            (1 - discount / 100) *
-            (1 + tax / 100)
-          ).toFixed(2);
+
+          updatedRow.lineTotal = (size * quantity).toFixed(2);
         }
         return updatedRow;
       }
@@ -142,36 +134,37 @@ function AddEditCustomerOrderRequests() {
 
   const handleSave = async () => {
     try {
-      const isValid = await customerOrderRequestAddEditForm.validate();
+      const isValid = await supplierOrderRequestAddEditForm.validate();
       if (!isValid) {
         return;
       }
 
-      const formData = customerOrderRequestAddEditForm.values;
-      formData.customer = customer?._id;
+      const formData = supplierOrderRequestAddEditForm.values;
+      formData.supplier = supplier?._id;
       formData.expectedDate = value;
       formData.status = 'CONFIRMED';
       formData.order = rows;
+      formData.purpose = supplierOrderRequestAddEditForm.values.purpose;
       formData.subTotal = calculateTotal('lineTotal').toFixed(2);
       formData.totalDiscount = calculateTotal('lineDiscount').toFixed(2);
       formData.totalTax = calculateTotal('lineTax').toFixed(2);
       formData.netTotal = calculateTotal('lineTotal').toFixed(2);
 
-      await dispatch(createCustomerOrderRequest(formData)).unwrap();
+      await dispatch(createSupplierOrderRequest(formData)).unwrap();
 
       Notifications.show({
         title: 'Successful',
-        message: 'Customer order request created successfully',
+        message: 'Supplier order request created successfully',
         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
       });
-      customerOrderRequestAddEditForm.reset();
-      dispatch(setCustomer(null));
-      dispatch(fetchCustomerOrderRequests());
-      navigate('/admin/customers/order-requests');
+      supplierOrderRequestAddEditForm.reset();
+      dispatch(setSupplier(null));
+      dispatch(fetchSupplierOrderRequests());
+      navigate('/admin/Suppliers/order-requests');
     } catch (error) {
       Notifications.show({
         title: 'Error',
-        message: 'There was an error creating the customer order request',
+        message: 'There was an error creating the Supplier order request',
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });
@@ -180,29 +173,29 @@ function AddEditCustomerOrderRequests() {
 
   const handleUpdate = async () => {
     try {
-      const formData = customerOrderRequestAddEditForm.values;
-      formData.expectedDate = value || selectedCustomerOrderRequest.expectedDate;
+      const formData = supplierOrderRequestAddEditForm.values;
+      formData.expectedDate = value || selectedSupplierOrderRequest.expectedDate;
       formData.order = rows;
       formData.subTotal = calculateTotal('lineTotal').toFixed(2);
       formData.totalDiscount = calculateTotal('lineDiscount').toFixed(2);
       formData.totalTax = calculateTotal('lineTax').toFixed(2);
       formData.netTotal = calculateTotal('lineTotal').toFixed(2);
 
-      const payload = { ...formData, id: selectedCustomerOrderRequest?._id };
+      const payload = { ...formData, id: selectedSupplierOrderRequest?._id };
       console.log('PAYLOAD', payload);
 
-      await dispatch(updateCustomerOrderRequest(payload)).unwrap();
+      await dispatch(updateSupplierOrderRequest(payload)).unwrap();
       Notifications.show({
         title: 'Successful',
-        message: 'Customer order request updated successfully',
+        message: 'Supplier order request updated successfully',
         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
       });
-      dispatch(fetchCustomerOrderRequests());
-      navigate('/admin/customers/order-requests'); // navigate to the order requests list after updating
+      dispatch(fetchSupplierOrderRequests());
+      navigate('/admin/suppliers/order-requests'); // navigate to the order requests list after updating
     } catch (e) {
       Notifications.show({
         title: 'Error',
-        message: 'There was an error updating the customer order request',
+        message: 'There was an error updating the Supplier order request',
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });
@@ -210,26 +203,26 @@ function AddEditCustomerOrderRequests() {
   };
 
   useEffect(() => {
-    if (selectedCustomerOrderRequest) {
-      customerOrderRequestAddEditForm.setValues({
-        customer: selectedCustomerOrderRequest.customer?._id,
-        orderId: selectedCustomerOrderRequest.orderId,
-        expectedDate: new Date(selectedCustomerOrderRequest.expectedDate),
-        order: selectedCustomerOrderRequest.order?.map((item) => ({
+    if (selectedSupplierOrderRequest) {
+      supplierOrderRequestAddEditForm.setValues({
+        supplier: selectedSupplierOrderRequest.supplier?._id,
+        orderId: selectedSupplierOrderRequest.orderId,
+        expectedDate: new Date(selectedSupplierOrderRequest.expectedDate),
+        order: selectedSupplierOrderRequest.order?.map((item) => ({
           product: item.product?._id,
           quantity: item.quantity?.toString(),
           lineDiscount: item.lineDiscount?.toString(),
           lineTax: item.lineTax?.toString(),
           lineTotal: item.lineTotal?.toString(),
         })),
-        subTotal: selectedCustomerOrderRequest.subTotal.toString(),
-        totalDiscount: selectedCustomerOrderRequest.totalDiscount.toString(),
-        totalTax: selectedCustomerOrderRequest.totalTax.toString(),
-        netTotal: selectedCustomerOrderRequest.netTotal.toString(),
-        status: selectedCustomerOrderRequest.status,
+        subTotal: selectedSupplierOrderRequest.subTotal.toString(),
+        totalDiscount: selectedSupplierOrderRequest.totalDiscount.toString(),
+        totalTax: selectedSupplierOrderRequest.totalTax.toString(),
+        netTotal: selectedSupplierOrderRequest.netTotal.toString(),
+        status: selectedSupplierOrderRequest.status,
       });
       setRows(
-        selectedCustomerOrderRequest.order?.map((item) => ({
+        selectedSupplierOrderRequest.order?.map((item) => ({
           product: item.product?._id,
           productCode: item.product.code,
           productName: item.product.name,
@@ -242,7 +235,12 @@ function AddEditCustomerOrderRequests() {
         }))
       );
     }
-  }, [selectedCustomerOrderRequest]);
+  }, [selectedSupplierOrderRequest]);
+
+  const handlePurposeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.currentTarget.value;
+    supplierOrderRequestAddEditForm.setFieldValue('purpose', selectedValue || ''); // Update form state safely
+  };
 
   return (
     <>
@@ -254,7 +252,7 @@ function AddEditCustomerOrderRequests() {
                 <IconArrowLeft />
               </Link>
               <Text size="md" style={{ fontWeight: 'bold' }}>
-                Add Customer Order Request
+                Add Supplier Order Request
               </Text>
             </div>
             <div></div>
@@ -264,23 +262,23 @@ function AddEditCustomerOrderRequests() {
           action=""
           style={{ width: '100%' }}
           onSubmit={
-            !selectedCustomerOrderRequest
-              ? customerOrderRequestAddEditForm.onSubmit((values) => handleSave())
-              : customerOrderRequestAddEditForm.onSubmit((values) => handleUpdate())
+            !selectedSupplierOrderRequest
+              ? supplierOrderRequestAddEditForm.onSubmit((values) => handleSave())
+              : supplierOrderRequestAddEditForm.onSubmit((values) => handleUpdate())
           }
         >
           <Grid.Col>
             <Card shadow="sm" padding="lg" radius="md" withBorder>
               <Text style={{ fontWeight: 'bold' }} size="lg">
-                Customer Details
+                Supplier Details
               </Text>
               <Table withRowBorders={false}>
                 <Table.Tr>
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Name:
                   </Table.Td>
-                  <Table.Td>{customer?.fullName}</Table.Td>
-                  {!selectedCustomerOrderRequest && (
+                  <Table.Td>{supplier?.name}</Table.Td>
+                  {!selectedSupplierOrderRequest && (
                     <>
                       <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                         Expected Date:
@@ -296,13 +294,13 @@ function AddEditCustomerOrderRequests() {
                       </Table.Td>
                     </>
                   )}
-                  {selectedCustomerOrderRequest && (
+                  {selectedSupplierOrderRequest && (
                     <>
                       <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                         Created Date:
                       </Table.Td>
                       <Table.Td>
-                        {selectedCustomerOrderRequest?.createdAt?.split('T')[0] || 'N/A'}
+                        {selectedSupplierOrderRequest?.createdAt?.split('T')[0] || 'N/A'}
                       </Table.Td>
                     </>
                   )}
@@ -312,9 +310,27 @@ function AddEditCustomerOrderRequests() {
                     Phone:
                   </Table.Td>
                   <Table.Td>
-                    {customer?.phone} | {customer?.phoneSecondary}
+                    {supplier?.phone} | {supplier?.phoneSecondary}
                   </Table.Td>
-                  {selectedCustomerOrderRequest && (
+                  <Table.Td width={150} style={{ fontWeight: 'bold' }}>
+                    Purpose:
+                  </Table.Td>
+                  <Table.Td>
+                    <Select
+                      size="xs"
+                      placeholder="Pick value"
+                      data={['For Delivery', 'For Warehouse']}
+                      key={supplierOrderRequestAddEditForm.key('purpose')}
+                      {...supplierOrderRequestAddEditForm.getInputProps('purpose')}
+                    />
+                  </Table.Td>
+                </Table.Tr>
+                <Table.Tr>
+                  <Table.Td width={150} style={{ fontWeight: 'bold' }}>
+                    Email:
+                  </Table.Td>
+                  <Table.Td>{supplier?.email}</Table.Td>
+                  {selectedSupplierOrderRequest && (
                     <>
                       <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                         Expected Date:
@@ -326,8 +342,8 @@ function AddEditCustomerOrderRequests() {
                           placeholder="Pick expected date"
                           value={
                             value ||
-                            (selectedCustomerOrderRequest?.expectedDate
-                              ? new Date(selectedCustomerOrderRequest.expectedDate)
+                            (selectedSupplierOrderRequest?.expectedDate
+                              ? new Date(selectedSupplierOrderRequest.expectedDate)
                               : null)
                           }
                           onChange={(date) => setValue(date)}
@@ -338,15 +354,9 @@ function AddEditCustomerOrderRequests() {
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
-                    Email:
-                  </Table.Td>
-                  <Table.Td>{customer?.email}</Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                  <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Address:
                   </Table.Td>
-                  <Table.Td>{customer?.address}</Table.Td>
+                  <Table.Td>{supplier?.address}</Table.Td>
                 </Table.Tr>
               </Table>
             </Card>
@@ -358,12 +368,8 @@ function AddEditCustomerOrderRequests() {
                   <Table.Th>Product Code</Table.Th>
                   <Table.Th>Product Name</Table.Th>
                   <Table.Th>Product Size</Table.Th>
-                  <Table.Th>Unit Price</Table.Th>
                   <Table.Th>Quantity</Table.Th>
-                  <Table.Th>Discount</Table.Th>
-                  <Table.Th>Tax</Table.Th>
                   <Table.Th>Line Total</Table.Th>
-                  <Table.Th></Table.Th>
                 </Table.Tr>
                 {rows?.map((row, index) => (
                   <Table.Tr key={index}>
@@ -386,33 +392,12 @@ function AddEditCustomerOrderRequests() {
                       <TextInput size="xs" value={row.productSize} disabled />
                     </Table.Td>
                     <Table.Td>
-                      <TextInput size="xs" value={row.unitPrice} disabled />
-                    </Table.Td>
-                    <Table.Td>
                       <TextInput
                         size="xs"
                         placeholder="Enter Quantity"
                         value={row.quantity}
                         defaultValue={0}
                         onChange={(e) => handleChange(e.currentTarget.value, 'quantity', index)}
-                      />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput
-                        size="xs"
-                        placeholder="Enter discount"
-                        rightSection="%"
-                        value={row.lineDiscount}
-                        onChange={(e) => handleChange(e.currentTarget.value, 'lineDiscount', index)}
-                      />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput
-                        size="xs"
-                        placeholder="Enter tax"
-                        rightSection="%"
-                        value={row.lineTax}
-                        onChange={(e) => handleChange(e.currentTarget.value, 'lineTax', index)}
                       />
                     </Table.Td>
                     <Table.Td>
@@ -426,72 +411,46 @@ function AddEditCustomerOrderRequests() {
                   </Table.Tr>
                 ))}
                 <Table.Tr>
-                  <Table.Td colSpan={2}>
+                  <Table.Td>
                     <Button size="xs" style={{ width: '100%' }} onClick={addRow}>
                       Add Products
                     </Button>
                   </Table.Td>
                 </Table.Tr>
-                {/* <Table.Tr>
-                  <Table.Td colSpan={6}></Table.Td>
-                  <Table.Td>
-                    <Text size="md" style={{ fontWeight: 'bold' }}>
-                     Sub total:
-                    </Text>
-                  </Table.Td>
-                  <Table.Td>
-                    <Text size="md" style={{ fontWeight: 'bold' }}>
-                      {calculateTotal('lineTotal').toFixed(2)}
-                    </Text>
-                  </Table.Td>
-                </Table.Tr> */}
-                {/* <Table.Tr>
-                  <Table.Td colSpan={6}></Table.Td>
-                  <Table.Td>
-                    <Text size="sm" style={{ fontWeight: 'bold' }}>
-                      Total Discount:
-                    </Text>
-                  </Table.Td>
-                  <Table.Td>
-                    <Text size="sm" style={{ fontWeight: 'bold' }}>
-                      {calculateTotal('discount').toFixed(2)}
-                    </Text>
-                  </Table.Td>
-                </Table.Tr> */}
-                {/* <Table.Tr>
-                  <Table.Td colSpan={6}></Table.Td>
-                  <Table.Td>
-                    <Text size="sm" style={{ fontWeight: 'bold' }}>
-                      Total Tax:
-                    </Text>
-                  </Table.Td>
-                  <Table.Td>
-                    <Text size="sm" style={{ fontWeight: 'bold' }}>
-                      {calculateTotal('tax').toFixed(2)}
-                    </Text>
-                  </Table.Td>
-                </Table.Tr> */}
                 <Table.Tr>
-                  <Table.Td colSpan={6}></Table.Td>
+                  <Table.Td colSpan={3}></Table.Td>
                   <Table.Td>
-                    <Text size="md" style={{ fontWeight: 'bold' }}>
-                      Grand Total:
-                    </Text>
+                    <Text size="sm">Total Quantity</Text>
                   </Table.Td>
                   <Table.Td>
                     <Text size="md" style={{ fontWeight: 'bold' }}>
-                      {calculateTotal('lineTotal').toFixed(2)}
+                      {calculateTotal('quantity')}
                     </Text>
                   </Table.Td>
+                  <Table.Td></Table.Td>
+                </Table.Tr>
+                <Table.Tr>
+                  <Table.Td colSpan={3}></Table.Td>
+                  <Table.Td>
+                    <Text size="sm">Total Size</Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text size="md" style={{ fontWeight: 'bold' }}>
+                      {calculateTotal('lineTotal').toFixed(2)} KG
+                    </Text>
+                  </Table.Td>
+                  <Table.Td></Table.Td>
                 </Table.Tr>
               </Table>
             </Card>
+          </Grid.Col>
+          <Grid.Col span={12}>
             <div>
               <Button
                 style={{ width: '15%', marginTop: 10, float: 'right' }}
-                onClick={selectedCustomerOrderRequest ? handleUpdate : handleSave}
+                onClick={selectedSupplierOrderRequest ? handleUpdate : handleSave}
               >
-                {selectedCustomerOrderRequest ? 'Update Order' : 'Save Order'}
+                {selectedSupplierOrderRequest ? 'Update Order' : 'Save Order'}
               </Button>
             </div>
           </Grid.Col>
@@ -501,4 +460,4 @@ function AddEditCustomerOrderRequests() {
   );
 }
 
-export default AddEditCustomerOrderRequests;
+// export default AddSupplierOrderRequests;

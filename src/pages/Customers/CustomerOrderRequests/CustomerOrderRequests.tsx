@@ -82,11 +82,10 @@ function CustomerOrderRequests() {
   const displayedCustomers = filteredCustomers.slice(startModal, endModal);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchCustomerOrderRequests());
-      dispatch(fetchCustomers());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchCustomerOrderRequests());
+    dispatch(fetchCustomers());
+    dispatch(setCustomerOrderRequest(null));
+  }, [dispatch]);
 
   const handleSelect = (customer) => {
     dispatch(setCustomer(customer));
@@ -102,6 +101,8 @@ function CustomerOrderRequests() {
   };
 
   const handleView = (orderRequest) => {
+    dispatch(setCustomerOrderRequest(orderRequest));
+    navigate('/admin/customers/view-order-requests');
     // Implement your view functionality here
   };
 
@@ -216,7 +217,19 @@ function CustomerOrderRequests() {
                 <Table.Th>Action</Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody>{modalData}</Table.Tbody>
+            <Table.Tbody>
+              {modalData.length > 0 ? (
+                modalData
+              ) : (
+                <Table.Tr>
+                  <Table.Td colSpan={10}>
+                    <Text color="dimmed" align="center">
+                      No data found
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
           </Table>
           <Pagination
             total={Math.ceil(filteredCustomers.length / customersPerPage)}
@@ -261,7 +274,19 @@ function CustomerOrderRequests() {
             <Divider my="md" />
             <Table striped highlightOnHover>
               <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
             <Pagination
               total={Math.ceil(filteredRequests.length / requestsPerPage)}

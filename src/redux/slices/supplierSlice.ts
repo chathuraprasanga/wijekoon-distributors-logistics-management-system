@@ -149,7 +149,7 @@ export const createSupplierOrderRequest = createAsyncThunk(
   'suppliers/createSupplierOrderRequest',
   async (supplierOrderRequest: any) => {
     const response = await axios.post(
-      'http://localhost:3000/supplierOrderRequests',
+      'http://localhost:3000/supplierOrderRequest',
       supplierOrderRequest,
       {
         headers: {
@@ -165,7 +165,7 @@ export const updateSupplierOrderRequest = createAsyncThunk(
   'suppliers/updateSupplierOrderRequest',
   async (supplierOrderRequest: any) => {
     const response = await axios.put(
-      `http://localhost:3000/supplierOrderRequests/${supplierOrderRequest.id}`,
+      `http://localhost:3000/supplierOrderRequest/${supplierOrderRequest.id}`,
       supplierOrderRequest,
       {
         headers: {
@@ -173,6 +173,34 @@ export const updateSupplierOrderRequest = createAsyncThunk(
         },
       }
     );
+    return response.data;
+  }
+);
+
+export const updateSupplierOrderRequestStatus = createAsyncThunk(
+  'suppliers/updateSupplierOrderRequestStatus',
+  async (supplierOrderRequest: any) => {
+    const response = await axios.put(
+      `http://localhost:3000/supplierOrderRequest/status/${supplierOrderRequest.id}`,
+      supplierOrderRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
+);
+
+export const getSupplierOrderRequestById = createAsyncThunk(
+  'suppliers/getSupplierOrderRequestById',
+  async (supplierOrderRequestId: string) => {
+    const response = await axios.get(`http://localhost:3000/supplierOrderRequest/${supplierOrderRequestId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     return response.data;
   }
 );
@@ -558,6 +586,33 @@ const supplierSlice = createSlice({
       .addCase(deleteSupplierPayment.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to delete supplier payment';
+      })
+      .addCase(updateSupplierOrderRequestStatus.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(updateSupplierOrderRequestStatus.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        const index = state.supplierOrderRequests.findIndex(
+          (request) => request.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.supplierOrderRequests[index] = action.payload;
+        }
+      })
+      .addCase(updateSupplierOrderRequestStatus.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to update supplier order request status';
+      })
+      .addCase(getSupplierOrderRequestById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getSupplierOrderRequestById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.supplierOrderRequest = action.payload;
+      })
+      .addCase(getSupplierOrderRequestById.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch supplier order request';
       });
   },
 });

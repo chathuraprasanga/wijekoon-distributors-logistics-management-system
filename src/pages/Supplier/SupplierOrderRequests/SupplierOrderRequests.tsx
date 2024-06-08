@@ -1,201 +1,160 @@
 import {
-  Modal,
-  SegmentedControl,
-  TextInput,
-  Table,
-  Pagination,
-  Grid,
+  Badge,
   Button,
   Card,
   Divider,
-  Badge,
+  Grid,
   Menu,
+  Modal,
+  Pagination,
+  SegmentedControl,
+  Table,
   Text,
+  TextInput,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconDots, IconSearch } from '@tabler/icons-react';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { RootState } from '@/redux/store';
+import {
+  fetchSupplierOrderRequests,
+  fetchSuppliers,
+  setSupplier,
+  setSupplierOrderRequest,
+  fetchProducts,
+} from '@/redux/slices/supplierSlice';
 
 function SupplierOrderRequests() {
   const [activePage, setPage] = useState(1);
-  const [activeModelPage, setModelPage] = useState(1);
-
+  const [activeModalPage, setModalPage] = useState(1);
+  const dispatch = useDispatch();
+  const status = useSelector((state: RootState) => state.suppliers.status);
+  const suppliers = useSelector((state: RootState) => state.suppliers.suppliers);
+  const supplierOrderRequests = useSelector(
+    (state: RootState) => state.suppliers.supplierOrderRequests
+  );
   const [opened, { open, close }] = useDisclosure(false);
+  const navigate = useNavigate();
 
-  const elements = [
-    {
-      orderId: 'WDS-001',
-      date: '01/04/2024',
-      Supplier: 'Tech Innovations',
-      products: '01',
-      quantity: '200',
-      expectedDate: '18/04/2024',
-      purpose: 'For Delivery',
-      status: 'PENDING',
-    },
-    {
-      orderId: 'WDS-002',
-      date: '02/04/2024',
-      Supplier: 'Eco Products',
-      products: '02',
-      quantity: '150',
-      expectedDate: '20/04/2024',
-      purpose: 'For Warehouse',
-      status: 'CONFIRMED',
-    },
-    {
-      orderId: 'WDS-003',
-      date: '03/04/2024',
-      Supplier: 'Healthcare Solutions',
-      products: '03',
-      quantity: '250',
-      expectedDate: '22/04/2024',
-      purpose: 'For Delivery',
-      status: 'REJECTED',
-    },
-    {
-      orderId: 'WDS-004',
-      date: '04/04/2024',
-      Supplier: 'Fashion Forward',
-      products: '04',
-      quantity: '300',
-      expectedDate: '24/04/2024',
-      purpose: 'For Warehouse',
-      status: 'CANCELLED',
-    },
-    {
-      orderId: 'WDS-005',
-      date: '05/04/2024',
-      Supplier: 'Tech Innovations',
-      products: '05',
-      quantity: '175',
-      expectedDate: '26/04/2024',
-      purpose: 'For Delivery',
-      status: 'PENDING',
-    },
-    {
-      orderId: 'WDS-006',
-      date: '06/04/2024',
-      Supplier: 'Eco Products',
-      products: '01',
-      quantity: '225',
-      expectedDate: '28/04/2024',
-      purpose: 'For Warehouse',
-      status: 'CONFIRMED',
-    },
-    {
-      orderId: 'WDS-007',
-      date: '07/04/2024',
-      Supplier: 'Healthcare Solutions',
-      products: '02',
-      quantity: '250',
-      expectedDate: '30/04/2024',
-      purpose: 'For Delivery',
-      status: 'REJECTED',
-    },
-    {
-      orderId: 'WDS-008',
-      date: '08/04/2024',
-      Supplier: 'Fashion Forward',
-      products: '03',
-      quantity: '275',
-      expectedDate: '02/05/2024',
-      purpose: 'For Warehouse',
-      status: 'CANCELLED',
-    },
-    {
-      orderId: 'WDS-009',
-      date: '09/04/2024',
-      Supplier: 'Tech Innovations',
-      products: '04',
-      quantity: '200',
-      expectedDate: '04/05/2024',
-      purpose: 'For Delivery',
-      status: 'PENDING',
-    },
-    {
-      orderId: 'WDS-010',
-      date: '10/04/2024',
-      Supplier: 'Eco Products',
-      products: '05',
-      quantity: '150',
-      expectedDate: '06/05/2024',
-      purpose: 'For Warehouse',
-      status: 'CONFIRMED',
-    },
-    {
-      orderId: 'WDS-011',
-      date: '11/04/2024',
-      Supplier: 'Healthcare Solutions',
-      products: '01',
-      quantity: '250',
-      expectedDate: '08/05/2024',
-      purpose: 'For Delivery',
-      status: 'REJECTED',
-    },
-    {
-      orderId: 'WDS-012',
-      date: '12/04/2024',
-      Supplier: 'Fashion Forward',
-      products: '02',
-      quantity: '300',
-      expectedDate: '10/05/2024',
-      purpose: 'For Warehouse',
-      status: 'CANCELLED',
-    },
-  ];
+  // pagination for main
+  const requestsPerPage = 10;
+  const handlePageChange = (newPage: any) => {
+    setPage(newPage);
+  };
+  const startMain = (activePage - 1) * requestsPerPage;
+  const endMain = startMain + requestsPerPage;
 
-  const rows = elements.slice(0, 10).map((element) => (
-    <>
-      <Table.Tr key={element.orderId}>
-        <Table.Td>{element.orderId}</Table.Td>
-        <Table.Td>{element.date}</Table.Td>
-        <Table.Td>{element.Supplier}</Table.Td>
-        <Table.Td>{element.products}</Table.Td>
-        <Table.Td>{element.quantity}</Table.Td>
-        <Table.Td>{element.expectedDate}</Table.Td>
-        <Table.Td>{element.purpose}</Table.Td>
-        <Table.Td>
-          <Badge
-            color={(() => {
-              switch (element.status) {
-                case 'PENDING':
-                  return 'yellow'; // Assuming yellow for pending
-                case 'CONFIRMED':
-                  return 'green'; // Assuming blue for confirmed
-                case 'CANCELLED':
-                  return 'purple'; // Assuming red for cancelled
-                case 'REJECTED':
-                  return 'red'; // Assuming gray for not completed
-                default:
-                  return 'gray'; // Default color if status is not recognized
-              }
-            })()}
-            radius="xs"
-            size="xs"
-          >
-            {element.status}
-          </Badge>
-        </Table.Td>
-        <Table.Td>
-          <Menu shadow="md" width={100}>
-            <Menu.Target>
-              <IconDots style={{ cursor: 'pointer' }} />
-            </Menu.Target>
+  // pagination for modal
+  const suppliersPerPage = 5;
+  const handleModalPageChange = (newPage: any) => {
+    setModalPage(newPage);
+  };
+  const startModal = (activeModalPage - 1) * suppliersPerPage;
+  const endModal = startModal + suppliersPerPage;
 
-            <Menu.Dropdown>
-              <Link to="/admin/suppliers/view-order-requests" style={{ textDecoration: 'none' }}>
-                <Menu.Item>View</Menu.Item>
-              </Link>
-              <Link to="/admin/suppliers/edit-order-requests" style={{ textDecoration: 'none' }}>
-                <Menu.Item>Edit</Menu.Item>
-              </Link>
-            </Menu.Dropdown>
-          </Menu>
-        </Table.Td>
-      </Table.Tr>
-    </>
+  // for search
+  const [searchSegment, setSearchSegment] = useState('Email');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // filtering suppliers based on search
+  const filteredRequests = supplierOrderRequests.filter((request: any) => {
+    const value = searchSegment === 'Supplier' ? request.supplier?.fullName || '' : request.orderId;
+    return value.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  const displayedRequests = filteredRequests.slice(startMain, endMain);
+
+  // modal Search
+  const [modalSearchSegment, setModalSearchSegment] = useState('Email');
+  const [modalSearchTerm, setModalSearchTerm] = useState('');
+  const filteredSuppliers = suppliers.filter((supplier: any) => {
+    const value =
+      modalSearchSegment === 'Name'
+        ? supplier.name
+        : modalSearchSegment === 'Phone'
+          ? supplier.phone
+          : supplier.email;
+    return value.toLowerCase().includes(modalSearchTerm.toLowerCase());
+  });
+
+  const displayedSuppliers = filteredSuppliers.slice(startModal, endModal);
+
+  useEffect(() => {
+    dispatch(fetchSupplierOrderRequests());
+    dispatch(fetchSuppliers());
+    dispatch(setSupplierOrderRequest(null));
+  }, [dispatch]);
+
+  const handleSelect = (supplier) => {
+    dispatch(setSupplier(supplier));
+    navigate('/admin/suppliers/add-order-requests');
+    dispatch(setSupplierOrderRequest(null));
+  };
+
+  const handleEdit = (orderRequest) => {
+    dispatch(setSupplierOrderRequest(orderRequest));
+    dispatch(setSupplier(orderRequest.supplier));
+    dispatch(fetchProducts());
+    navigate('/admin/suppliers/add-order-requests');
+  };
+
+  const handleView = (orderRequest) => {
+    dispatch(setSupplierOrderRequest(orderRequest));
+    navigate('/admin/suppliers/view-order-requests');
+    // Implement your view functionality here
+  };
+
+  const rows = displayedRequests.map((element: any, index: any) => (
+    <Table.Tr key={element.orderId}>
+      <Table.Td>{element.orderId}</Table.Td>
+      <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
+      <Table.Td>{element.supplier?.name || 'N/A'}</Table.Td>
+      <Table.Td>{element.order.length}</Table.Td>
+      <Table.Td>
+        {element.order.reduce((acc: any, item: any) => acc + parseInt(item.quantity), 0)}
+      </Table.Td>
+      <Table.Td>{element.expectedDate.split('T')[0]}</Table.Td>
+      <Table.Td>
+        <Badge
+          color={(() => {
+            switch (element.status) {
+              case 'PENDING':
+                return 'yellow';
+              case 'CONFIRMED':
+                return 'green';
+              case 'CANCELLED':
+                return 'red';
+              case 'COMPLETED':
+                return 'blue';
+              case 'NOT COMPLETED':
+                return 'purple';
+              default:
+                return 'gray';
+            }
+          })()}
+          radius="xs"
+          size="xs"
+        >
+          {element.status}
+        </Badge>
+      </Table.Td>
+      <Table.Td>
+        <Menu shadow="md" width={100}>
+          <Menu.Target>
+            <IconDots style={{ cursor: 'pointer' }} />
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+            {element.status === 'PENDING' && (
+              <Menu.Item onClick={() => handleEdit(element)}>Edit</Menu.Item>
+            )}
+          </Menu.Dropdown>
+        </Menu>
+      </Table.Td>
+    </Table.Tr>
   ));
 
   const ths = (
@@ -206,62 +165,24 @@ function SupplierOrderRequests() {
       <Table.Th>Products</Table.Th>
       <Table.Th>Quantity</Table.Th>
       <Table.Th>Expected Date</Table.Th>
-      <Table.Th>Purpose</Table.Th>
       <Table.Th>Status</Table.Th>
       <Table.Th>Action</Table.Th>
     </Table.Tr>
   );
 
-  const SupplierReqData = [
-    {
-      id: 1,
-      name: 'Tech Innovations',
-      phone: '+1 1234567890',
-      email: 'techinnovations@example.com',
-      address: '123, lakeside, new york, USA',
-      status: 'ACTIVE',
-    },
-    {
-      id: 2,
-      name: 'Eco Products',
-      phone: '+1 2345678901',
-      email: 'ecoproducts@example.com',
-      address: '456, main street, chicago, USA',
-      status: 'ACTIVE',
-    },
-    {
-      id: 3,
-      name: 'Healthcare Solutions',
-      phone: '+1 3456789012',
-      email: 'healthcaresolutions@example.com',
-      address: '789, park avenue, los angeles, USA',
-      status: 'ACTIVE',
-    },
-    {
-      id: 4,
-      name: 'Fashion Forward',
-      phone: '+1 4567890123',
-      email: 'fashionforward@example.com',
-      address: '1011, oakwood drive, houston, USA',
-      status: 'ACTIVE',
-    },
-  ];
-
-  const modalData = SupplierReqData.slice(0, 5).map((element) => (
-    <>
-      <Table.Tr key={element.id}>
-        <Table.Td>{element.id}</Table.Td>
-        <Table.Td>{element.name}</Table.Td>
-        <Table.Td>{element.phone}</Table.Td>
-        <Table.Td>{element.email}</Table.Td>
-        <Table.Td>{element.address}</Table.Td>
-        <Table.Td>
-          <Link to="/admin/suppliers/add-order-requests">
-            <Button size="xs">Select</Button>
-          </Link>
-        </Table.Td>
-      </Table.Tr>
-    </>
+  const modalData = displayedSuppliers.map((element, index) => (
+    <Table.Tr key={element._id}>
+      <Table.Td>{startModal + index + 1}</Table.Td>
+      <Table.Td>{element.name}</Table.Td>
+      <Table.Td>{element.phone}</Table.Td>
+      <Table.Td>{element.email}</Table.Td>
+      <Table.Td>{element.address}</Table.Td>
+      <Table.Td>
+        <Button size="xs" onClick={() => handleSelect(element)}>
+          Select
+        </Button>
+      </Table.Td>
+    </Table.Tr>
   ));
 
   return (
@@ -276,30 +197,34 @@ function SupplierOrderRequests() {
             color="violet"
             data={['Name', 'Phone', 'Email']}
             defaultValue="Email"
+            onChange={setModalSearchSegment}
           />
           <TextInput
             ml={10}
             size="xs"
-            placeholder="Serach"
+            placeholder="Search"
+            onChange={(event) => setModalSearchTerm(event.currentTarget.value)}
             rightSection={<IconSearch size="20" color="gray" />}
           />
         </div>
         <div>
           <Table>
-            <Table.Tr>
-              <Table.Th>#</Table.Th>
-              <Table.Th>Supplier</Table.Th>
-              <Table.Th>Phone</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Address</Table.Th>
-              <Table.Th>Action</Table.Th>
-            </Table.Tr>
-            {modalData}
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>#</Table.Th>
+                <Table.Th>Supplier</Table.Th>
+                <Table.Th>Phone</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Address</Table.Th>
+                <Table.Th>Action</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{modalData}</Table.Tbody>
           </Table>
           <Pagination
-            total={SupplierReqData.length / 5}
-            value={activeModelPage}
-            onChange={setModelPage}
+            total={Math.ceil(filteredSuppliers.length / suppliersPerPage)}
+            value={activeModalPage}
+            onChange={handleModalPageChange}
             mt={10}
             style={{ display: 'flex', justifyContent: 'flex-end' }}
             size="xs"
@@ -313,11 +238,9 @@ function SupplierOrderRequests() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Supplier Order Requests</Text>
             </div>
-            {/* <Link to="/admin/Suppliers/add-order-requests"> */}
             <Button size="sm" onClick={open}>
               Create Supplier Order Requests
             </Button>
-            {/* </Link> */}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>
@@ -326,23 +249,42 @@ function SupplierOrderRequests() {
               <SegmentedControl
                 size="xs"
                 color="violet"
-                data={['Order ID', 'Supplier']}
-                defaultValue="Supplier"
+                data={['Supplier', 'Order ID']}
+                defaultValue="Order ID"
+                onChange={setSearchSegment}
               />
-              <TextInput size="xs" ml={10} rightSection={<IconSearch />} placeholder="Search" />
+              <TextInput
+                size="xs"
+                ml={10}
+                rightSection={<IconSearch />}
+                placeholder="Search"
+                onChange={(event) => setSearchTerm(event.currentTarget.value)}
+              />
             </div>
-            <Divider my="md" />
-            <Table striped highlightOnHover>
+            <Divider my={10} />
+            <Table>
               <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
             <Pagination
-              total={elements.length / 10}
+              total={Math.ceil(filteredRequests.length / requestsPerPage)}
               value={activePage}
-              onChange={setPage}
+              onChange={handlePageChange}
               mt={10}
               style={{ display: 'flex', justifyContent: 'flex-end' }}
-              size="xs"
+              size="sm"
             />
           </Card>
         </Grid.Col>

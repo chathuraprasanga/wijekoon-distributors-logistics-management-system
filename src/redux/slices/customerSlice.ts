@@ -6,6 +6,7 @@ interface CustomersState {
   pagedCustomers: any[];
   customer: any | null;
   customerOrderRequests: any[];
+  confirmedCustomerOredrRequests: any[];
   pagedCustomerOrderRequests: any[];
   customerOrderRequest: any | null;
   customerOrders: any[];
@@ -14,6 +15,7 @@ interface CustomersState {
   customerPayments: any[];
   pagedCustomerPayments: any[];
   customerPayment: any | null;
+  updateCustomerPayment: any| null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -21,6 +23,7 @@ interface CustomersState {
 const initialState: CustomersState = {
   customers: [],
   customerOrderRequests: [],
+  confirmedCustomerOredrRequests: [],
   customerOrders: [],
   customerPayments: [],
   pagedCustomers: [],
@@ -31,6 +34,7 @@ const initialState: CustomersState = {
   customerOrderRequest: {},
   customerOrder: {},
   customerPayment: {},
+  updateCustomerPayment: {},
   status: 'idle',
   error: null,
 };
@@ -61,11 +65,15 @@ export const createCustomer = createAsyncThunk(
 export const updateCustomer = createAsyncThunk(
   'customers/updateCustomer',
   async (customer: any) => {
-    const response = await axios.put(`http://localhost:3000/customer/${customer.id}`, customer.data, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await axios.put(
+      `http://localhost:3000/customer/${customer.id}`,
+      customer.data,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
     return response.data;
   }
 );
@@ -86,6 +94,18 @@ export const fetchCustomerOrderRequests = createAsyncThunk(
   'customers/fetchCustomerOrderRequests',
   async () => {
     const response = await axios.get('http://localhost:3000/customerOrderRequests', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
+);
+
+export const fetchConfirmedCustomerOrderRequests = createAsyncThunk(
+  'customers/fetchConfirmedCustomerOrderRequests',
+  async () => {
+    const response = await axios.get('http://localhost:3000/customerOrderRequestsConfiremed', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -215,7 +235,7 @@ export const updateCustomerPayment = createAsyncThunk(
   'customers/updateCustomerPayment',
   async (customerPayment: any) => {
     const response = await axios.put(
-      `http://localhost:3000/customerPayments/${customerPayment.id}`,
+      `http://localhost:3000/customerPayment/${customerPayment._id}`,
       customerPayment,
       {
         headers: {
@@ -254,6 +274,9 @@ const customerSlice = createSlice({
     },
     setCustomerPayment: (state, action) => {
       state.customerPayment = action.payload;
+    },
+    setUpdateCustomerPayment: (state, action) => {
+      state.updateCustomerPayment = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -453,12 +476,24 @@ const customerSlice = createSlice({
       .addCase(deleteCustomerPayment.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to delete customer payment';
+      })
+      .addCase(fetchConfirmedCustomerOrderRequests.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchConfirmedCustomerOrderRequests.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.confirmedCustomerOredrRequests = action.payload;
+      })
+      .addCase(fetchConfirmedCustomerOrderRequests.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to delete customer payment';
       });
 
     //write the rest of the code
   },
 });
 
-export const { setCustomer, setCustomerOrderRequest, setCustomerOrder, setCustomerPayment } =  customerSlice.actions;
+export const { setCustomer, setCustomerOrderRequest, setCustomerOrder, setCustomerPayment, setUpdateCustomerPayment } =
+  customerSlice.actions;
 
 export default customerSlice.reducer;
