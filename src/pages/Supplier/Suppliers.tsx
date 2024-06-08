@@ -47,14 +47,12 @@ function Suppliers() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchSuppliers());
-      dispatch(fetchSupplierOrderRequests());
-      dispatch(fetchSupplierOrders());
-      dispatch(fetchSupplierPayments());
-      dispatch(fetchProducts());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchSuppliers());
+    dispatch(fetchSupplierOrderRequests());
+    dispatch(fetchSupplierOrders());
+    dispatch(fetchSupplierPayments());
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   // pagination
   const handlePageChange = (newPage: any) => {
@@ -193,7 +191,19 @@ function Suppliers() {
             <Divider my="md" />
             <Table striped highlightOnHover>
               <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
             <Pagination
               total={Math.ceil(suppliers.length / suppliersPerPage)}

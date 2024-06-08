@@ -40,6 +40,10 @@ const JobRoles: React.FC = () => {
   const [jobRoleToDelete, setJobRoleToDelete] = useState<JobRole | null>(null);
   const [opened, setOpened] = useState(false);
 
+  const userDetailsString = localStorage.getItem('user');
+  const userDetails = JSON.parse(userDetailsString);
+  const role = userDetails.role.name;
+
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchJobRoles());
@@ -117,7 +121,7 @@ const JobRoles: React.FC = () => {
             size="xs"
             color="violet"
             onClick={() => handleEditBtn(element)}
-            disabled={element.name === 'Super Admin'}
+            disabled={role !== 'Super Admin' || element.name === 'Super Admin'}
           >
             Edit
           </Button>
@@ -125,7 +129,7 @@ const JobRoles: React.FC = () => {
             ml={10}
             size="xs"
             color="red"
-            disabled={element.name === 'Super Admin'}
+            disabled={role !== 'Super Admin' || element.name === 'Super Admin'}
             onClick={() => handleDeleteBtn(element)}
           >
             Delete

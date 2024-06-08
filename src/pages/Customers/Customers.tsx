@@ -46,13 +46,11 @@ function Customers() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchCustomers());
-      dispatch(fetchCustomerOrderRequests());
-      dispatch(fetchCustomerOrders());
-      dispatch(fetchCustomerPayments());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchCustomers());
+    dispatch(fetchCustomerOrderRequests());
+    dispatch(fetchCustomerOrders());
+    dispatch(fetchCustomerPayments());
+  }, [dispatch]);
 
   // pagination
   const handlePageChange = (newPage: any) => {
@@ -146,15 +144,15 @@ function Customers() {
   ));
 
   const ths = (
-    <tr>
-      <th>#</th>
-      <th>Customer name</th>
-      <th>Phone</th>
-      <th>Email</th>
-      <th>Address</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
+    <Table.Tr>
+      <Table.Th>#</Table.Th>
+      <Table.Th>Customer name</Table.Th>
+      <Table.Th>Phone</Table.Th>
+      <Table.Th>Email</Table.Th>
+      <Table.Th>Address</Table.Th>
+      <Table.Th>Status</Table.Th>
+      <Table.Th>Action</Table.Th>
+    </Table.Tr>
   );
 
   return (
@@ -191,8 +189,20 @@ function Customers() {
             </div>
             <Divider my="md" />
             <Table striped highlightOnHover>
-              <thead>{ths}</thead>
-              <tbody>{rows}</tbody>
+              <Table.Thead>{ths}</Table.Thead>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
             <Pagination
               total={Math.ceil(filteredCustomers.length / customerPerPage)}

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Modal, Table, Select, TextInput, ActionIcon, Button, Text } from '@mantine/core';
-import { DatePickerInput } from '@mantine/dates';
-import { IconTrash } from '@tabler/icons-react';
-import { useDisclosure } from '@mantine/hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { setCustomerPayment, updateCustomerPayment } from '@/redux/slices/customerSlice';
+import { Modal, Table, Select, TextInput, ActionIcon, Button, Text, rem } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { setCustomerPayment } from '@/redux/slices/customerSlice';
+import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
+import { RootState } from '@/redux/store';
+import { useNavigate } from 'react-router-dom';
+import { Notifications } from '@mantine/notifications';
 
-// Define the type for the row data
 interface RowData {
   method: string;
   bank: string;
@@ -18,20 +18,36 @@ interface RowData {
   amount: number;
 }
 
-const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
-  const [payments, setPayments] = useState<RowData[]>([
-    // { method: 'Cash', bank: '', branch: '', chequeNumber: '', depositDate: null, amount: '' },
+const CustomerPaymentUpdateModal = ({
+  customerPayment,
+  totalPayable,
+  opened,
+  onClose,
+}: {
+  customerOrder: any;
+  totalPayable: number;
+  opened: boolean;
+  onClose: () => void;
+}) => {
+  const [outstanding, setOutstanding] = useState<number>(parseFloat(totalPayable?.toFixed(2)));
+
+  const selectedPayment = useSelector((state: RootState) => state.customers.customerPayment);
+  console.log(selectedPayment);
+  const [payments, setPayments] = useState<RowData[]>(
+    selectedPayment ? selectedPayment.paymentDetails : []
+  );
+  const [dates, setDates] = useState<Date[]>([
+    selectedPayment.paymentDetails.map((item: any) => item.depositDate),
   ]);
-  const [outstanding, setOutstanding] = useState(totalPayable.toFixed(2));
-  const [dates, setDates] = useState<Date[]>([]);
-  console.log(payments, outstanding, dates);
+  console.log(dates);
+  const navigate = useNavigate();
+  console.log('null', payments);
+
   const dispatch = useDispatch();
 
   const paymentForm = useForm({
     initialValues: {
-      paymentDetails: [
-        { method: 'Cash', bank: '', branch: '', chequeNo: '', depositDate: '', amount: '' },
-      ],
+      paymentDetails: [selectedPayment.paymentDetails],
       outstanding: outstanding.toString(),
     },
     validate: {},
@@ -46,68 +62,76 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
         branch: '',
         chequeNumber: '',
         depositDate: new Date(),
-        amount: 0.00,
+        amount: 0.0,
       },
     ]);
 
     setDates((prevDates) => [...prevDates, new Date()]);
-    // Recalculate outstanding amount after adding a new payment detail
     const newOutstanding = calculateOutstanding(totalPayable, payments);
-    setOutstanding(newOutstanding.toString());
+    setOutstanding(newOutstanding);
   };
 
   const removePaymentDetail = (index: number) => {
     setPayments((prevPayments) => prevPayments.filter((_, i) => i !== index));
-
-    // Recalculate outstanding amount after removing a payment detail
     const newOutstanding = calculateOutstanding(totalPayable, payments);
-    setOutstanding(newOutstanding.toString());
+    setOutstanding(newOutstanding);
   };
 
-  const handlePaymentChange = (index: number, field: keyof RowData, value: string) => {
+  const handlePaymentChange = (index: number, field: keyof RowData, value: string | Date) => {
     const updatedPayments = payments.map((payment, i) =>
-      i === index ? { ...payment, [field]: value } : payment
+      i === index
+        ? { ...payment, [field]: typeof value === 'string' ? value : new Date(value).toISOString() }
+        : payment
     );
 
     setPayments(updatedPayments);
-
-    // If updating the depositDate, update the dates state
     if (field === 'depositDate') {
       const newDates = dates.map((date, i) => (i === index ? new Date(value) : date));
       setDates(newDates);
     }
 
-    // Recalculate outstanding amount after changing a payment detail
     const newOutstanding = calculateOutstanding(totalPayable, updatedPayments);
-    setOutstanding(newOutstanding.toString());
+    setOutstanding(newOutstanding);
   };
 
-  const calculateOutstanding = (totalPayable, payments) =>
+  const calculateOutstanding = (totalPayable: number, payments: RowData[]) =>
     parseFloat(totalPayable) -
       payments.reduce((acc, payment) => acc + parseFloat(payment.amount), 0) || 0;
 
-  const handleSave = () => {
-    const paymentPayload: any = {};
-
-    // Map through the payments array to construct the paymentDetails object
-    paymentPayload.paymentDetails = payments.map((payment) => ({
-      method: payment.method,
-      bank: payment.bank,
-      branch: payment.branch,
-      chequeNumber: payment.chequeNumber,
-      depositDate: payment.depositDate.toISOString(), // Convert Date object to ISO string
-      amount: payment.amount,
-    }));
-
-    paymentPayload.totalPayable = totalPayable;
-    paymentPayload.outstanding = payments.length === 0 ? totalPayable : outstanding;
-    paymentPayload.status =
-      parseFloat(outstanding) === 0.0 ? (payments.length === 0 ? 'NOT PAID' : 'PAID') : 'NOT PAID';
-
-    console.log(paymentPayload);
-    dispatch(setCustomerPayment(paymentPayload));
-    setDates([]);
-    onClose();
+  const handleSave = async () => {
+    const paymentPayload = {
+      ...selectedPayment,
+      paymentDetails: payments.map((payment) => ({
+        method: payment.method,
+        bank: payment.bank,
+        branch: payment.branch,
+        chequeNumber: payment.chequeNumber,
+        depositDate: payment.depositDate,
+        amount: payment.amount,
+      })),
+      totalPayable: totalPayable,
+      outstanding: outstanding,
+      status: outstanding === 0 ? 'PAID' : 'NOT PAID',
+    };
+    try {
+      dispatch(updateCustomerPayment(paymentPayload)).unwrap();
+      Notifications.show({
+        title: 'Successful',
+        message: 'Payment details updated successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      setDates([]);
+      paymentForm.reset();
+      navigate('/admin/customers/payments');
+      onClose();
+    } catch (e: any) {
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error Payment Details',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
   };
 
   const isCheque = (method: any) => method === 'Cheque';
@@ -149,6 +173,7 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
                     size="xs"
                     placeholder="Bank code"
                     disabled={!isCheque(payment.method)}
+                    value={payment.bank}
                     key={paymentForm.key('paymentDetails.bank')}
                     onChange={(event) =>
                       handlePaymentChange(index, 'bank', event.currentTarget.value)
@@ -160,6 +185,7 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
                     size="xs"
                     placeholder="Branch code"
                     disabled={!isCheque(payment.method)}
+                    value={payment.branch}
                     key={paymentForm.key('paymentDetails.branch')}
                     onChange={(event) =>
                       handlePaymentChange(index, 'branch', event.currentTarget.value)
@@ -171,6 +197,7 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
                     size="xs"
                     placeholder="Chq Number"
                     key={paymentForm.key('paymentDetails.chequeNumber')}
+                    value={payment.chequeNumber}
                     disabled={!isCheque(payment.method)}
                     onChange={(event) =>
                       handlePaymentChange(index, 'chequeNumber', event.currentTarget.value)
@@ -197,6 +224,7 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
                     size="xs"
                     placeholder="Amount"
                     key={paymentForm.key('paymentDetails.amount')}
+                    value={payment.amount}
                     onChange={(event) =>
                       handlePaymentChange(index, 'amount', event.currentTarget.value)
                     }
@@ -227,7 +255,7 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
                 <Text size="xs">Outstanding:</Text>
               </Table.Td>
               <Table.Td>
-                <TextInput size="xs" value={outstanding} readOnly />
+                <TextInput size="xs" value={outstanding?.toFixed(2)} readOnly />
               </Table.Td>
               <Table.Td width={50}></Table.Td>
             </Table.Tr>
@@ -243,4 +271,4 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
   );
 };
 
-export default PaymentModal;
+export default CustomerPaymentUpdateModal;

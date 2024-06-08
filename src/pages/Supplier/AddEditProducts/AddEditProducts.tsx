@@ -39,9 +39,7 @@ function AddEditProducts() {
   const [imageUrl, setImageUrl] = useState<string>('');
   const dispatch = useDispatch();
   const selectedProduct = useSelector((state: RootState) => state.suppliers.product);
-  // console.log(selectedProduct);
   const suppliers = useSelector((state: RootState) => state.suppliers.suppliers);
-  // const status = useSelector((state: RootState) => state.suppliers.status);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,54 +75,54 @@ function AddEditProducts() {
     },
   });
 
-  const handleUpload = async (file: FileWithPath) =>
-  new Promise((resolve, reject) => {
+  const handleUpload = async (file: FileWithPath) => {
     const storageRef = ref(storage, `products/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(`Upload is ${progress}% done`);
-      },
-      (error) => {
-        Notifications.show({
-          title: 'Error',
-          message: 'Image upload failed. Please try again.',
-          icon: <IconAlertCircle style={{ width: rem(18), height: rem(18) }} />,
-          color: 'red',
-        });
-        reject(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref)
-          .then((downloadURL) => {
-            console.log('Download URL:', downloadURL); // Log the download URL
-            setImageUrl(downloadURL);
-            productAddEditForm.setFieldValue('imageUrl', downloadURL);
-            resolve(downloadURL);
-          })
-          .catch((error) => {
-            console.error('Error getting download URL:', error);
-            reject(error);
+    return new Promise<string>((resolve, reject) => {
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          Notifications.show({
+            title: 'Error',
+            message: 'Image upload failed. Please try again.',
+            icon: <IconAlertCircle style={{ width: rem(18), height: rem(18) }} />,
+            color: 'red',
           });
-      }
-    );
-  });
-
-  const previews = files.map((file, index) => {
-    const previewUrl = URL.createObjectURL(file);
-    return <Image key={index} src={previewUrl} onLoad={() => URL.revokeObjectURL(previewUrl)} />;
-  });
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref)
+            .then((downloadURL) => {
+              console.log('Download URL:', downloadURL); // Log the download URL
+              resolve(downloadURL);
+            })
+            .catch((error) => {
+              console.error('Error getting download URL:', error);
+              reject(error);
+            });
+        }
+      );
+    });
+  };
 
   const handleSave = async (values: any) => {
     try {
+      let imageUrlToUse = imageUrl;
       if (files.length === 1) {
-        await handleUpload(files[0]);
+        imageUrlToUse = await handleUpload(files[0]);
+        setImageUrl(imageUrlToUse); // Ensure state is updated
+        productAddEditForm.setFieldValue('imageUrl', imageUrlToUse);
       }
 
-      await dispatch(createProduct(values)).unwrap();
+      const payload = { ...values, imageUrl: imageUrlToUse };
+      console.log(payload);
+
+      await dispatch(createProduct(payload)).unwrap();
       Notifications.show({
         title: 'Successful',
         message: 'Product Created Successfully',
@@ -145,11 +143,16 @@ function AddEditProducts() {
 
   const handleUpdate = async (values: any) => {
     try {
+      let imageUrlToUse = imageUrl;
       if (files.length === 1) {
-        await handleUpload(files[0]);
+        imageUrlToUse = await handleUpload(files[0]);
+        setImageUrl(imageUrlToUse); // Ensure state is updated
+        productAddEditForm.setFieldValue('imageUrl', imageUrlToUse);
       }
 
-      await dispatch(updateProduct({ id: selectedProduct?._id, data: values })).unwrap();
+      const payload = { ...values, imageUrl: imageUrlToUse };
+
+      await dispatch(updateProduct({ id: selectedProduct?._id, data: payload })).unwrap();
       Notifications.show({
         title: 'Successful',
         message: 'Product Updated Successfully',
@@ -183,6 +186,18 @@ function AddEditProducts() {
       });
     }
   }, [selectedProduct]);
+
+  const previews = files.map((file, index) => {
+    const previewUrl = URL.createObjectURL(file);
+    return (
+      <Image
+        key={index}
+        src={previewUrl}
+        style={{ width: '200px', height: '200px' }} // Set your desired width and height
+        onLoad={() => URL.revokeObjectURL(previewUrl)}
+      />
+    );
+  });
 
   return (
     <>
@@ -285,9 +300,13 @@ function AddEditProducts() {
                     {previews}
                   </SimpleGrid>
 
-                  {imageUrl && (
+                  {imageUrl && files.length === 0 && (
                     <SimpleGrid cols={1} mt="xl">
-                      <Image src={imageUrl} alt="Product Image" />
+                      <Image
+                        src={imageUrl}
+                        alt="Product Image"
+                        style={{ width: '200px', height: '200px' }} // Set your desired width and height
+                      />
                     </SimpleGrid>
                   )}
                 </div>

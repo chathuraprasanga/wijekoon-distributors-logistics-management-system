@@ -178,10 +178,12 @@ function AddEditEmployees() {
                   withAsterisk
                   label="Employee Job Role"
                   placeholder="Select a Role"
-                  data={jobRoles.map((role) => ({
-                    label: role.name,
-                    value: role._id,
-                  }))}
+                  data={jobRoles
+                    .filter((role) => role.name !== 'Super Admin')
+                    .map((role) => ({
+                      label: role.name,
+                      value: role._id,
+                    }))}
                   {...employeeAddEditForm.getInputProps('jobRole')}
                 />
               </Table.Td>

@@ -1,9 +1,15 @@
+import { RootState } from '@/redux/store';
 import { ActionIcon, Badge, Button, Card, Divider, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft, IconMailForward } from '@tabler/icons-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 function ViewSupplier() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const supplier = useSelector((state: RootState) => state.suppliers.supplier);
+
   return (
     <>
       <Grid>
@@ -29,7 +35,7 @@ function ViewSupplier() {
               <Text>Name</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Keshara Minerals and Chemicals</Text>
+              <Text>{supplier?.name}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -37,7 +43,7 @@ function ViewSupplier() {
               <Text>Email</Text>
             </Table.Td>
             <Table.Td style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Text>kesharamineralsandc@gmail.com</Text>
+              <Text>{supplier?.email}</Text>
               <Link to="">
                 <ActionIcon variant="filled" aria-label="Settings">
                   <IconMailForward style={{ width: '70%', height: '70%' }} stroke={1.5} />
@@ -50,8 +56,8 @@ function ViewSupplier() {
               <Text>Phone</Text>
             </Table.Td>
             <Table.Td>
-              <Text>081 5236987</Text>
-              <Text>077 7123456</Text>
+              <Text>{supplier?.phone}</Text>
+              <Text>{supplier?.phoneSecondary}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -59,7 +65,7 @@ function ViewSupplier() {
               <Text>Address</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Godawele Watta, Kotikapola, Mawathagama, Kurunegala</Text>
+              <Text>{supplier?.address}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -68,8 +74,8 @@ function ViewSupplier() {
             </Table.Td>
             <Table.Td>
               <Text>
-                <Badge color="green" radius="sm">
-                  ACTIVE
+                <Badge color={supplier.status === 'ACTIVE' ? 'green' : 'red'} radius="sm" size="xs">
+                  {supplier?.status}
                 </Badge>
               </Text>
             </Table.Td>
@@ -79,7 +85,7 @@ function ViewSupplier() {
               <Text>Cheque Payment Destination</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Keshara Minerals and Chemicals (PVT) Ltd.</Text>
+              <Text>{supplier?.chequePaymentDestination}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -87,7 +93,7 @@ function ViewSupplier() {
               <Text>Notes</Text>
             </Table.Td>
             <Table.Td rowSpan={2}>
-              <Text>-</Text>
+              <Text>{supplier?.notes}</Text>
             </Table.Td>
           </Table.Tr>
         </Table>

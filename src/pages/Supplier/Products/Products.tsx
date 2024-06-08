@@ -44,11 +44,9 @@ function Products() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchProducts());
-      dispatch(fetchSuppliers());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchProducts());
+    dispatch(fetchSuppliers());
+  }, [dispatch]);
 
   // pagination
   const handlePageChange = (newPage: number) => {
@@ -108,11 +106,11 @@ function Products() {
   const rows = displayedProducts.map((product: any, index: number) => (
     <Table.Tr key={product._id}>
       <Table.Td>{product.code}</Table.Td>
-      <Table.Td>{product.name}</Table.Td>
+      <Table.Td>{product?.name}</Table.Td>
       <Table.Td>{product.size}</Table.Td>
       <Table.Td>{product.buyingPrice}</Table.Td>
       <Table.Td>{product.sellingPrice}</Table.Td>
-      <Table.Td>{product.supplier.name}</Table.Td>
+      <Table.Td>{product.supplier?.name}</Table.Td>
       <Table.Td>
         <Badge color={product.status === 'ACTIVE' ? 'green' : 'red'} radius="xs" size="xs">
           {product.status}
@@ -183,7 +181,19 @@ function Products() {
             <Divider my="md" />
             <Table striped highlightOnHover>
               <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
             <Pagination
               total={Math.ceil(filteredProducts.length / productsPerPage)}

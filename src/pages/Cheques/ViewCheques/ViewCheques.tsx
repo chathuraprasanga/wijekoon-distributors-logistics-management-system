@@ -1,9 +1,18 @@
+import { RootState } from '@/redux/store';
 import { Badge, Button, Card, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 function ViewCheques() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const chequeData = useSelector((state: RootState) => state.cheques.cheque);
+
+  const customerData = chequeData.customer;
+  const orderData = chequeData.order;
+
   return (
     <>
       <Grid>
@@ -32,13 +41,15 @@ function ViewCheques() {
                   <Text fw="bold">Name:</Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text>Chathura Prasanga</Text>
+                  <Text>{customerData.fullName}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text fw="bold">Phone:</Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text>077 9250108 | 075 0943040</Text>
+                  <Text>
+                    {customerData.phone} | {customerData.phoneSecondary}
+                  </Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -46,13 +57,13 @@ function ViewCheques() {
                   <Text fw="bold">Email:</Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text>chathuraprasanga98@gmail.com</Text>
+                  <Text>{customerData.email}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text fw="bold">Address:</Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text>Godawele Watta, Kotikapola, Mawathagama</Text>
+                  <Text>{customerData.address}</Text>
                 </Table.Td>
               </Table.Tr>
             </Table>
@@ -68,13 +79,13 @@ function ViewCheques() {
                   <Text fw="bold">Date:</Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text>03.04.2024</Text>
+                  <Text>{orderData.createdAt.split('T')[0]}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text fw="bold">Order ID:</Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text>WDS-0056</Text>
+                  <Text>{orderData.orderId}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -82,7 +93,7 @@ function ViewCheques() {
                   <Text fw="bold">Amount:</Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text>LKR 120000.00</Text>
+                  <Text>LKR {orderData.netTotal.toFixed(2)}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text fw="bold"></Text>
@@ -106,7 +117,7 @@ function ViewCheques() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">123456</Text>
+                  <Text size="sm">{chequeData.chequeNumber}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -116,7 +127,7 @@ function ViewCheques() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">7135 Peoples Bank</Text>
+                  <Text size="sm">{chequeData.bank}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -126,7 +137,7 @@ function ViewCheques() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">116</Text>
+                  <Text size="sm">{chequeData.branch}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -136,7 +147,7 @@ function ViewCheques() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">LKR 120000.00</Text>
+                  <Text size="sm">LKR {chequeData.amount}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -146,7 +157,7 @@ function ViewCheques() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">18.04.2024</Text>
+                  <Text size="sm">{chequeData.depositDate?.split('T')[0]}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -157,8 +168,24 @@ function ViewCheques() {
                 </Table.Td>
                 <Table.Td width="35%">
                   <Text size="sm">
-                    <Badge color="teal" radius="sm" size="sm">
-                      Deposited
+                    <Badge
+                      color={
+                        chequeData.status === 'PENDING'
+                          ? 'yellow'
+                          : chequeData.status === 'DEPOSITED'
+                            ? 'green'
+                            : chequeData.status === 'ACCEPTED'
+                              ? 'blue'
+                              : chequeData.status === 'REJECTED'
+                                ? 'red'
+                                : chequeData.status === 'RETURNED'
+                                  ? 'violet'
+                                  : 'gray'
+                      }
+                      radius="sm"
+                      size="xs"
+                    >
+                      {chequeData.status.toUpperCase()}
                     </Badge>
                   </Text>
                 </Table.Td>
@@ -167,12 +194,21 @@ function ViewCheques() {
           </Card>
         </Grid.Col>
         <Grid.Col>
-          <div style={{ float: 'right' }}>
-            <Button ml={10} color="red">
-              Returned
-            </Button>
-            <Button ml={10}>Accepted</Button>
-          </div>
+          {chequeData.status === 'PENDING' && (
+            <div style={{ float: 'right' }}>
+              <Button ml={10} color="violet">
+                Depositted
+              </Button>
+            </div>
+          )}
+          {chequeData.status === 'DEPOSITTED' && (
+            <div style={{ float: 'right' }}>
+              <Button ml={10} color="red">
+                Returned
+              </Button>
+              <Button ml={10}>Accepted</Button>
+            </div>
+          )}
         </Grid.Col>
       </Grid>
     </>

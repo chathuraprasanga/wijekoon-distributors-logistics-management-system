@@ -23,6 +23,8 @@ import {
   fetchCustomerOrders,
   setCustomerOrderRequest,
   setCustomerPayment,
+  fetchConfirmedCustomerOrderRequests,
+  setCustomerOrder,
 } from '@/redux/slices/customerSlice';
 import { RootState } from '@/redux/store';
 
@@ -35,6 +37,9 @@ function CustomerOrders() {
   const customerOrderRequests = useSelector(
     (state: RootState) => state.customers.customerOrderRequests
   );
+  const confirmedCustomerOrderRequests = useSelector(
+    (state: RootState) => state.customers.confirmedCustomerOredrRequests
+  );
   const customerOrders = useSelector((state: RootState) => state.customers.customerOrders);
 
   const [opened, { open, close }] = useDisclosure(false);
@@ -43,6 +48,7 @@ function CustomerOrders() {
   useEffect(() => {
     dispatch(fetchCustomers());
     dispatch(fetchCustomerOrderRequests());
+    dispatch(fetchConfirmedCustomerOrderRequests());
     dispatch(fetchCustomerOrders());
   }, [dispatch]);
 
@@ -80,7 +86,7 @@ function CustomerOrders() {
   // modal Search
   const [modalSearchSegment, setModalSearchSegment] = useState('Customer');
   const [modalSearchTerm, setModalSearchTerm] = useState('');
-  const filteredRequests = customerOrderRequests.filter((request: any) => {
+  const filteredRequests = confirmedCustomerOrderRequests.filter((request: any) => {
     const value =
       modalSearchSegment === 'Customer' && request.customer
         ? request.customer.fullName
@@ -90,17 +96,22 @@ function CustomerOrders() {
 
   const displaedRequests = filteredRequests.slice(startModal, endModal);
 
-  const handleSelect = (request) => {
+  const handleSelect = (request: any) => {
     dispatch(setCustomerOrderRequest(request));
     dispatch(setCustomerPayment(null));
     navigate('/admin/customers/add-orders');
+  };
+
+  const handleView = (element: any) => {
+    dispatch(setCustomerOrder(element));
+    navigate('/admin/customers/view-orders');
   };
 
   const rows = displayedOrders.map((element, index) => (
     <>
       <Table.Tr key={element.orderId}>
         <Table.Td>{element.orderId}</Table.Td>
-        <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
+        <Table.Td>{element.createdAt?.split('T')[0]}</Table.Td>
         <Table.Td>{element?.customerOrderRequest?.customer?.fullName}</Table.Td>
         <Table.Td>{element?.customerOrderRequest?.order?.length}</Table.Td>
         <Table.Td>
@@ -109,7 +120,7 @@ function CustomerOrders() {
             0
           )}
         </Table.Td>{' '}
-        <Table.Td>{element.netTotal.toFixed(2)}</Table.Td>
+        <Table.Td>{element.netTotal?.toFixed(2)}</Table.Td>
         <Table.Td>
           <Badge color={element.status === 'PAID' ? 'green' : 'red'} radius="xs" size="xs">
             {element.status}
@@ -122,9 +133,9 @@ function CustomerOrders() {
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Link to="/admin/customers/view-orders" style={{ textDecoration: 'none' }}>
-                <Menu.Item>View</Menu.Item>
-              </Link>
+              {/* <Link to="/admin/customers/view-orders" style={{ textDecoration: 'none' }}> */}
+              <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+              {/* </Link> */}
             </Menu.Dropdown>
           </Menu>
         </Table.Td>
@@ -152,8 +163,8 @@ function CustomerOrders() {
         <Table.Td>{element?.createdAt?.split('T')[0]}</Table.Td>
         <Table.Td>{element?.customer?.fullName}</Table.Td>
         <Table.Td>{element?.order?.length}</Table.Td>
-        <Table.Td>{element?.order.map((item) => parseInt(item.quantity))}</Table.Td>
-        <Table.Td>{element?.netTotal.toFixed(2)}</Table.Td>
+        <Table.Td>{element?.order.map((item: any) => parseInt(item.quantity))}</Table.Td>
+        <Table.Td>{element?.netTotal?.toFixed(2)}</Table.Td>
         <Table.Td>
           {/* <Link to="/admin/customers/add-orders"> */}
           <Button size="xs" onClick={() => handleSelect(element)}>
@@ -189,19 +200,33 @@ function CustomerOrders() {
         </div>
         <div>
           <Table>
-            <Table.Tr>
-              <Table.Th>Order ID</Table.Th>
-              <Table.Th>Date</Table.Th>
-              <Table.Th>Customer</Table.Th>
-              <Table.Th>Products</Table.Th>
-              <Table.Th>Quantity</Table.Th>
-              <Table.Th>Amount</Table.Th>
-              <Table.Th>Action</Table.Th>
-            </Table.Tr>
-            {modalData}
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Order ID</Table.Th>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Customer</Table.Th>
+                <Table.Th>Products</Table.Th>
+                <Table.Th>Quantity</Table.Th>
+                <Table.Th>Amount</Table.Th>
+                <Table.Th>Action</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {modalData.length > 0 ? (
+                modalData
+              ) : (
+                <Table.Tr>
+                  <Table.Td colSpan={10}>
+                    <Text color="dimmed" align="center">
+                      No data found
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
           </Table>
           <Pagination
-            total={Math.ceil(filteredRequests.length / requestsPerPage)}
+            total={Math.ceil(confirmedCustomerOrderRequests.length / customersPerPage)}
             value={activeModalPage}
             onChange={handleModalPageChange}
             mt={10}
@@ -238,13 +263,25 @@ function CustomerOrders() {
                 ml={10}
                 rightSection={<IconSearch />}
                 placeholder="Search"
-                onChange={(event) => setSearchTerm(event.currentTarget.value)}
+                onChange={(event) => setSearchTerm(event.currentTarget.value.trim())}
               />
             </div>
             <Divider my="md" />
             <Table striped highlightOnHover>
               <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
             <Pagination
               total={Math.ceil(filteredOrders.length / requestsPerPage)}

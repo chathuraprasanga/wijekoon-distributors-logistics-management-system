@@ -221,7 +221,7 @@ function AddCustomerOrders() {
       <PaymentModal
         opened={opened}
         onClose={close}
-        customerOrder={selectedRequest}
+        customerPayment={paymentData}
         totalPayable={calculateTotal('lineTotal')}
       />
       <form onSubmit={() => customerOrderAddForm.onSubmit(handleSave)}>

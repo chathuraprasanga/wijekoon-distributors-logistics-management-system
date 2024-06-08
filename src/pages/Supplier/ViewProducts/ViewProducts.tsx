@@ -1,9 +1,30 @@
-import { Grid, Card, Table, ActionIcon, Badge, Button, Divider, Text } from '@mantine/core';
+import { RootState } from '@/redux/store';
+import {
+  Grid,
+  Card,
+  Table,
+  ActionIcon,
+  Badge,
+  Button,
+  Divider,
+  Text,
+  SimpleGrid,
+  Image,
+} from '@mantine/core';
 import { IconArrowLeft, IconMailForward } from '@tabler/icons-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 function ViewProducts() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const selectedProduct = useSelector((state: RootState) => state.suppliers.product);
+  console.log(selectedProduct);
+
+  const handleEditProduct = () => {
+    navigate('/admin/suppliers/add-edit-products');
+  };
   return (
     <>
       <Grid>
@@ -29,7 +50,7 @@ function ViewProducts() {
               <Text>Product Code</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Chathura Prasanga</Text>
+              <Text>{selectedProduct?.code || 'N/A'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -37,7 +58,7 @@ function ViewProducts() {
               <Text>Name</Text>
             </Table.Td>
             <Table.Td style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Text>chathuraprasanga98@gmail.com</Text>
+              <Text>{selectedProduct?.name || 'N/A'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -45,8 +66,7 @@ function ViewProducts() {
               <Text>Size</Text>
             </Table.Td>
             <Table.Td>
-              <Text>077 9250108</Text>
-              <Text>075 0943040</Text>
+              <Text>{`${selectedProduct?.size} KG` || 'N/A'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -54,7 +74,7 @@ function ViewProducts() {
               <Text>Buying Price</Text>
             </Table.Td>
             <Table.Td>
-              <Text>N/A</Text>
+              <Text>{selectedProduct?.buyingPrice.toFixed(2) || 'N/A'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -62,7 +82,7 @@ function ViewProducts() {
               <Text>Selling Price</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Godawele Watta, Kotikapola, Mawathagama, Kurunegala</Text>
+              <Text>{selectedProduct?.sellingPrice.toFixed(2) || 'N/A'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -70,7 +90,7 @@ function ViewProducts() {
               <Text>Supplier</Text>
             </Table.Td>
             <Table.Td>
-              <Text>Godawele Watta, Kotikapola, Mawathagama, Kurunegala</Text>
+              <Text>{selectedProduct?.supplier?.name || 'N/A'}</Text>
             </Table.Td>
           </Table.Tr>
           <Table.Tr>
@@ -79,8 +99,8 @@ function ViewProducts() {
             </Table.Td>
             <Table.Td>
               <Text>
-                <Badge color="green" radius="sm">
-                  ACTIVE
+                <Badge color={selectedProduct.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                  {selectedProduct?.status || 'N/A'}
                 </Badge>
               </Text>
             </Table.Td>
@@ -90,23 +110,29 @@ function ViewProducts() {
               <Text>Notes</Text>
             </Table.Td>
             <Table.Td rowSpan={2}>
-              <Text>-</Text>
+              <Text>{selectedProduct?.notes || '-'}</Text>
             </Table.Td>
           </Table.Tr>
         </Table>
         <Table>
           <Table.Tr>
             <Table.Td colSpan={2}>
-              <div style={{ width: 300, height: 300, backgroundColor: 'whitesmoke' }}></div>
+              <SimpleGrid cols={1} mt="xl">
+                <Image
+                  src={selectedProduct.imageUrl}
+                  alt="Product Image"
+                  style={{ width: '200px', height: '200px' }} // Set your desired width and height
+                />
+              </SimpleGrid>
             </Table.Td>
           </Table.Tr>
         </Table>
 
         <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between' }}>
           <div></div>
-          <Link to="/admin/suppliers/add-edit-products">
-            <Button>Edit Record</Button>
-          </Link>
+          {/* <Link to="/admin/suppliers/add-edit-products"> */}
+          <Button onClick={handleEditProduct}>Edit Product</Button>
+          {/* </Link> */}
         </div>
 
         <Divider my="md" />

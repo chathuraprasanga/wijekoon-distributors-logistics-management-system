@@ -1,3 +1,5 @@
+import { fetchCheques, setCheque } from '@/redux/slices/chequesSlice';
+import { RootState } from '@/redux/store';
 import {
   Badge,
   Button,
@@ -5,76 +7,86 @@ import {
   Divider,
   Grid,
   Menu,
+  Pagination,
   SegmentedControl,
   Table,
   Text,
   TextInput,
 } from '@mantine/core';
 import { IconDots, IconSearch } from '@tabler/icons-react';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Cheques() {
-  const data = [
-    {
-      no: '123456',
-      customer: 'Star hardware',
-      bank: 'peoples bank',
-      branch: '114',
-      amount: 'LKR 1200000.00',
-      depositDate: '13.04.2024',
-      status: 'Depositted',
-    },
-    {
-      no: '234567',
-      customer: 'Sunrise Hardware',
-      bank: 'Commercial Bank',
-      branch: '207',
-      amount: 'LKR 800000.00',
-      depositDate: '14.04.2024',
-      status: 'Depositted',
-    },
-    {
-      no: '345678',
-      customer: 'Moonlight Hardware',
-      bank: 'Sampath Bank',
-      branch: '312',
-      amount: 'LKR 1500000.00',
-      depositDate: '15.04.2024',
-      status: 'Depositted',
-    },
-    {
-      no: '456789',
-      customer: 'Golden Hardware',
-      bank: 'Hatton National Bank',
-      branch: '408',
-      amount: 'LKR 500000.00',
-      depositDate: '16.04.2024',
-      status: 'Depositted',
-    },
-    {
-      no: '567890',
-      customer: 'Silver Hardware',
-      bank: 'Bank of Ceylon',
-      branch: '513',
-      amount: 'LKR 1000000.00',
-      depositDate: '17.04.2024',
-      status: 'Depositted',
-    },
-  ];
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const status = useSelector((state: RootState) => state.cheques.status);
+  const error = useSelector((state: RootState) => state.cheques.error);
+  const cheques = useSelector((state: RootState) => state.cheques.cheques);
+  console.log(cheques);
 
-  const tds = data.map((item) => (
+  useEffect(() => {
+    dispatch(fetchCheques());
+  }, [dispatch]);
+
+  // for pagination
+  const [activePage, setPage] = useState(1);
+  const chequesperPage = 10;
+
+  // for search
+  const [searchSegment, setSearchSegment] = useState('Customer');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // pagination
+  const handlePageChange = (newPage: any) => {
+    setPage(newPage);
+  };
+
+  const start = (activePage - 1) * chequesperPage;
+  const end = start + chequesperPage;
+
+  const filteredCheques = cheques.filter((cheque: any) => {
+    const value =
+      searchSegment === 'Cheque Number' ? cheque.chequeNumber : cheque.customer.fullName;
+    return value.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  const displayedCheques = filteredCheques.slice(start, end);
+
+  const handleViewEdit = (data: any) => {
+    dispatch(setCheque(data));
+    navigate('/admin/cheques/view');
+  };
+
+  const tds = displayedCheques.map((item: any, index: any) => (
     <>
-      <Table.Tr>
-        <Table.Td>{item.no}</Table.Td>
-        <Table.Td>{item.customer}</Table.Td>
-        <Table.Td>{item.bank}</Table.Td>
-        <Table.Td>{item.branch}</Table.Td>
-        <Table.Td>{item.amount}</Table.Td>
-        <Table.Td>{item.depositDate}</Table.Td>
+      <Table.Tr key={item._id}>
+        <Table.Td>{item?.chequeNumber}</Table.Td>
+        <Table.Td>{item?.customer?.fullName}</Table.Td>
+        <Table.Td>{item?.bank}</Table.Td>
+        <Table.Td>{item?.branch}</Table.Td>
+        <Table.Td>{item?.amount}</Table.Td>
+        <Table.Td>{item?.depositDate?.split('T')[0]}</Table.Td>
         <Table.Td>
-          <Badge color="green" radius="sm" size="sm">
-            {item.status}
+          <Badge
+            color={
+              item.status === 'PENDING'
+                ? 'yellow'
+                : item.status === 'DEPOSITED'
+                  ? 'green'
+                  : item.status === 'ACCEPTED'
+                    ? 'blue'
+                    : item.status === 'REJECTED'
+                      ? 'red'
+                      : item.status === 'RETURNED'
+                        ? 'violet'
+                        : 'gray'
+            }
+            radius="sm"
+            size="xs"
+          >
+            {item?.status}
           </Badge>
         </Table.Td>
         <Table.Td>
@@ -84,9 +96,9 @@ function Cheques() {
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Link to="/admin/cheques/view" style={{ textDecoration: 'none' }}>
-                <Menu.Item>View</Menu.Item>
-              </Link>
+              {/* <Link to="/admin/cheques/view" style={{ textDecoration: 'none' }}> */}
+              <Menu.Item onClick={() => handleViewEdit(item)}>View</Menu.Item>
+              {/* </Link> */}
               {/* <Link to="/admin/cheques/add-edit" style={{ textDecoration: 'none' }}>
                 <Menu.Item>Edit</Menu.Item>
               </Link>
@@ -120,10 +132,18 @@ function Cheques() {
               <SegmentedControl
                 size="xs"
                 color="violet"
-                data={['Cheque Number', 'Bank', 'Customer']}
+                data={['Cheque Number', 'Customer']}
                 defaultValue="Customer"
+                onChange={setSearchSegment}
               />
-              <TextInput size="xs" ml={10} rightSection={<IconSearch />} placeholder="Search" />
+              <TextInput
+                size="xs"
+                ml={10}
+                rightSection={<IconSearch />}
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.currentTarget.value)}
+              />
             </div>
             <Divider my="md" />
             <Table mt={10} striped highlightOnHover>
@@ -137,8 +157,28 @@ function Cheques() {
                 <Table.Th>Status</Table.Th>
                 <Table.Th>Action</Table.Th>
               </Table.Tr>
-              <Table.Tbody>{tds}</Table.Tbody>
+              <Table.Tbody>
+                {tds.length > 0 ? (
+                  tds
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
+            <Pagination
+              total={Math.ceil(filteredCheques.length / chequesperPage)}
+              value={activePage}
+              onChange={handlePageChange}
+              mt={10}
+              style={{ display: 'flex', justifyContent: 'flex-end' }}
+              size="xs"
+            />
           </Card>
         </Grid.Col>
       </Grid>
