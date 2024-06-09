@@ -10,7 +10,6 @@ import { fetchProducts } from '@/redux/slices/supplierSlice';
 import { RootState } from '@/redux/store';
 import {
   createCustomerOrder,
-  fetchCustomerOrderRequests,
   fetchCustomerOrders,
   setCustomer,
   setCustomerPayment,

@@ -229,7 +229,7 @@ export const fetchSupplierOrders = createAsyncThunk('suppliers/fetchSupplierOrde
 export const createSupplierOrder = createAsyncThunk(
   'suppliers/createSupplierOrder',
   async (supplierOrder: any) => {
-    const response = await axios.post('http://localhost:3000/supplierOrders', supplierOrder, {
+    const response = await axios.post('http://localhost:3000/supplierOrder', supplierOrder, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

@@ -3,8 +3,10 @@ import axios from 'axios';
 
 interface ChequeState {
   cheques: any[];
+  pendingCheques: any[];
   cheque: {};
   pagedCheques: any[];
+  payments: any[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -13,6 +15,8 @@ const initialState: ChequeState = {
   cheque: [],
   cheques: [],
   pagedCheques: [],
+  pendingCheques: [],
+  payments: [],
   status: 'idle',
   error: null,
 };
@@ -22,6 +26,15 @@ const accessToken = localStorage.getItem('accessToken');
 // Async thunks for backend interactions
 export const fetchCheques = createAsyncThunk('cheques/fetchCheques', async () => {
   const response = await axios.get('http://localhost:3000/cheques', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+});
+
+export const fetchPendingCheques = createAsyncThunk('cheques/fetchPendingCheques', async () => {
+  const response = await axios.get('http://localhost:3000/cheques/pending', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -67,6 +80,9 @@ const chequeSlice: any = createSlice({
   reducers: {
     setCheque: (state, action) => {
       state.cheque = action.payload;
+    },
+    setPaymenets: (state, action) => {
+      state.payments = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -126,10 +142,21 @@ const chequeSlice: any = createSlice({
       })
       .addCase(updateCheque.rejected, (state, action) => {
         state.status = 'failed';
+      })
+      .addCase(fetchPendingCheques.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchPendingCheques.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.pendingCheques = action.payload;
+      })
+      .addCase(fetchPendingCheques.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch employees';
       });
   },
 });
 
-export const { setCheque } = chequeSlice.actions;
+export const { setCheque, setPaymenets } = chequeSlice.actions;
 
 export default chequeSlice.reducer;

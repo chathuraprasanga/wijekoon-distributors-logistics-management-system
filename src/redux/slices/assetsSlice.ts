@@ -8,6 +8,7 @@ interface AssetsState {
   pagedVehicles: any[];
   warehouses: any[];
   vehicles: any[];
+  activeLorries: any[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -19,6 +20,7 @@ const initialState: AssetsState = {
   pagedVehicles: [],
   warehouses: [],
   vehicles: [],
+  activeLorries: [],
   status: 'idle',
   error: null,
 };
@@ -65,6 +67,15 @@ export const getPagedWarehouses = createAsyncThunk(
 
 export const fetchVehicles = createAsyncThunk('assets/fetchVehicles', async () => {
   const response = await axios.get('http://localhost:3000/vehicles', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+});
+
+export const fetchAllActiveLorries = createAsyncThunk('assets/fetchAllActiveLorries', async () => {
+  const response = await axios.get('http://localhost:3000/vehicles/active-lorries', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -283,6 +294,17 @@ const assetsSlice = createSlice({
       })
       .addCase(getVehicleById.rejected, (state, action) => {
         state.status = 'failed';
+      })
+      .addCase(fetchAllActiveLorries.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchAllActiveLorries.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.activeLorries = action.payload.data;
+      })
+      .addCase(fetchAllActiveLorries.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch active lorries';
       });
   },
 });
