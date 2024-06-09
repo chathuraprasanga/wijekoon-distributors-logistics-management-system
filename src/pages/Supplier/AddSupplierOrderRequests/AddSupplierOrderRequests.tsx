@@ -202,6 +202,8 @@ function AddEditSupplierOrderRequests() {
       formData.totalDiscount = calculateTotal('lineDiscount').toFixed(2);
       formData.totalTax = calculateTotal('lineTax').toFixed(2);
       formData.netTotal = calculateTotal('lineTotal').toFixed(2);
+      formData.totalSize = calculateTotal('lineSize').toFixed(2);
+      formData.totalQuantity = calculateTotal('quantity');
 
       const payload = { ...formData, id: selectedSupplierOrderRequest?._id };
       console.log('PAYLOAD', payload);
@@ -236,11 +238,13 @@ function AddEditSupplierOrderRequests() {
           lineDiscount: item.lineDiscount?.toString(),
           lineTax: item.lineTax?.toString(),
           lineTotal: item.lineTotal?.toString(),
+          lineSize: item.lineSize?.toString(),
         })),
         subTotal: selectedSupplierOrderRequest.subTotal?.toString(),
         totalDiscount: selectedSupplierOrderRequest.totalDiscount?.toString(),
         totalTax: selectedSupplierOrderRequest.totalTax?.toString(),
         netTotal: selectedSupplierOrderRequest.netTotal?.toString(),
+        // totalSize: selectedSupplierOrderRequest?.totalSize?.tostring(),
         status: selectedSupplierOrderRequest?.status,
       });
       setRows(
@@ -254,6 +258,7 @@ function AddEditSupplierOrderRequests() {
           lineDiscount: item.lineDiscount?.toString(),
           lineTax: item.lineTax?.toString(),
           lineTotal: item.lineTotal?.toString(),
+          lineSize: item.lineSize?.toString(),
         }))
       );
     }

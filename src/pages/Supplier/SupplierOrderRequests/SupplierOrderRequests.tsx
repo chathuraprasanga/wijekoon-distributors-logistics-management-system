@@ -262,7 +262,7 @@ function SupplierOrderRequests() {
               />
             </div>
             <Divider my={10} />
-            <Table>
+            <Table striped>
               <Table.Thead>{ths}</Table.Thead>
               <Table.Tbody>
                 {rows.length > 0 ? (

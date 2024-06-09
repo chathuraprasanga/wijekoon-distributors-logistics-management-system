@@ -7,6 +7,7 @@ interface EmployeeState {
   employees: any[];
   pagedEmployees: any[];
   employee: any | null;
+  driverEmployees: any[];
   jobRoles: any[];
   pagedJobRoles: any[];
   jobRole: any | null;
@@ -23,6 +24,7 @@ const initialState: EmployeeState = {
   pagedJobRoles: [],
   jobRole: {},
   permissions: [],
+  driverEmployees: [],
   status: 'idle',
   error: null,
 };
@@ -32,6 +34,15 @@ const accessToken = localStorage.getItem('accessToken');
 // Async thunks for backend interactions
 export const fetchEmployees = createAsyncThunk('employees/fetchEmployees', async () => {
   const response = await axios.get('http://localhost:3000/employees', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+});
+
+export const fetchDriverEmployees = createAsyncThunk('employees/fetchDriverEmployees', async () => {
+  const response = await axios.get('http://localhost:3000/employees/drivers', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -98,17 +109,14 @@ export const deleteJobRole = createAsyncThunk(
   }
 );
 
-export const updateJobRole = createAsyncThunk(
-  'employees/updateJobRole',
-  async (jobRole: any) => {
-    const response = await axios.put(`http://localhost:3000/jobRole/${jobRole.id}`, jobRole, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  }
-);
+export const updateJobRole = createAsyncThunk('employees/updateJobRole', async (jobRole: any) => {
+  const response = await axios.put(`http://localhost:3000/jobRole/${jobRole.id}`, jobRole, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+});
 
 export const fetchPermissions = createAsyncThunk('employees/fetchPermissions', async () => {
   const response = await axios.get('http://localhost:3000/permissions');
@@ -244,7 +252,18 @@ const employeeSlice = createSlice({
       .addCase(deleteJobRole.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch paged job roles';
-      });
+      })
+      .addCase(fetchDriverEmployees.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchDriverEmployees.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.driverEmployees = action.payload.data;
+      })
+      .addCase(fetchDriverEmployees.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch employees';
+      })
   },
 });
 

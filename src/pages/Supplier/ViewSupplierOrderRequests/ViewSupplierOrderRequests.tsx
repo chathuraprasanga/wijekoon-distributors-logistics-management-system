@@ -21,6 +21,7 @@ import {
   getSupplierOrderRequestById,
   updateSupplierOrderRequestStatus,
 } from '@/redux/slices/supplierSlice';
+import { setPaymenets } from '@/redux/slices/chequesSlice';
 
 function ViewSupplierOrderRequests() {
   const navigate = useNavigate();
@@ -87,6 +88,7 @@ function ViewSupplierOrderRequests() {
   };
 
   const handleCreateOrder = () => {
+    dispatch(setPaymenets(null));
     navigate('/admin/suppliers/add-orders');
   };
 
@@ -255,9 +257,11 @@ function ViewSupplierOrderRequests() {
                   </Button>
                 </>
               )}
-              <Button ml={10} color="violet" onClick={handleCreateOrder}>
-                Create Order
-              </Button>
+              {selectedRequest.status === 'CONFIRMED' && (
+                <Button ml={10} color="violet" onClick={handleCreateOrder}>
+                  Create Order
+                </Button>
+              )}
             </div>
           </Grid.Col>
         </Grid>
