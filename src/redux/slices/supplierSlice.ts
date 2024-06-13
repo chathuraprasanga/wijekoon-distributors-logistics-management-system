@@ -145,6 +145,18 @@ export const fetchSupplierOrderRequests = createAsyncThunk(
   }
 );
 
+export const fetchConfirmedSupplierOrderRequests = createAsyncThunk(
+  'suppliers/fetchConfirmedSupplierOrderRequests',
+  async () => {
+    const response = await axios.get('http://localhost:3000/supplierOrderRequests/confirmed', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  }
+);
+
 export const createSupplierOrderRequest = createAsyncThunk(
   'suppliers/createSupplierOrderRequest',
   async (supplierOrderRequest: any) => {
@@ -613,7 +625,18 @@ const supplierSlice = createSlice({
       .addCase(getSupplierOrderRequestById.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch supplier order request';
-      });
+      })
+      .addCase(fetchConfirmedSupplierOrderRequests.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchConfirmedSupplierOrderRequests.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.supplierOrderRequests = action.payload;
+      })
+      .addCase(fetchConfirmedSupplierOrderRequests.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch supplier order requests';
+      })
   },
 });
 

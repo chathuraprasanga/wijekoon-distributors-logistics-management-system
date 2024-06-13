@@ -56,7 +56,7 @@ import Cheques from './pages/Cheques/Cheques';
 import ViewCheques from './pages/Cheques/ViewCheques/ViewCheques';
 import AddEditCheques from './pages/Cheques/AddEditCheques/AddEditCheques';
 import AddEditWarehouse from './pages/Assets/AddEditWarehouse/AddEditWarehouse';
-import PaymentModal from './pages/Customers/AddCustomerOrders/PaymentModal/PaymentModal';
+import ViewSuppliersOrders from './pages/Supplier/ViewSupplierOrder/ViewSupplierOrder';
 
 const router = createBrowserRouter([
   {
@@ -162,6 +162,10 @@ const router = createBrowserRouter([
       {
         path: 'suppliers/add-orders',
         element: <AddSupplierOrders />,
+      },
+      {
+        path: 'suppliers/view-orders',
+        element: <ViewSuppliersOrders />,
       },
       {
         path: 'suppliers/payments',
