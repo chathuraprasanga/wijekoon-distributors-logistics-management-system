@@ -199,7 +199,7 @@ function CustomerOrders() {
           />
         </div>
         <div>
-          <Table>
+          <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Order ID</Table.Th>

@@ -1,11 +1,55 @@
 import React, { useState } from 'react';
 import { Button, Card, Center, TextInput, Text, rem } from '@mantine/core';
-import { IconCopyright, IconUser } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { IconCheck, IconCopyright, IconUser, IconX } from '@tabler/icons-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { useForm } from '@mantine/form';
+import { Notifications } from '@mantine/notifications';
+import { forgotPassword } from '@/redux/slices/authSlice';
 
 function ForgotPassword() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [opened, setOpened] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const status = useSelector((state: RootState) => state.auth.status);
+  const error = useSelector((state: RootState) => state.auth.error);
+
+  const forgotPasswordForm = useForm({
+    initialValues: {
+      email: '',
+    },
+    validate: {
+      email: (value) => {
+        if (!/^\S+@\S+$/.test(value)) {
+          return 'Email is not valid';
+        }
+        return null;
+      },
+    },
+  });
+
+  const handleSubmit = async (values: typeof forgotPasswordForm.values) => {
+    try {
+      await dispatch(forgotPassword(values)).unwrap();
+      if (error === null) {
+        Notifications.show({
+          title: 'Successful',
+          message: 'Check your Email',
+          icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+        });
+        navigate('/');
+      }
+    } catch (e: any) {
+      Notifications.show({
+        title: 'Error',
+        message: `${e.message}`,
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const rightSection = (
@@ -41,27 +85,31 @@ function ForgotPassword() {
           right: 0,
         }}
       >
-        <Card shadow="sm" padding="lg" radius="md" style={{ width: 300 }} withBorder>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <img src="./src/assets/logo1.png" alt="" style={{ width: 150 }} />
-          </div>
+        <form onSubmit={forgotPasswordForm.onSubmit(handleSubmit)}>
+          <Card shadow="sm" padding="lg" radius="md" style={{ width: 300 }} withBorder>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <img src="./src/assets/logo1.png" alt="" style={{ width: 150 }} />
+            </div>
 
-          <TextInput
-            rightSection={rightSection}
-            label="User Email"
-            placeholder="Type your email here"
-            withAsterisk
-            required
-          />
+            <TextInput
+              rightSection={rightSection}
+              label="User Email"
+              placeholder="Type your email here"
+              withAsterisk
+              required
+              key={forgotPasswordForm.key('email')}
+              {...forgotPasswordForm.getInputProps('email')}
+            />
 
-          <Button variant="filled" color="violet" style={{ marginTop: 20 }}>
-            Submit
-          </Button>
+            <Button type="submit" variant="filled" color="violet" style={{ marginTop: 20 }}>
+              Submit
+            </Button>
 
-          <p style={{ fontSize: 12 }}>
-            Go to login <Link to="/">click here</Link>
-          </p>
-        </Card>
+            <p style={{ fontSize: 12 }}>
+              Go to login <Link to="/">click here</Link>
+            </p>
+          </Card>
+        </form>
         <p
           style={{
             justifyContent: 'center',

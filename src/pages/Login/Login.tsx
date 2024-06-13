@@ -14,7 +14,7 @@ function Login() {
   const [opened, setOpened] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const { error } = useSelector((state: RootState) => state.auth);
+  const error = useSelector((state: RootState) => state.auth.error);
   const status = useSelector((state: RootState) => state.auth.status);
   console.log(error);
 
@@ -37,9 +37,7 @@ function Login() {
   const handleLogin = async (values: typeof loginForm.values) => {
     try {
       await dispatch(login(values)).unwrap();
-      if (error === null) {
-        navigate('/admin/dashboard');
-      }
+      navigate('/admin/dashboard');
     } catch (e: any) {
       Notifications.show({
         title: 'Error',

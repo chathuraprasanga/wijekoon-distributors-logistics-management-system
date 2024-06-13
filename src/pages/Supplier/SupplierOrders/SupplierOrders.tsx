@@ -1,4 +1,11 @@
 import {
+  fetchConfirmedSupplierOrderRequests,
+  fetchSupplierOrders,
+  setSupplierOrder,
+  setSupplierOrderRequest,
+} from '@/redux/slices/supplierSlice';
+import { RootState } from '@/redux/store';
+import {
   Grid,
   Button,
   Card,
@@ -14,149 +21,96 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconDots, IconSearch } from '@tabler/icons-react';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 function SupplierOrders() {
-  const [activePage, setPage] = useState(1);
   const [activeModelPage, setModelPage] = useState(1);
-
   const [opened, { open, close }] = useDisclosure(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const status = useSelector((state: RootState) => state.suppliers.status);
+  const error = useSelector((state: RootState) => state.suppliers.error);
+  const orders = useSelector((state: RootState) => state.suppliers.supplierOrders);
+  const orderRequests = useSelector((state: RootState) => state.suppliers.supplierOrderRequests);
 
-  const elements = [
-    {
-      orderId: 'WDS-1',
-      date: '13/04/2024',
-      supplier: 'Keshara Minerals and Chemicals',
-      purpose: 'For Delivery',
-      products: '02',
-      qty: '223',
-      amount: '186500.00',
-      status: 'PAID',
-    },
-    {
-      orderId: 'WDS-2',
-      date: '14/04/2024',
-      supplier: 'ABC Suppliers',
-      purpose: 'For Warehouse',
-      products: '03',
-      qty: '547',
-      amount: '300000.00',
-      status: 'NOT PAID',
-    },
-    {
-      orderId: 'WDS-3',
-      date: '15/04/2024',
-      supplier: 'XYZ Distributors',
-      purpose: 'For Delivery',
-      products: '04',
-      qty: '482',
-      amount: '324000.00',
-      status: 'PAID',
-    },
-    {
-      orderId: 'WDS-4',
-      date: '16/04/2024',
-      supplier: 'PQR Industries',
-      purpose: 'For Warehouse',
-      products: '01',
-      qty: '345',
-      amount: '150000.00',
-      status: 'NOT PAID',
-    },
-    {
-      orderId: 'WDS-5',
-      date: '17/04/2024',
-      supplier: 'LMN Enterprises',
-      purpose: 'For Delivery',
-      products: '03',
-      qty: '812',
-      amount: '250000.00',
-      status: 'PAID',
-    },
-    {
-      orderId: 'WDS-6',
-      date: '18/04/2024',
-      supplier: 'Keshara Minerals and Chemicals',
-      purpose: 'For Warehouse',
-      products: '02',
-      qty: '433',
-      amount: '175000.00',
-      status: 'NOT PAID',
-    },
-    {
-      orderId: 'WDS-7',
-      date: '19/04/2024',
-      supplier: 'ABC Suppliers',
-      purpose: 'For Delivery',
-      products: '01',
-      qty: '194',
-      amount: '105000.00',
-      status: 'PAID',
-    },
-    {
-      orderId: 'WDS-8',
-      date: '20/04/2024',
-      supplier: 'XYZ Distributors',
-      purpose: 'For Warehouse',
-      products: '02',
-      qty: '293',
-      amount: '200000.00',
-      status: 'NOT PAID',
-    },
-    {
-      orderId: 'WDS-9',
-      date: '21/04/2024',
-      supplier: 'PQR Industries',
-      purpose: 'For Delivery',
-      products: '03',
-      qty: '512',
-      amount: '275000.00',
-      status: 'PAID',
-    },
-    {
-      orderId: 'WDS-10',
-      date: '22/04/2024',
-      supplier: 'LMN Enterprises',
-      purpose: 'For Warehouse',
-      products: '04',
-      qty: '707',
-      amount: '350000.00',
-      status: 'NOT PAID',
-    },
-    {
-      orderId: 'WDS-11',
-      date: '23/04/2024',
-      supplier: 'Keshara Minerals and Chemicals',
-      purpose: 'For Delivery',
-      products: '01',
-      qty: '129',
-      amount: '80000.00',
-      status: 'PAID',
-    },
-    {
-      orderId: 'WDS-12',
-      date: '24/04/2024',
-      supplier: 'ABC Suppliers',
-      purpose: 'For Warehouse',
-      products: '02',
-      qty: '251',
-      amount: '175000.00',
-      status: 'NOT PAID',
-    },
-  ];
+  useEffect(() => {
+    dispatch(fetchSupplierOrders());
+    dispatch(fetchConfirmedSupplierOrderRequests());
+  }, [dispatch]);
 
-  const rows = elements.slice(0, 10).map((element) => (
+  // for search
+  const [searchSegment, setSearchSegment] = useState('Supplier');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // for pagination
+  const [activePage, setPage] = useState(1);
+  const ordersPerPage = 10;
+  const handlePageChange = (newPage: any) => {
+    setPage(newPage);
+  };
+
+  const start = (activePage - 1) * ordersPerPage;
+  const end = start + ordersPerPage;
+
+  const filteredOrders = orders.filter((order: any) => {
+    const value =
+      searchSegment === 'Supplier'
+        ? order.supplierOrderRequest.supplier.name
+        : order.supplierOrderRequest.orderId;
+    return value.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  const displayedOrders = filteredOrders.slice(start, end);
+
+  const handleView = (data: any) => {
+    dispatch(setSupplierOrder(data));
+    navigate('/admin/suppliers/view-orders');
+  };
+
+  // pagination for modal
+  const [activeModalPage, setModalPage] = useState(1);
+  const requestPerPage = 5;
+  const handleModalPageChange = (newPage: any) => {
+    setModalPage(newPage);
+  };
+  const startModal = (activeModalPage - 1) * requestPerPage;
+  const endModal = startModal + requestPerPage;
+
+  // modal Search
+  const [modalSearchSegment, setModalSearchSegment] = useState('Supplier');
+  const [modalSearchTerm, setModalSearchTerm] = useState('');
+
+  const filteredRequests = orderRequests.filter((request: any) => {
+    const value =
+      modalSearchSegment === 'Supplier' && request.customer
+        ? request.supplier.name
+        : request.orderId;
+    return value && value.toLowerCase().includes(modalSearchTerm.toLowerCase());
+  });
+
+  const displaedRequests = filteredRequests.slice(startModal, endModal);
+
+  const handleSelect = (element: any) => {
+    dispatch(setSupplierOrderRequest(element));
+    navigate('/admin/suppliers/add-orders');
+  };
+
+  const rows = displayedOrders.map((element: any, index: any) => (
     <>
-      <Table.Tr key={element.orderId}>
-        <Table.Td width="10%">{element.orderId}</Table.Td>
-        <Table.Td width="10%">{element.date}</Table.Td>
-        <Table.Td width="20%">{element.supplier}</Table.Td>
+      <Table.Tr key={element._id}>
+        <Table.Td width="10%">{element?.supplierOrderRequest?.orderId}</Table.Td>
+        <Table.Td width="10%">{element?.createdAt?.split('T')[0]}</Table.Td>
+        <Table.Td width="20%">{element?.supplierOrderRequest?.supplier?.name}</Table.Td>
 
-        <Table.Td width="5%">{element.products}</Table.Td>
-        <Table.Td width="5%">{element.qty}</Table.Td>
-        <Table.Td width="15%">{element.amount}</Table.Td>
-        <Table.Td width="15%">{element.purpose}</Table.Td>
+        <Table.Td width="5%">{element?.supplierOrderRequest?.order.length}</Table.Td>
+        <Table.Td width="5%">{element?.supplierOrderRequest?.totalQuantity}</Table.Td>
+        <Table.Td width="10%">{element?.supplierOrderRequest?.netTotal.toFixed(2)}</Table.Td>
+        <Table.Td width="10%">{element?.supplierOrderRequest?.totalSize} KG</Table.Td>
+        <Table.Td width="15%" style={{ textTransform: 'capitalize' }}>
+          {element?.supplierOrderRequest?.purpose}
+        </Table.Td>
         <Table.Td width="10%">
           <Badge color={element.status === 'PAID' ? 'green' : 'red'} radius="xs" size="xs">
             {element.status}
@@ -169,9 +123,9 @@ function SupplierOrders() {
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Link to="/admin/suppliers/view-orders" style={{ textDecoration: 'none' }}>
-                <Menu.Item>View</Menu.Item>
-              </Link>
+              {/* <Link to="/admin/suppliers/view-orders" style={{ textDecoration: 'none' }}> */}
+              <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+              {/* </Link> */}
             </Menu.Dropdown>
           </Menu>
         </Table.Td>
@@ -187,38 +141,30 @@ function SupplierOrders() {
       <Table.Th>Products</Table.Th>
       <Table.Th>Qty</Table.Th>
       <Table.Th>Amount</Table.Th>
+      <Table.Th>Size</Table.Th>
       <Table.Th>Purpose</Table.Th>
       <Table.Th>Status</Table.Th>
       <Table.Th>Action</Table.Th>
     </Table.Tr>
   );
 
-  const SupplierReqData = [
-    {
-      orderId: 'WDS-114',
-      date: '01/04/2024',
-      name: 'Chathura Prasanga',
-      purpose: 'For Delivery',
-      product: '04',
-      quantity: 1,
-      amount: '125000.00',
-    },
-  ];
-
-  const modalData = SupplierReqData.slice(0, 5).map((element) => (
+  const modalData = displaedRequests.map((element, index) => (
     <>
-      <Table.Tr key={element.orderId}>
+      <Table.Tr key={element._id}>
         <Table.Td>{element.orderId}</Table.Td>
-        <Table.Td>{element.date}</Table.Td>
-        <Table.Td>{element.name}</Table.Td>
-        <Table.Td>{element.product}</Table.Td>
-        <Table.Td>{element.quantity}</Table.Td>
-        <Table.Td>{element.amount}</Table.Td>
-        <Table.Td>{element.purpose}</Table.Td>
+        <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
+        <Table.Td>{element.supplier.name}</Table.Td>
+        <Table.Td>{element.order.length}</Table.Td>
+        <Table.Td>{element.totalQuantity}</Table.Td>
+        <Table.Td>{element.netTotal}</Table.Td>
+
+        <Table.Td style={{ textTransform: 'capitalize' }}>{element.purpose}</Table.Td>
         <Table.Td>
-          <Link to="/admin/suppliers/add-orders">
-            <Button size="xs">Select</Button>
-          </Link>
+          {/* <Link to="/admin/suppliers/add-orders"> */}
+          <Button size="xs" onClick={() => handleSelect(element)}>
+            Select
+          </Button>
+          {/* </Link> */}
         </Table.Td>
       </Table.Tr>
     </>
@@ -234,34 +180,50 @@ function SupplierOrders() {
           <SegmentedControl
             size="xs"
             color="violet"
-            data={['Order ID', 'Date', 'Supplier']}
+            data={['Order ID', 'Supplier']}
             defaultValue="Supplier"
+            onChange={setModalSearchSegment}
           />
           <TextInput
             ml={10}
             size="xs"
             placeholder="Serach"
             rightSection={<IconSearch size="20" color="gray" />}
+            onChange={(event) => setModalSearchTerm(event.currentTarget.value)}
           />
         </div>
         <div>
-          <Table>
-            <Table.Tr>
-              <Table.Th>Order ID</Table.Th>
-              <Table.Th>Date</Table.Th>
-              <Table.Th>Supplier</Table.Th>
-              <Table.Th>Products</Table.Th>
-              <Table.Th>Quantity</Table.Th>
-              <Table.Th>Amount</Table.Th>
-              <Table.Th>Purpose</Table.Th>
-              <Table.Th>Action</Table.Th>
-            </Table.Tr>
-            {modalData}
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Order ID</Table.Th>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Supplier</Table.Th>
+                <Table.Th>Products</Table.Th>
+                <Table.Th>Quantity</Table.Th>
+                <Table.Th>Amount</Table.Th>
+                <Table.Th>Purpose</Table.Th>
+                <Table.Th>Action</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {modalData.length > 0 ? (
+                modalData
+              ) : (
+                <Table.Tr>
+                  <Table.Td colSpan={10}>
+                    <Text color="dimmed" align="center">
+                      No data found
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
           </Table>
           <Pagination
-            total={SupplierReqData.length / 5}
-            value={activeModelPage}
-            onChange={setModelPage}
+            total={Math.ceil(filteredRequests.length / requestPerPage)}
+            value={activeModalPage}
+            onChange={handleModalPageChange}
             mt={10}
             style={{ display: 'flex', justifyContent: 'flex-end' }}
             size="xs"
@@ -289,18 +251,37 @@ function SupplierOrders() {
                 color="violet"
                 data={['Order ID', 'Supplier']}
                 defaultValue="Supplier"
+                onChange={setSearchSegment}
               />
-              <TextInput size="xs" ml={10} rightSection={<IconSearch />} placeholder="Search" />
+              <TextInput
+                size="xs"
+                ml={10}
+                onChange={(event) => setSearchTerm(event.currentTarget.value)}
+                rightSection={<IconSearch />}
+                placeholder="Search"
+              />
             </div>
             <Divider my="md" />
             <Table striped highlightOnHover>
               <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Table.Tr>
+                    <Table.Td colSpan={10}>
+                      <Text color="dimmed" align="center">
+                        No data found
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                )}
+              </Table.Tbody>
             </Table>
             <Pagination
-              total={elements.length / 10}
+              total={Math.ceil(filteredOrders.length / ordersPerPage)}
               value={activePage}
-              onChange={setPage}
+              onChange={handlePageChange}
               mt={10}
               style={{ display: 'flex', justifyContent: 'flex-end' }}
               size="xs"

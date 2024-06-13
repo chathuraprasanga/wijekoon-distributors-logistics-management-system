@@ -17,6 +17,7 @@ interface AuthState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   permissions: string[] | null; // New state to hold permissions
+  message: any;
 }
 
 const initialState: AuthState = {
@@ -25,7 +26,10 @@ const initialState: AuthState = {
   user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
   status: 'idle',
   error: null,
-  permissions: localStorage.getItem('permissions') ? JSON.parse(localStorage.getItem('permissions')!) : null,
+  permissions: localStorage.getItem('permissions')
+    ? JSON.parse(localStorage.getItem('permissions')!)
+    : null,
+  message: {},
 };
 
 interface LoginResponse {
@@ -43,7 +47,7 @@ interface LoginResponse {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: { email: string; password: string }) => {
+  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await axios.post<LoginResponse>('http://localhost:3000/login', {
         email,
@@ -51,7 +55,42 @@ export const login = createAsyncThunk(
       });
       return response.data;
     } catch (error: any) {
-      return error.response?.data || 'Something went wrong';
+      // Check if the error is due to invalid credentials or other issues
+      if (error.response && error.response.status === 401) {
+        // If the error is specifically about invalid credentials, throw an error
+        throw new Error('Invalid credentials');
+      } else {
+        // For other types of errors, use rejectWithValue to specify the error message
+        return rejectWithValue(error.response?.data || 'Something went wrong');
+      }
+    }
+  }
+);
+
+interface ForgotPasswordResponse {
+  message: string;
+}
+
+export const forgotPassword = createAsyncThunk(
+  'auth/forgotPassword',
+  async ({ email }: { email: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<ForgotPasswordResponse>(
+        'http://localhost:3000/forgot-password',
+        {
+          email,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      // Check if the error is due to invalid email or other issues
+      if (error.response && error.response.status === 400) {
+        // If the error is specifically about an invalid email, throw an error
+        throw new Error('Email not found');
+      } else {
+        // For other types of errors, use rejectWithValue to specify the error message
+        return rejectWithValue(error.response?.data || 'Something went wrong');
+      }
     }
   }
 );
@@ -116,6 +155,18 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Login failed';
+      })
+      .addCase(forgotPassword.pending, (state, action) => {
+        state.status = 'loading';
+      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.message = action.payload.message;
+      })
+
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Forgot Password failed';
       });
   },
 });
