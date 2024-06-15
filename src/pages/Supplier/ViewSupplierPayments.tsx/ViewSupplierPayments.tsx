@@ -1,11 +1,33 @@
-import { Button, Card, Grid, Table, Text } from '@mantine/core';
+import { Badge, Button, Card, Grid, Table, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import SupplierPaymentUpdateModal from './SupplierPaymentModal/SupplierPaymentModal';
+import { RootState } from '@/redux/store';
 
 function ViewSupplierPayments() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const status = useSelector((state: RootState) => state.suppliers.status);
+  const error = useSelector((state: RootState) => state.suppliers.error);
+  const supplierPayment = useSelector((state: RootState) => state.suppliers.supplierPayment);
+  console.log(supplierPayment);
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const { supplier } = supplierPayment?.supplierOrder?.supplierOrderRequest;
+  const order = supplierPayment.supplierOrder;
+  const paymentDetails = supplierPayment.payments;
+
   return (
     <>
+      <SupplierPaymentUpdateModal
+        opened={opened}
+        onClose={close}
+        customerOrder={order}
+        totalPayable={supplierPayment?.totalPayable}
+      />
       <Grid>
         <Grid.Col span={12}>
           <div>
@@ -25,27 +47,29 @@ function ViewSupplierPayments() {
       <Grid>
         <Grid.Col span={12}>
           <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Text style={{ fontWeight: 'bold' }}>Customer Details</Text>
+            <Text style={{ fontWeight: 'bold' }}>Supplier Details</Text>
             <Table withRowBorders={false}>
               <Table.Tr>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Name:
                 </Table.Td>
-                <Table.Td width="35%">Chathura Prasanga</Table.Td>
+                <Table.Td width="35%">{supplier?.name}</Table.Td>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Phone:
                 </Table.Td>
-                <Table.Td width="35%">0779250108/0750943040</Table.Td>
+                <Table.Td width="35%">
+                  {supplier?.phone} | {supplier?.phoneSecondary}
+                </Table.Td>
               </Table.Tr>
               <Table.Tr>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Email ID:
                 </Table.Td>
-                <Table.Td width="35%">chathuraprasanga98@gmail.com</Table.Td>
+                <Table.Td width="35%">{supplier?.email}</Table.Td>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Address:
                 </Table.Td>
-                <Table.Td width="35%">Godawele Watta, Kotikapola, Mawathagama, Kurunegla</Table.Td>
+                <Table.Td width="35%">{supplier?.address}</Table.Td>
               </Table.Tr>
             </Table>
           </Card>
@@ -58,29 +82,39 @@ function ViewSupplierPayments() {
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Date:
                 </Table.Td>
-                <Table.Td width="35%">13/04/2024</Table.Td>
+                <Table.Td width="35%">{order?.createdAt.split('T')[0]}</Table.Td>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Total Payment:
                 </Table.Td>
-                <Table.Td width="35%">125000.00</Table.Td>
+                <Table.Td width="35%">{supplierPayment?.totalPayable.toFixed(2)}</Table.Td>
               </Table.Tr>
               <Table.Tr>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Order ID:
                 </Table.Td>
-                <Table.Td width="35%">WD-0089</Table.Td>
-                <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
-                  Paid Amount:
+                <Table.Td width="35%">
+                  {supplierPayment?.supplierOrder?.supplierOrderRequest?.orderId}
                 </Table.Td>
-                <Table.Td width="35%">75000.00</Table.Td>
+                <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
+                  Outstanding:
+                </Table.Td>
+                <Table.Td width="35%">{supplierPayment?.outstanding?.toFixed(2)}</Table.Td>
               </Table.Tr>
               <Table.Tr>
                 <Table.Td width="15%"></Table.Td>
                 <Table.Td width="35%"></Table.Td>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
-                  Outstanding:
+                  Status:
                 </Table.Td>
-                <Table.Td width="35%">50000.00</Table.Td>
+                <Table.Td width="35%">
+                  <Badge
+                    size="xs"
+                    radius="xs"
+                    color={supplierPayment?.status === 'PAID' ? 'green' : 'red'}
+                  >
+                    {supplierPayment?.status}
+                  </Badge>
+                </Table.Td>
               </Table.Tr>
             </Table>
             <Table
@@ -97,37 +131,48 @@ function ViewSupplierPayments() {
                 <Table.Th>Unit Price</Table.Th>
                 <Table.Th>Quantity</Table.Th>
                 <Table.Th>Discount</Table.Th>
+                <Table.Th>Tax</Table.Th>
                 <Table.Th>Line Total</Table.Th>
               </Table.Tr>
+              {supplierPayment?.supplierOrder?.supplierOrderRequest?.order?.map((item, index) => (
+                <Table.Tr key={item._id}>
+                  <Table.Td>{item?.product?.code}</Table.Td>
+                  <Table.Td>{item?.product?.name}</Table.Td>
+                  <Table.Td>{item?.product?.size}</Table.Td>
+                  <Table.Td>{item?.product?.buyingPrice}</Table.Td>
+                  <Table.Td>{item?.quantity}</Table.Td>
+                  <Table.Td>{item?.discount?.toFixed(2) || 0.0} %</Table.Td>
+                  <Table.Td>{item?.tax?.toFixed(2) || 0.0} %</Table.Td>
+                  <Table.Td>{item?.lineTotal?.toFixed(2)}</Table.Td>
+                </Table.Tr>
+              ))}
+
               <Table.Tr>
-                <Table.Td>KSL-20</Table.Td>
-                <Table.Td>Keshara Super lime</Table.Td>
-                <Table.Td>20KG</Table.Td>
-                <Table.Td>500.00</Table.Td>
-                <Table.Td>300</Table.Td>
-                <Table.Td>20%</Table.Td>
-                <Table.Td>120000.00</Table.Td>
+                <Table.Td colSpan={6}></Table.Td>
+                <Table.Td>Grand Total:</Table.Td>
+                <Table.Td>
+                  {supplierPayment?.supplierOrder?.supplierOrderRequest?.netTotal?.toFixed(2)}
+                </Table.Td>
               </Table.Tr>
               <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
-                <Table.Td>Sub Total:</Table.Td>
-                <Table.Td>120000.00</Table.Td>
+                <Table.Td colSpan={6}></Table.Td>
+                <Table.Td>Total Quantity:</Table.Td>
+                <Table.Td>
+                  {supplierPayment?.supplierOrder?.supplierOrderRequest?.totalQuantity}
+                </Table.Td>
               </Table.Tr>
               <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
-                <Table.Td>Tax:</Table.Td>
-                <Table.Td>5000.00</Table.Td>
+                <Table.Td colSpan={6}></Table.Td>
+                <Table.Td>Total Size: </Table.Td>
+                <Table.Td>
+                  {supplierPayment?.supplierOrder?.supplierOrderRequest?.totalSize.toFixed(2)} KG
+                </Table.Td>
               </Table.Tr>
-              <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
-                <Table.Td>Discount: </Table.Td>
-                <Table.Td>30000.00</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
+              {/* <Table.Tr>
+                <Table.Td colSpan={6}></Table.Td>
                 <Table.Td>30000.00</Table.Td>
                 <Table.Td>125000.00</Table.Td>
-              </Table.Tr>
+              </Table.Tr> */}
             </Table>
           </Card>
         </Grid.Col>
@@ -148,30 +193,36 @@ function ViewSupplierPayments() {
                 <Table.Th>Chequ no.</Table.Th>
                 <Table.Th>Amount</Table.Th>
               </Table.Tr>
-              <Table.Tr>
-                <Table.Td>Cheque</Table.Td>
-                <Table.Td>7010</Table.Td>
-                <Table.Td>116</Table.Td>
-                <Table.Td>123456</Table.Td>
-                <Table.Td>50000.00</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>Cash</Table.Td>
-                <Table.Td>-</Table.Td>
-                <Table.Td>-</Table.Td>
-                <Table.Td>-</Table.Td>
-                <Table.Td>25000.00</Table.Td>
-              </Table.Tr>
+              {supplierPayment?.payments?.map((item, index) => (
+                <Table.Tr key={item._id}>
+                  <Table.Td>{item?.method}</Table.Td>
+                  <Table.Td>{item?.bank || '-'}</Table.Td>
+                  <Table.Td>{item?.branch || '-'}</Table.Td>
+                  <Table.Td>{item?.chequeNumber || '-'}</Table.Td>
+                  <Table.Td>{item?.amount?.toFixed(2)}</Table.Td>
+                </Table.Tr>
+              ))}
               <Table.Tr>
                 <Table.Td colSpan={3}>
-                  <Button size="xs">New Payment Details</Button>
+                  {/* {supplierPayment?.status !== 'PAID' && (
+                    <Button size="xs" onClick={() => open()}>
+                      New Payment Details
+                    </Button>
+                  )} */}
                 </Table.Td>
                 <Table.Td>Outstanding</Table.Td>
-                <Table.Td>25000.00</Table.Td>
+                <Table.Td>{supplierPayment?.outstanding.toFixed(2)}</Table.Td>
               </Table.Tr>
             </Table>
             <div>
-              {/* <Button style={{ width: '15%', marginTop: 10, float: 'right' }}>Update</Button> */}
+              {supplierPayment?.status !== 'PAID' && (
+                <Button
+                  onClick={() => open()}
+                  style={{ width: '15%', marginTop: 10, float: 'right' }}
+                >
+                  New Payment
+                </Button>
+              )}
             </div>
           </Card>
         </Grid.Col>

@@ -4,7 +4,7 @@ import {
   setSupplierOrder,
   setSupplierOrderRequest,
 } from '@/redux/slices/supplierSlice';
-import { RootState } from '@/redux/store';
+
 import {
   Grid,
   Button,
@@ -23,7 +23,8 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconDots, IconSearch } from '@tabler/icons-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { RootState } from '@/redux/store';
 
 function SupplierOrders() {
   const [activeModelPage, setModelPage] = useState(1);
@@ -57,9 +58,9 @@ function SupplierOrders() {
   const filteredOrders = orders.filter((order: any) => {
     const value =
       searchSegment === 'Supplier'
-        ? order.supplierOrderRequest.supplier.name
-        : order.supplierOrderRequest.orderId;
-    return value.toLowerCase().includes(searchTerm.toLowerCase());
+        ? order.supplierOrderRequest?.supplier?.name
+        : order.supplierOrderRequest?.orderId;
+    return value?.toLowerCase().includes(searchTerm?.toLowerCase());
   });
 
   const displayedOrders = filteredOrders.slice(start, end);
@@ -85,9 +86,9 @@ function SupplierOrders() {
   const filteredRequests = orderRequests.filter((request: any) => {
     const value =
       modalSearchSegment === 'Supplier' && request.customer
-        ? request.supplier.name
-        : request.orderId;
-    return value && value.toLowerCase().includes(modalSearchTerm.toLowerCase());
+        ? request?.supplier.name
+        : request?.orderId;
+    return value && value?.toLowerCase().includes(modalSearchTerm?.toLowerCase());
   });
 
   const displaedRequests = filteredRequests.slice(startModal, endModal);
@@ -151,12 +152,12 @@ function SupplierOrders() {
   const modalData = displaedRequests.map((element, index) => (
     <>
       <Table.Tr key={element._id}>
-        <Table.Td>{element.orderId}</Table.Td>
-        <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
-        <Table.Td>{element.supplier.name}</Table.Td>
-        <Table.Td>{element.order.length}</Table.Td>
-        <Table.Td>{element.totalQuantity}</Table.Td>
-        <Table.Td>{element.netTotal}</Table.Td>
+        <Table.Td>{element?.orderId}</Table.Td>
+        <Table.Td>{element?.createdAt?.split('T')[0]}</Table.Td>
+        <Table.Td>{element?.supplier?.name}</Table.Td>
+        <Table.Td>{element?.order?.length}</Table.Td>
+        <Table.Td>{element?.totalQuantity}</Table.Td>
+        <Table.Td>{element?.netTotal}</Table.Td>
 
         <Table.Td style={{ textTransform: 'capitalize' }}>{element.purpose}</Table.Td>
         <Table.Td>

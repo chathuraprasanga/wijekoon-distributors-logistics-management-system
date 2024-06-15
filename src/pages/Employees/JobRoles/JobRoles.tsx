@@ -45,11 +45,9 @@ const JobRoles: React.FC = () => {
   const role = userDetails.role.name;
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchJobRoles());
-      dispatch(fetchPermissions());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchJobRoles());
+    dispatch(fetchPermissions());
+  }, [dispatch]);
 
   const handleCreateJobBtn = () => {
     dispatch(setJobRole(null));

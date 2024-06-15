@@ -6,8 +6,8 @@ import { useForm } from '@mantine/form';
 import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { Notifications } from '@mantine/notifications';
-import { setCustomerPayment, updateCustomerPayment } from '@/redux/slices/customerSlice';
 import { RootState } from '@/redux/store';
+import { fetchSupplierPayments, updateSupplierPayment } from '@/redux/slices/supplierSlice';
 
 interface RowData {
   method: string;
@@ -18,25 +18,26 @@ interface RowData {
   amount: number;
 }
 
-const CustomerPaymentUpdateModal = ({
-  customerPayment,
+const SupplierPaymentUpdateModal = ({
+  supplierPayment,
   totalPayable,
   opened,
   onClose,
 }: {
-  customerOrder: any;
+  SupplierOrder: any;
   totalPayable: number;
   opened: boolean;
   onClose: () => void;
 }) => {
   const [outstanding, setOutstanding] = useState<number>(parseFloat(totalPayable?.toFixed(2)));
 
-  const selectedPayment = useSelector((state: RootState) => state.customers.customerPayment);
+  const selectedPayment = useSelector((state: RootState) => state.suppliers.supplierPayment);
+  console.log('SELECTED PAYMENT:', selectedPayment);
   const [payments, setPayments] = useState<RowData[]>(
-    selectedPayment ? selectedPayment.paymentDetails : []
+    selectedPayment ? selectedPayment.payments : []
   );
   const [dates, setDates] = useState<Date[]>([
-    selectedPayment.paymentDetails.map((item: any) => item.depositDate),
+    selectedPayment.payments.map((item: any) => item.depositDate),
   ]);
   const navigate = useNavigate();
 
@@ -98,7 +99,7 @@ const CustomerPaymentUpdateModal = ({
   const handleSave = async () => {
     const paymentPayload = {
       ...selectedPayment,
-      paymentDetails: payments.map((payment) => ({
+      payments: payments.map((payment) => ({
         method: payment.method,
         bank: payment.bank,
         branch: payment.branch,
@@ -111,7 +112,7 @@ const CustomerPaymentUpdateModal = ({
       status: outstanding === 0 ? 'PAID' : 'NOT PAID',
     };
     try {
-      dispatch(updateCustomerPayment(paymentPayload)).unwrap();
+      dispatch(updateSupplierPayment(paymentPayload)).unwrap();
       Notifications.show({
         title: 'Successful',
         message: 'Payment details updated successfully',
@@ -119,7 +120,8 @@ const CustomerPaymentUpdateModal = ({
       });
       setDates([]);
       paymentForm.reset();
-      navigate('/admin/customers/payments');
+      dispatch(fetchSupplierPayments());
+      navigate('/admin/Suppliers/payments');
       onClose();
     } catch (e: any) {
       Notifications.show({
@@ -268,4 +270,4 @@ const CustomerPaymentUpdateModal = ({
   );
 };
 
-export default CustomerPaymentUpdateModal;
+export default SupplierPaymentUpdateModal;

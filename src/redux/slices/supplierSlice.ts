@@ -306,7 +306,7 @@ export const updateSupplierPayment = createAsyncThunk(
   'suppliers/updateSupplierPayment',
   async (supplierPayment: any) => {
     const response = await axios.put(
-      `http://localhost:3000/supplierPayments/${supplierPayment.id}`,
+      `http://localhost:3000/supplierPayment/${supplierPayment._id}`,
       supplierPayment,
       {
         headers: {

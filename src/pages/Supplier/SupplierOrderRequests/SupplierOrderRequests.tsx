@@ -125,11 +125,13 @@ function SupplierOrderRequests() {
               case 'CONFIRMED':
                 return 'green';
               case 'CANCELLED':
-                return 'red';
+                return 'orange';
               case 'COMPLETED':
                 return 'blue';
               case 'NOT COMPLETED':
                 return 'purple';
+              case 'REJECTED':
+                return 'red';
               default:
                 return 'gray';
             }
@@ -219,7 +221,19 @@ function SupplierOrderRequests() {
                 <Table.Th>Action</Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody>{modalData}</Table.Tbody>
+            <Table.Tbody>
+              {modalData.length > 0 ? (
+                modalData
+              ) : (
+                <Table.Tr>
+                  <Table.Td colSpan={10}>
+                    <Text color="dimmed" align="center">
+                      No data found
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
           </Table>
           <Pagination
             total={Math.ceil(filteredSuppliers.length / suppliersPerPage)}
