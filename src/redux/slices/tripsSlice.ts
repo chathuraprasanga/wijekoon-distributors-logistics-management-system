@@ -34,13 +34,22 @@ export const fetchTrips = createAsyncThunk('trips/fetchTrips', async () => {
   return response.data;
 });
 
+export const fetchCompletedTrips = createAsyncThunk('trips/fetchCompletedTrips', async () => {
+  const response = await axios.get('http://localhost:3000/trips/completed', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+});
+
 export const createTrip = createAsyncThunk('trips/createTrip', async (trip: any) => {
   const response = await axios.post('http://localhost:3000/trip', trip);
   return response.data;
 });
 
 export const updateTrip = createAsyncThunk('trips/updateTrip', async (trip: any) => {
-  const response = await axios.put(`http://localhost:3000/trip/${trip.id}`, trip);
+  const response = await axios.put(`http://localhost:3000/trip/${trip._id}`, trip);
   return response.data;
 });
 
@@ -267,7 +276,18 @@ const tripSlice = createSlice({
       })
       .addCase(deleteExpense.rejected, (state, action) => {
         state.status = 'failed';
-      });
+      })
+      .addCase(fetchCompletedTrips.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchCompletedTrips.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.trips = action.payload;
+      })
+      .addCase(fetchCompletedTrips.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch trips';
+      })
 },
 });
 

@@ -2,18 +2,17 @@ import { Button, Card, Grid, Table, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { RootState } from '@/redux/store';
 import CustomerPaymentUpdateModal from './customerPaymentUpdate/customerPaymentUpdateModal';
 
 function AddCustomerPayments() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const dispatch = useDispatch();
+  // const navigate = useNavigate();
   const selectedPayment = useSelector((state: RootState) => state.customers.customerPayment);
-  console.log(selectedPayment);
   const selectedOrder = selectedPayment?.customerOrder;
-  const paymentDetails = selectedPayment?.paymentDetails;
+  // const paymentDetails = selectedPayment?.paymentDetails;
   const [opened, { open, close }] = useDisclosure(false);
 
   return (

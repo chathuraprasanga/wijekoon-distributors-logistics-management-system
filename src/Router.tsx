@@ -57,10 +57,15 @@ import ViewCheques from './pages/Cheques/ViewCheques/ViewCheques';
 import AddEditCheques from './pages/Cheques/AddEditCheques/AddEditCheques';
 import AddEditWarehouse from './pages/Assets/AddEditWarehouse/AddEditWarehouse';
 import ViewSuppliersOrders from './pages/Supplier/ViewSupplierOrder/ViewSupplierOrder';
+import Home from './pages/CustomerPortal/home';
 
 const router = createBrowserRouter([
   {
     path: '/',
+    element: <Home />,
+  },
+  {
+    path: '/admin-login',
     element: <Login />,
   },
   {

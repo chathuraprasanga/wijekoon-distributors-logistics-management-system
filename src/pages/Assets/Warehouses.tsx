@@ -19,11 +19,7 @@ import { IconCheck, IconDots, IconSearch, IconX } from '@tabler/icons-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  fetchWarehouses,
-  setWarehouse,
-  updateWarehouse,
-} from '@/redux/slices/assetsSlice';
+import { fetchWarehouses, setWarehouse, updateWarehouse } from '@/redux/slices/assetsSlice';
 import { RootState } from '@/redux/store';
 
 function Warehouses() {
@@ -38,10 +34,8 @@ function Warehouses() {
   const error = useSelector((state: RootState) => state.assets.error);
 
   useEffect(() => {
-    if (status === 'idle') {
-      disptach(fetchWarehouses());
-    }
-  }, [status, disptach]);
+    disptach(fetchWarehouses());
+  }, [disptach]);
 
   // for search
   const [searchSegment, setSearchSegment] = useState('City');

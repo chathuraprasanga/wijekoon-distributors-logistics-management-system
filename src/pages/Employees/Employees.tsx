@@ -37,14 +37,11 @@ function Employees() {
 
   const employees = useSelector((state: RootState) => state.employees.employees);
   const status = useSelector((state: RootState) => state.employees.status);
-  console.log(employees);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchEmployees());
-      dispatch(fetchJobRoles());
-    }
-  }, [status, dispatch]);
+    dispatch(fetchEmployees());
+    dispatch(fetchJobRoles());
+  }, [dispatch]);
 
   const handleEditBtn = (element: any, type: string) => {
     dispatch(setEmployee(element));

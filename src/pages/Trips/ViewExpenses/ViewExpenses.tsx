@@ -1,9 +1,19 @@
+import { fetchExpenses } from '@/redux/slices/tripsSlice';
+import { RootState } from '@/redux/store';
 import { Button, Card, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 function ViewExpenses() {
+  const dispatch = useDispatch();
+  const expense = useSelector((state: RootState) => state.trips.expense);
+
+  useEffect(() => {
+    dispatch(fetchExpenses);
+  }, [dispatch]);
+
   return (
     <>
       <Grid>
@@ -34,7 +44,7 @@ function ViewExpenses() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">WDT-006</Text>
+                  <Text size="sm">{expense?.tripId?.tripId}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text size="sm" fw="bold">
@@ -42,7 +52,7 @@ function ViewExpenses() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">02.04.2024</Text>
+                  <Text size="sm">{expense.tripId.createdAt.split('T')[0]}</Text>
                 </Table.Td>
               </Table.Tr>
 
@@ -53,7 +63,7 @@ function ViewExpenses() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">Indika Kumara</Text>
+                  <Text size="sm">{expense.tripId.driver.name}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text size="sm" fw="bold">
@@ -61,7 +71,7 @@ function ViewExpenses() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">NW LC 3801</Text>
+                  <Text size="sm">{expense?.tripId?.vehicle?.number || 'N/A'}</Text>
                 </Table.Td>
               </Table.Tr>
 
@@ -72,15 +82,17 @@ function ViewExpenses() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">For Delivery</Text>
+                  <Text size="sm" style={{ textTransform: 'capitalize' }}>
+                    {expense.tripId.supplierOrder.supplierOrderRequest.purpose}
+                  </Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text size="sm" fw="bold">
-                    Total Amount:
+                    Total Expenses:
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">LKR 6000.00</Text>
+                  <Text size="sm">{expense.totalAmount.toFixed(2)}</Text>
                 </Table.Td>
               </Table.Tr>
             </Table>
@@ -96,22 +108,21 @@ function ViewExpenses() {
                 <Table.Th>Description</Table.Th>
                 <Table.Th>Amount</Table.Th>
               </Table.Tr>
-              <Table.Tr>
-                <Table.Td>01</Table.Td>
-                <Table.Td>Lunch</Table.Td>
-                <Table.Td>LKR 1000.00</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>02</Table.Td>
-                <Table.Td>Deisel</Table.Td>
-                <Table.Td>LKR 5000.00</Table.Td>
-              </Table.Tr>
+              {expense.expenses.map((item, index) => (
+                <Table.Tr>
+                  <Table.Td>{index + 1}</Table.Td>
+                  <Table.Td>{item.description}</Table.Td>
+                  <Table.Td>{item.amount.toFixed(2)}</Table.Td>
+                </Table.Tr>
+              ))}
             </Table>
           </Card>
         </Grid.Col>
         <Grid.Col>
           <div>
-            <Link to="/admin/expenses/add-edit"><Button style={{ float: 'right' }}>Edit Records</Button></Link>
+            <Link to="/admin/expenses/add-edit">
+              <Button style={{ float: 'right' }}>Edit Records</Button>
+            </Link>
           </div>
         </Grid.Col>
       </Grid>
