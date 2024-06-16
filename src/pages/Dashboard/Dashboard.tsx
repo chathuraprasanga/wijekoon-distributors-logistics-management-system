@@ -1,7 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { Card, Grid, Select, Text, Divider } from '@mantine/core';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BarChart } from '@mantine/charts';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MonthPickerInput } from '@mantine/dates';
 import {
   IconBuildingBank,
@@ -10,9 +11,26 @@ import {
   IconWallet,
 } from '@tabler/icons-react';
 import { RootState } from '@/redux/store';
+import { fetchSummaryDetails } from '@/redux/slices/dashboardSlice';
 
 function Dashboard() {
   const userDetails = useSelector((state: RootState) => state.auth.user);
+  const summaryDetails = useSelector((state: RootState) => state.dashboard.summaryDetails);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [selectedWarehouse, setSelectedWarehouse] = useState('');
+
+  console.log(selectedWarehouse);
+
+  const warehouseDetails = summaryDetails.warehouseDetails;
+
+  useEffect(() => {
+    dispatch(fetchSummaryDetails());
+  }, [dispatch]);
+
+  const handleWarehouseChange = (value: any) => {
+    setSelectedWarehouse(value);
+  };
 
   const data = [
     { month: 'January', DirectSales: 1200, WarehoseSales: 900 },
@@ -65,7 +83,7 @@ function Dashboard() {
                       Revenue
                     </Text>
                     <Text size="md" style={{ marginLeft: 10 }}>
-                      LKR 534,000.00
+                      LKR {summaryDetails?.revenue?.toFixed(2) || '-'}
                     </Text>
                   </div>
                 </div>
@@ -83,7 +101,11 @@ function Dashboard() {
                       Expenses
                     </Text>
                     <Text size="md" style={{ marginLeft: 10 }}>
-                      LKR 534,000.00
+                      LKR{' '}
+                      {(
+                        summaryDetails?.expenses?.supplierOrderRequestNetTotal +
+                        summaryDetails?.expenses?.expensesTotalAmount
+                      ).toFixed(2) || '-'}
                     </Text>
                   </div>
                 </div>
@@ -101,7 +123,7 @@ function Dashboard() {
                       Debit
                     </Text>
                     <Text size="md" style={{ marginLeft: 10 }}>
-                      LKR 534,000.00
+                      LKR {summaryDetails?.debit?.toFixed(2) || '-'}
                     </Text>
                   </div>
                 </div>
@@ -119,7 +141,7 @@ function Dashboard() {
                       Credit
                     </Text>
                     <Text size="md" style={{ marginLeft: 10 }}>
-                      LKR 534,000.00
+                      LKR {summaryDetails?.credit?.toFixed(2) || '-'}
                     </Text>
                   </div>
                 </div>
@@ -142,7 +164,7 @@ function Dashboard() {
                         Customers
                       </Text>
                       <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        155
+                        {summaryDetails?.customers || '-'}
                       </Text>
                     </div>
                   </Card>
@@ -155,7 +177,7 @@ function Dashboard() {
                         Suppliers
                       </Text>
                       <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        5
+                        {summaryDetails?.suppliers || '-'}
                       </Text>
                     </div>
                   </Card>
@@ -168,7 +190,7 @@ function Dashboard() {
                         Employees
                       </Text>
                       <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        13
+                        {summaryDetails?.employees || '-'}
                       </Text>
                     </div>
                   </Card>
@@ -181,7 +203,7 @@ function Dashboard() {
                         Vehicles
                       </Text>
                       <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        4
+                        {summaryDetails?.vehicles || '-'}
                       </Text>
                     </div>
                   </Card>
@@ -197,13 +219,15 @@ function Dashboard() {
               <Text style={{ alignContent: 'center' }}>Stocks</Text>
               <Select
                 style={{ width: 290 }}
-                placeholder="Select a Warehose"
-                data={['W1-Mawathagama', 'W2-Barandana', 'W3-Kurunegala', 'W4-Kandy']}
-                defaultValue="W1-Mawathagama"
+                placeholder="Select a Warehouse"
+                data={warehouseDetails.map((wh: any) => `${wh.warehouseId} - ${wh.city}`)}
+                defaultValue=""
+                onChange={handleWarehouseChange}
                 size="xs"
               />
             </div>
             <Grid>
+
               <Grid.Col span={6} style={{ display: 'flex' }}>
                 <Grid.Col span={6}>
                   <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -257,6 +281,7 @@ function Dashboard() {
                   </Card>
                 </Grid.Col>
               </Grid.Col>
+
             </Grid>
           </div>
         </Grid.Col>
@@ -298,16 +323,24 @@ function Dashboard() {
             <Grid.Col span={4}>
               <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Text size="xl">Customer Order Requests</Text>
-                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>45</Text>
+                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>
+                  {summaryDetails?.customerOrderRequests || '-'}
+                </Text>
                 <Divider my="md" />
                 <Text size="xl">Customer Orders</Text>
-                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>45</Text>
+                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>
+                  {summaryDetails?.customerOrders || '-'}
+                </Text>
                 <Divider my="md" />
                 <Text size="xl">Supplier Order Requests</Text>
-                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>45</Text>
+                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>
+                  {summaryDetails?.supplierOrderRequests || '-'}
+                </Text>
                 <Divider my="md" />
                 <Text size="xl">Supplier Orders</Text>
-                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>45</Text>
+                <Text style={{ fontSize: 31, fontWeight: 'bold', color: '#5E1588' }}>
+                  {summaryDetails?.supplierOrders || '-'}
+                </Text>
               </Card>
             </Grid.Col>
           </Grid>

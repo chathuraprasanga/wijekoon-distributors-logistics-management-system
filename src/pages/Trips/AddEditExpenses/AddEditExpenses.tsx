@@ -18,12 +18,12 @@ function AddEditExpenses() {
   const navigate = useNavigate();
   const trips = useSelector((state: RootState) => state.trips.trips);
   const expense = useSelector((state: RootState) => state.trips.expense);
-  console.log(expense);
+  const trip = useSelector((state: RootState) => state.trips.trip);
   const [expenses, setExpenses] = useState([]);
 
   const form = useForm({
     initialValues: {
-      tripId: '',
+      tripId: trip._id || '',
       expenses: [],
       totalAmount: 0,
     },
@@ -42,7 +42,10 @@ function AddEditExpenses() {
   }, [dispatch, expense]);
 
   useEffect(() => {
-    const totalAmount = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+    const totalAmount = expenses?.reduce(
+      (sum, expense) => sum + parseFloat(expense.amount || 0),
+      0
+    );
     form.setFieldValue('totalAmount', totalAmount);
   }, [expenses]);
 
@@ -130,52 +133,37 @@ function AddEditExpenses() {
       <Grid>
         <Grid.Col span={12}>
           <Card shadow="sm" padding="lg" radius="md" withBorder>
-            {!expense && (
-              <>
-                <Text size="sm" fw="bold">
-                  Select a Trip:
-                </Text>
-                <Select
-                  size="xs"
-                  placeholder="Select a Trip"
-                  data={trips.map((trip) => ({
-                    value: trip._id.toString(),
-                    label: `${trip.tripId} ${trip.date?.split('T')[0] || '-'}`,
-                  }))}
-                  value={form.values.tripId}
-                  onChange={(value) => form.setFieldValue('tripId', value)}
-                  allowDeselect={false}
-                />
-              </>
-            )}
-            {expense && (
-              <>
-                <Table withRowBorders={false}>
-                  <Table.Tr>
-                    <Table.Td width="15%" fw="bold">
-                      Trip Id:
-                    </Table.Td>
-                    <Table.Td width="35%">{expense?.tripId?.tripId}</Table.Td>
-                    <Table.Td width="15%" fw="bold">
-                      Trip Date:
-                    </Table.Td>
-                    <Table.Td width="35%">{expense?.tripId?.createdAt.split('T')[0]}</Table.Td>
-                  </Table.Tr>
-                  <Table.Tr>
-                    <Table.Td width="15%" fw="bold">
-                      Driver:
-                    </Table.Td>
-                    <Table.Td width="35%">{expense?.tripId?.driver?.name}</Table.Td>
-                    <Table.Td width="15%" fw="bold">
-                      Purpose:
-                    </Table.Td>
-                    <Table.Td width="35%" style={{ textTransform: 'capitalize' }}>
-                      {expense?.tripId?.supplierOrder?.supplierOrderRequest?.purpose}
-                    </Table.Td>
-                  </Table.Tr>
-                </Table>
-              </>
-            )}
+            <>
+              <Table withRowBorders={false}>
+                <Table.Tr>
+                  <Table.Td width="15%" fw="bold">
+                    Trip Id:
+                  </Table.Td>
+                  <Table.Td width="35%">{expense?.tripId?.tripId || trip?.tripId}</Table.Td>
+                  <Table.Td width="15%" fw="bold">
+                    Trip Date:
+                  </Table.Td>
+                  <Table.Td width="35%">
+                    {expense?.tripId?.createdAt.split('T')[0] || trip.createdAt.split('T')[0]}
+                  </Table.Td>
+                </Table.Tr>
+                <Table.Tr>
+                  <Table.Td width="15%" fw="bold">
+                    Driver:
+                  </Table.Td>
+                  <Table.Td width="35%">
+                    {expense?.tripId?.driver?.name || trip?.driver?.name}
+                  </Table.Td>
+                  <Table.Td width="15%" fw="bold">
+                    Purpose:
+                  </Table.Td>
+                  <Table.Td width="35%" style={{ textTransform: 'capitalize' }}>
+                    {expense?.tripId?.supplierOrder?.supplierOrderRequest?.purpose ||
+                      trip?.supplierOrder?.supplierOrderRequest?.purpose}
+                  </Table.Td>
+                </Table.Tr>
+              </Table>
+            </>
           </Card>
         </Grid.Col>
 
@@ -190,7 +178,7 @@ function AddEditExpenses() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {expenses.map((expense, index) => (
+                {expenses?.map((expense, index) => (
                   <Table.Tr key={index}>
                     <Table.Td>
                       <TextInput
@@ -230,7 +218,7 @@ function AddEditExpenses() {
                     </Text>
                   </Table.Td>
                   <Table.Td align="right">
-                    <Text>{form.values.totalAmount.toFixed(2)}</Text>
+                    <Text>{form.values.totalAmount?.toFixed(2)}</Text>
                   </Table.Td>
                 </Table.Tr>
               </Table.Tbody>
