@@ -248,7 +248,7 @@ function AddCustomerOrders() {
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Name:
                   </Table.Td>
-                  <Table.Td>Chathura Prasanga</Table.Td>
+                  <Table.Td>{selectedRequest.customer.fullName}</Table.Td>
                   <Table.Td>
                     {/* <DatePickerInput
                       rightSection={<IconCalendar />}
@@ -263,19 +263,21 @@ function AddCustomerOrders() {
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Phone:
                   </Table.Td>
-                  <Table.Td>077 9250108</Table.Td>
+                  <Table.Td>
+                    {selectedRequest.customer.phone} | {selectedRequest.customer.phoneSecondary}
+                  </Table.Td>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Email:
                   </Table.Td>
-                  <Table.Td>chathuraprasanga98@gmail.com</Table.Td>
+                  <Table.Td>{selectedRequest.customer.email}</Table.Td>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Address:
                   </Table.Td>
-                  <Table.Td>Godawele Watta, Kotikapola, Mawathagama</Table.Td>
+                  <Table.Td>{selectedRequest.customer.address}</Table.Td>
                 </Table.Tr>
               </Table>
             </Card>

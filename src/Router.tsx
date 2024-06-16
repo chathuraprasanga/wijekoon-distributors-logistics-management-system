@@ -58,6 +58,7 @@ import AddEditCheques from './pages/Cheques/AddEditCheques/AddEditCheques';
 import AddEditWarehouse from './pages/Assets/AddEditWarehouse/AddEditWarehouse';
 import ViewSuppliersOrders from './pages/Supplier/ViewSupplierOrder/ViewSupplierOrder';
 import Home from './pages/CustomerPortal/home';
+import AddWarehouseCustomerOrders from './pages/Assets/AddEditWarehouseOrder/AddEditWarehouseOrder';
 
 const router = createBrowserRouter([
   {
@@ -214,7 +215,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'assets/warehouses/add-edit-orders',
-        element: <AddEditWarehouseOrder />,
+        element: <AddWarehouseCustomerOrders />,
       },
       {
         path: 'vehicles',

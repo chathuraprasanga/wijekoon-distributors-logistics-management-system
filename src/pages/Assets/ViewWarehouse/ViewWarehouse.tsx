@@ -1,9 +1,17 @@
-import { RootState } from '@/redux/store';
 import { Grid, Card, Table, Text, Badge, Button } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { setWarehouse } from '@/redux/slices/assetsSlice';
+import {
+  setCustomer,
+  setCustomerOrder,
+  setCustomerOrderRequest,
+  setCustomerPayment,
+} from '@/redux/slices/customerSlice';
+import { RootState } from '@/redux/store';
+import { setTrip } from '@/redux/slices/tripsSlice';
 
 function ViewWarehouse() {
   const navigate = useNavigate();
@@ -26,6 +34,20 @@ function ViewWarehouse() {
       </Table.Tr>
     </>
   ));
+
+  const handleCreateOrder = () => {
+    dispatch(setCustomerOrder(null));
+    dispatch(setCustomer(null));
+    dispatch(setCustomerOrderRequest(null));
+    dispatch(setWarehouse(selectedWarehouse));
+    dispatch(setCustomerPayment(null));
+    navigate('/admin/assets/warehouses/add-edit-orders');
+  };
+
+  const handleStockReceive = () => {
+    dispatch(setTrip(null));
+    navigate('/admin/assets/warehouses/stock-receive');
+  };
 
   return (
     <>
@@ -123,11 +145,13 @@ function ViewWarehouse() {
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Text fw="bold">Stock Details</Text>
               <div>
-                <Link to="/admin/assets/warehouses/stock-receive">
-                  <Button size="xs">Stock Receive</Button>
-                </Link>
+                {/* <Link to="/admin/assets/warehouses/stock-receive"> */}
+                <Button size="xs" onClick={handleStockReceive}>
+                  Stock Receive
+                </Button>
+                {/* </Link> */}
                 <Link to="/admin/assets/warehouses/stock-dispatch">
-                  <Button size="xs" ml={10}>
+                  <Button size="xs" ml={10} disabled>
                     Stock Disptach
                   </Button>
                 </Link>
@@ -148,9 +172,11 @@ function ViewWarehouse() {
         </Grid.Col>
         <Grid.Col span={12}>
           <div>
-            <Link to="/admin/assets/warehouses/add-edit-orders">
-              <Button style={{ float: 'right' }}>Create Order</Button>
-            </Link>
+            {/* <Link to="/admin/assets/warehouses/add-edit-orders"> */}
+            <Button style={{ float: 'right' }} onClick={handleCreateOrder}>
+              Create Order
+            </Button>
+            {/* </Link> */}
           </div>
         </Grid.Col>
       </Grid>

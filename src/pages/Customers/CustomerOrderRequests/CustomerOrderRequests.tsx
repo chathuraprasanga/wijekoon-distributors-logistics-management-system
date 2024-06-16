@@ -115,7 +115,7 @@ function CustomerOrderRequests() {
       <Table.Td>
         {element.order.reduce((acc: any, item: any) => acc + parseInt(item.quantity), 0)}
       </Table.Td>
-      <Table.Td>{element.expectedDate.split('T')[0]}</Table.Td>
+      <Table.Td>{element?.expectedDate?.split('T')[0] || 'N/A'}</Table.Td>
       <Table.Td>
         <Badge
           color={(() => {
