@@ -84,7 +84,7 @@ function ViewCustomerOrderRequests() {
                     Expected Date:
                   </Table.Td>
                   <Table.Td width="35%">
-                    {new Date(selectedRequest.expectedDate).toLocaleDateString()}
+                    {selectedRequest?.expectedDate?.split('T')[0] || 'N/A'}
                   </Table.Td>
                 </Table.Tr>
                 <Table.Tr>

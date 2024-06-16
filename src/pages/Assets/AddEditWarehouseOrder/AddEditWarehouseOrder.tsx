@@ -1,309 +1,540 @@
 import {
-  Modal,
-  Table,
-  Select,
-  TextInput,
   ActionIcon,
   Button,
-  Grid,
   Card,
+  Grid,
+  Modal,
+  Pagination,
+  SegmentedControl,
+  Select,
+  Table,
   Text,
-  Input,
+  TextInput,
+  rem,
 } from '@mantine/core';
-import { DateInput, DatePickerInput } from '@mantine/dates';
+import { IconArrowLeft, IconCheck, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
+import { useForm } from '@mantine/form';
+import { Notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
-import { IconTrash, IconArrowLeft, IconSearch } from '@tabler/icons-react';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { fetchProducts } from '@/redux/slices/supplierSlice';
+import { RootState } from '@/redux/store';
+import {
+  createCustomerOrder,
+  fetchCustomerOrders,
+  fetchCustomers,
+  setCustomer,
+  setCustomerPayment,
+} from '@/redux/slices/customerSlice';
+import WarehousePaymentModal from './warehousePaymen/WarehousePaymentModal';
 
-function AddEditWarehouseOrder() {
+interface RowData {
+  product: string;
+  productCode: string;
+  productName: string;
+  productSize: string;
+  unitPrice: string;
+  quantity: string;
+  discount: string;
+  tax: string;
+  lineTotal: string;
+}
+
+function AddWarehouseCustomerOrders() {
+  const [isFirstModalOpen, setFirstModalOpen] = useState(false);
+  const [isSecondModalOpen, setSecondModalOpen] = useState(false);
+  const [activeModalPage, setModalPage] = useState(1);
   const [value, setValue] = useState<Date | null>(null);
+  const [rows, setRows] = useState<RowData[]>([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const status = useSelector((state: RootState) => state.customers.status);
+  const error = useSelector((state: RootState) => state.customers.error);
+  const products = useSelector((state: RootState) => state.suppliers.products);
+  const selectedRequest = useSelector((state: RootState) => state.customers.customerOrderRequest);
   const [opened, { open, close }] = useDisclosure(false);
+  const paymentData = useSelector((state: RootState) => state.customers.customerPayment);
+  const customers = useSelector((state: RootState) => state.customers.customers);
+  const customer = useSelector((state: RootState) => state.customers.customer);
+  const warehouse = useSelector((state: RootState) => state.assets.warehouse);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchCustomers());
+  }, [dispatch]);
+
+  const addRow = () => {
+    dispatch(fetchProducts());
+    setRows([
+      ...rows,
+      {
+        product: '',
+        productCode: '',
+        productName: '',
+        productSize: '',
+        unitPrice: '',
+        quantity: '',
+        discount: '',
+        tax: '',
+        lineTotal: (0).toFixed(2),
+      },
+    ]);
+  };
+
+  const calculateTotal = (field: keyof RowData) =>
+    rows?.reduce((acc, row) => acc + parseFloat(row[field] || '0'), 0);
+
+  const customerOrderAddForm = useForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      orderId: selectedRequest?.orderId,
+      customerOrderRequest: selectedRequest?._id,
+      order: [
+        {
+          product: '',
+          quantity: '',
+          discount: '',
+          tax: '',
+          lineTotal: '',
+        },
+      ],
+      subTotal: calculateTotal('lineTotal')?.toFixed(2),
+      totalDiscount: calculateTotal('discount')?.toFixed(2),
+      totalTax: calculateTotal('tax')?.toFixed(2),
+      netTotal: calculateTotal('lineTotal')?.toFixed(2),
+      status: 'NOT PAID' || '',
+      warehouse: '',
+      customer: '',
+      paymentData: {
+        totalPayable: '',
+        paymentDetails: [],
+        outstanding: '',
+        status: '',
+      },
+    },
+    validate: {},
+  });
+
+  const removeRow = (index: number) => {
+    setRows(rows.filter((row, rowIndex) => rowIndex !== index));
+  };
+
+  const handleProductChange = (code: string, index: number) => {
+    const product = products.find((p) => p.code === code);
+    if (product) {
+      const updatedRows = rows?.map((row, rowIndex) =>
+        rowIndex === index
+          ? {
+              ...row,
+              product: product?._id,
+              productCode: product.code,
+              productName: product.name,
+              productSize: product.size,
+              unitPrice: product.sellingPrice,
+              lineTotal: (0).toFixed(2), // Set initial line total to 0.0
+            }
+          : row
+      );
+      setRows(updatedRows);
+    }
+  };
+
+  const handleChange = (value: string, field: keyof RowData, index: number) => {
+    const updatedRows = rows?.map((row, rowIndex) => {
+      if (rowIndex === index) {
+        const updatedRow = { ...row, [field]: value };
+        if (field === 'quantity' || field === 'discount' || field === 'tax') {
+          const unitPrice = parseFloat(updatedRow.unitPrice) || 0;
+          const quantity = parseFloat(updatedRow.quantity) || 0;
+          const discount = parseFloat(updatedRow.discount) || 0;
+          const tax = parseFloat(updatedRow.tax) || 0;
+          updatedRow.lineTotal = (
+            unitPrice *
+            quantity *
+            (1 - discount / 100) *
+            (1 + tax / 100)
+          )?.toFixed(2);
+        }
+        return updatedRow;
+      }
+      return row;
+    });
+    setRows(updatedRows);
+  };
+
+  useEffect(() => {
+    if (selectedRequest) {
+      customerOrderAddForm.setValues({
+        orderId: selectedRequest.orderId,
+        order: selectedRequest.order?.map((item: any) => ({
+          product: item.product?._id,
+          quantity: item.quantity?.toString(),
+          discount: item.lineDiscount?.toString(),
+          tax: item.lineTax?.toString(),
+          lineTotal: item.lineTotal?.toString(),
+        })),
+        subTotal: selectedRequest.subTotal?.toString(),
+        totalDiscount: selectedRequest.totalDiscount?.toString(),
+        totalTax: selectedRequest.totalTax?.toString(),
+        netTotal: selectedRequest.netTotal?.toString(),
+        status: selectedRequest.status,
+      });
+      setRows(
+        selectedRequest.order?.map((item: any) => ({
+          product: item.product?._id,
+          productCode: item.product.code,
+          productName: item.product.name,
+          productSize: item.product.size?.toString(),
+          unitPrice: item.product.sellingPrice?.toString(),
+          quantity: item.quantity?.toString(),
+          discount: item.lineDiscount?.toString(),
+          tax: item.lineTax?.toString(),
+          lineTotal: item.lineTotal?.toString(),
+        }))
+      );
+    }
+  }, [selectedRequest]);
+
+  const handleSave = async () => {
+    try {
+      const isValid = await customerOrderAddForm.validate();
+      if (!isValid) {
+        return;
+      }
+
+      const formData = customerOrderAddForm.values;
+      // formData.orderId = selectedRequest.orderId;
+      // formData.customerOrderRequest = selectedRequest._id;
+      formData.status = paymentData.status;
+      formData.order = rows;
+      formData.subTotal = calculateTotal('lineTotal').toFixed(2);
+      formData.totalDiscount = calculateTotal('discount').toFixed(2);
+      formData.totalTax = calculateTotal('tax').toFixed(2);
+      formData.netTotal = calculateTotal('lineTotal').toFixed(2);
+      formData.paymentData = paymentData;
+      formData.warehouse = warehouse._id;
+      formData.customer = customer._id;
+
+      await dispatch(createCustomerOrder(formData)).unwrap();
+
+      Notifications.show({
+        title: 'Successful',
+        message: 'Customer order created successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      customerOrderAddForm.reset();
+      dispatch(setCustomer(null));
+      dispatch(setCustomerPayment(null));
+      dispatch(fetchCustomerOrders());
+      navigate('/admin/assets/warehouses');
+    } catch (error) {
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error creating the customer order',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
+  };
+
+  // pagination for modal
+  const customersPerPage = 5;
+  const handleModalPageChange = (newPage: any) => {
+    setModalPage(newPage);
+  };
+  const startModal = (activeModalPage - 1) * customersPerPage;
+  const endModal = startModal + customersPerPage;
+
+  // modal Search
+  const [modalSearchSegment, setModalSearchSegment] = useState('Email');
+  const [modalSearchTerm, setModalSearchTerm] = useState('');
+  const filteredCustomers = customers.filter((customer: any) => {
+    const value =
+      modalSearchSegment === 'Name'
+        ? customer.fullName
+        : modalSearchSegment === 'Phone'
+          ? customer.phone
+          : customer.email;
+    return value.toLowerCase().includes(modalSearchTerm.toLowerCase());
+  });
+
+  const displayedCustomers = filteredCustomers.slice(startModal, endModal);
+
+  const handleSelectCustomer = (element) => {
+    dispatch(setCustomer(element));
+    closeSecondModal();
+  };
+
+  const modalData = displayedCustomers.map((element, index) => (
+    <Table.Tr key={element._id}>
+      <Table.Td>{startModal + index + 1}</Table.Td>
+      <Table.Td>{element.fullName}</Table.Td>
+      <Table.Td>{element.phone}</Table.Td>
+      <Table.Td>{element.email}</Table.Td>
+      <Table.Td>{element.address}</Table.Td>
+      <Table.Td>
+        <Button size="xs" onClick={() => handleSelectCustomer(element)}>
+          Select
+        </Button>
+      </Table.Td>
+    </Table.Tr>
+  ));
+
+  const openFirstModal = () => setFirstModalOpen(true);
+  const closeFirstModal = () => setFirstModalOpen(false);
+
+  const openSecondModal = () => setSecondModalOpen(true);
+  const closeSecondModal = () => setSecondModalOpen(false);
+
+  const openCreateCustomer = () => {
+    dispatch(setCustomer(null));
+    navigate('/admin/customers/add-edit');
+  };
+
   return (
     <>
-      <Modal opened={opened} onClose={close} withCloseButton={false} size="80%">
-        <Text>Enter Payment Details</Text>
-        <Table withColumnBorders withTableBorder withRowBorders>
-          <Table.Tr>
-            <Table.Th>Payment Method</Table.Th>
-            <Table.Th>Bank</Table.Th>
-            <Table.Th>Branch</Table.Th>
-            <Table.Th>Chq no.</Table.Th>
-            <Table.Th>Deposit Date</Table.Th>
-            <Table.Th>Amount</Table.Th>
-            <Table.Th></Table.Th>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td width="15%">
-              <Select
-                size="xs"
-                placeholder="Pick value"
-                data={[
-                  { label: 'Cash', value: 'Cash' },
-                  { label: 'Cheque', value: 'Cheque' },
-                ]}
-                defaultValue="Cash"
-              />
-            </Table.Td>
-            <Table.Td>
-              <TextInput size="xs" placeholder="Bank code" />
-            </Table.Td>
-            <Table.Td>
-              <TextInput size="xs" placeholder="Branch code" />
-            </Table.Td>
-            <Table.Td>
-              <TextInput size="xs" placeholder="Chq Number" />
-            </Table.Td>
-            <Table.Td>
-              <DatePickerInput
-                size="xs"
-                placeholder="Deposit Date"
-                value={value}
-                onChange={setValue}
-              />
-            </Table.Td>
-            <Table.Td>
-              <TextInput size="xs" placeholder="Input placeholder" />
-            </Table.Td>
-            <Table.Td width={50}>
-              <ActionIcon variant="light" color="red">
-                <IconTrash />
-              </ActionIcon>
-            </Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Td colSpan={4}>
-              <Button size="xs">New Payment Detail</Button>
-            </Table.Td>
-            <Table.Td>
-              <Text size="xs">Outstanding:</Text>
-            </Table.Td>
-            <Table.Td>
-              <TextInput size="xs" placeholder="" />
-            </Table.Td>
-            <Table.Td width={50}></Table.Td>
-          </Table.Tr>
-          <Table.Tr></Table.Tr>
-        </Table>
-        <Button size="xs" style={{ float: 'right' }} mt={10} mb={10}>
-          Save
-        </Button>
-      </Modal>
-      <Grid>
-        <Grid.Col span={12}>
-          <div>
-            <div style={{ display: 'flex' }}>
-              <Link to={-1}>
-                <IconArrowLeft />
-              </Link>
-              <Text size="md" style={{ fontWeight: 'bold' }}>
-                Create Warehouse Customer Order
-              </Text>
+      <WarehousePaymentModal
+        isOpen={isFirstModalOpen}
+        onClose={closeFirstModal}
+        customerPayment={paymentData}
+        totalPayable={calculateTotal('lineTotal')}
+      />
+      <form onSubmit={() => customerOrderAddForm.onSubmit(handleSave)}>
+        <Grid>
+          <Grid.Col span={12}>
+            <div>
+              <div style={{ display: 'flex' }}>
+                <Link to={-1}>
+                  <IconArrowLeft />
+                </Link>
+                <Text size="md" style={{ fontWeight: 'bold' }}>
+                  Create Customer Order
+                </Text>
+              </div>
+              <div></div>
             </div>
-            <div></div>
-          </div>
-        </Grid.Col>
-        <Grid.Col>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Text style={{ fontWeight: 'bold' }} size="lg">
-              Customer Details
-            </Text>
-            <Table withRowBorders={false}>
+          </Grid.Col>
+          <Grid.Col>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Text style={{ fontWeight: 'bold' }} size="lg">
+                Customer Details
+              </Text>
+              <Table withRowBorders={false}>
+                <Table.Tr>
+                  <Table.Td width={150} style={{ fontWeight: 'bold' }}>
+                    Name:
+                  </Table.Td>
+                  <Table.Td>{customer?.fullName || '-'}</Table.Td>
+                  <Table.Td width={150} style={{ fontWeight: 'bold', float: 'right' }}>
+                    <div style={{ display: 'flex', float: 'right' }}>
+                      <Button size="xs" onClick={openSecondModal}>
+                        {!customer ? 'Select' : 'Change'} Customer
+                      </Button>
+                      <Button size="xs" ml={10} color="violet" onClick={openCreateCustomer}>
+                        Create Customer
+                      </Button>
+                    </div>
+                  </Table.Td>
+                  {/* <Table.Td>
+                    <Button></Button>
+                  </Table.Td> */}
+                </Table.Tr>
+                <Table.Tr>
+                  <Table.Td width={150} style={{ fontWeight: 'bold' }}>
+                    Phone:
+                  </Table.Td>
+                  <Table.Td>
+                    {customer?.phone || '-'} | {customer?.phoneSecondary || '-'}
+                  </Table.Td>
+                </Table.Tr>
+                <Table.Tr>
+                  <Table.Td width={150} style={{ fontWeight: 'bold' }}>
+                    Email:
+                  </Table.Td>
+                  <Table.Td>{customer?.email || '-'}</Table.Td>
+                </Table.Tr>
+                <Table.Tr>
+                  <Table.Td width={150} style={{ fontWeight: 'bold' }}>
+                    Address:
+                  </Table.Td>
+                  <Table.Td>{customer?.address || '-'}</Table.Td>
+                </Table.Tr>
+              </Table>
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Table withTableBorder withColumnBorders>
+                <Table.Tr>
+                  <Table.Th>Product Code</Table.Th>
+                  <Table.Th>Product Name</Table.Th>
+                  <Table.Th>Product Size</Table.Th>
+                  <Table.Th>Unit Price</Table.Th>
+                  <Table.Th>Quantity</Table.Th>
+                  <Table.Th>Discount</Table.Th>
+                  <Table.Th>Tax</Table.Th>
+                  <Table.Th>Line Total</Table.Th>
+                  <Table.Th></Table.Th>
+                </Table.Tr>
+                {rows?.map((row, index) => (
+                  <Table.Tr key={index}>
+                    <Table.Td>
+                      <Select
+                        size="xs"
+                        placeholder="Select Product"
+                        data={products?.map((product) => ({
+                          value: product.code,
+                          label: product.code,
+                        }))}
+                        value={row.productCode}
+                        onChange={(code) => handleProductChange(code, index)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput size="xs" value={row.productName} disabled />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput size="xs" value={row.productSize} disabled />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput size="xs" value={row.unitPrice} disabled />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput
+                        size="xs"
+                        placeholder="Enter Quantity"
+                        value={row.quantity}
+                        defaultValue={0}
+                        onChange={(e) => handleChange(e.currentTarget.value, 'quantity', index)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput
+                        size="xs"
+                        placeholder="Enter discount"
+                        rightSection="%"
+                        value={row.discount}
+                        onChange={(e) => handleChange(e.currentTarget.value, 'discount', index)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput
+                        size="xs"
+                        placeholder="Enter tax"
+                        rightSection="%"
+                        value={row.tax}
+                        onChange={(e) => handleChange(e.currentTarget.value, 'tax', index)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput size="xs" value={row.lineTotal} disabled />
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon variant="light" color="red" onClick={() => removeRow(index)}>
+                        <IconTrash />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+                <Table.Tr>
+                  <Table.Td colSpan={2}>
+                    <Button size="xs" style={{ width: '100%' }} onClick={addRow}>
+                      Add Products
+                    </Button>
+                  </Table.Td>
+                </Table.Tr>
+                <Table.Tr>
+                  <Table.Td colSpan={6}></Table.Td>
+                  <Table.Td>
+                    <Text size="md" style={{ fontWeight: 'bold' }}>
+                      Grand Total:
+                    </Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text size="md" style={{ fontWeight: 'bold' }}>
+                      {calculateTotal('lineTotal')?.toFixed(2)}
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              </Table>
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Button
+              style={{ float: 'right' }}
+              onClick={!paymentData ? () => openFirstModal() : handleSave}
+            >
+              {!paymentData ? 'Go to Payments' : 'Save'}
+            </Button>
+          </Grid.Col>
+        </Grid>
+      </form>
+
+      <Modal
+        opened={isSecondModalOpen}
+        onClose={closeSecondModal}
+        withCloseButton={false}
+        size="70%"
+      >
+        <Text size="md" style={{ fontWeight: 'bold' }}>
+          Select Customer to Create Customer Order Request
+        </Text>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <SegmentedControl
+            size="xs"
+            color="violet"
+            data={['Name', 'Phone', 'Email']}
+            defaultValue="Email"
+            onChange={setModalSearchSegment}
+          />
+          <TextInput
+            ml={10}
+            size="xs"
+            placeholder="Search"
+            onChange={(event) => setModalSearchTerm(event.currentTarget.value)}
+            rightSection={<IconSearch size="20" color="gray" />}
+          />
+        </div>
+        <div>
+          <Table>
+            <Table.Thead>
               <Table.Tr>
-                <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
-                  Name:
-                </Table.Td>
-                <Table.Td width="35%">
-                  <Select
-                    size="xs"
-                    placeholder="Search Customer"
-                    data={[
-                      'Chathura Prasanga',
-                      'Isuru Sandakelum',
-                      'Vishwa Rathnayake',
-                      'Madura Sankha',
-                    ]}
-                  />
-                </Table.Td>
-                <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
-                  Date:
-                </Table.Td>
-                <Table.Td width="35%">
-                  <DateInput
-                    clearable
-                    size="xs"
-                    defaultValue={new Date()}
-                    placeholder="Select Date"
-                  />
-                </Table.Td>
+                <Table.Th>#</Table.Th>
+                <Table.Th>Customer</Table.Th>
+                <Table.Th>Phone</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Address</Table.Th>
+                <Table.Th>Action</Table.Th>
               </Table.Tr>
-              <Table.Tr>
-                <Table.Td width={150} style={{ fontWeight: 'bold' }}>
-                  Phone:
-                </Table.Td>
-                <Table.Td style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Input size="xs" placeholder="Enter Phone Number" type="number" />
-                  <ActionIcon>
-                    <IconSearch />
-                  </ActionIcon>
-                </Table.Td>
-                <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
-                  Warehouse ID:
-                </Table.Td>
-                <Table.Td width="35%">
-                  <Select
-                    size="xs"
-                    placeholder="Search Customer"
-                    data={[
-                      'WDW-01 - Mawathagama',
-                      'WDW-02 - Barandana',
-                      'WDW-03 - Koshinna',
-                      'WDW-04 - Kurunegala',
-                    ]}
-                  />
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td width={150} style={{ fontWeight: 'bold' }}>
-                  Email:
-                </Table.Td>
-                <Table.Td>chathuraprasanga98@gmail.com</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td width={150} style={{ fontWeight: 'bold' }}>
-                  Address:
-                </Table.Td>
-                <Table.Td>Godawele Watta, Kotikapola, Mawathagama</Table.Td>
-              </Table.Tr>
-            </Table>
-          </Card>
-        </Grid.Col>
-        <Grid.Col span={12}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Table withTableBorder withColumnBorders>
-              <Table.Tr>
-                <Table.Th>Product Code</Table.Th>
-                <Table.Th>Product Name</Table.Th>
-                <Table.Th>Product Size</Table.Th>
-                <Table.Th>Unit Price</Table.Th>
-                <Table.Th>Quantity</Table.Th>
-                <Table.Th>Discount</Table.Th>
-                <Table.Th>Line Total</Table.Th>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="KSL-20" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="Keshara Super Lime" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="20KG" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="550.00" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="Enter Quantity" value="300" variant="filled" />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" value="20" rightSection="%" variant="filled" />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" value="150000.00" variant="filled" />
-                </Table.Td>
-                <Table.Td>
-                  <ActionIcon variant="light" color="red">
-                    <IconTrash />
-                  </ActionIcon>
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="KSL-20" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="Keshara Super Lime" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="20KG" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="550.00" disabled />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" placeholder="Enter Quantity" />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" rightSection="%" placeholder="Enter Discount" />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" value="150000.00" variant="filled" />
-                </Table.Td>
-                <Table.Td>
-                  <ActionIcon variant="light" color="red">
-                    <IconTrash />
-                  </ActionIcon>
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>
-                  <Button size="xs" style={{ width: '100%' }}>
-                    Add Products
-                  </Button>
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
-                <Table.Td>
-                  <Text size="sm">Sub Total:</Text>
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" value="300000.00" variant="filled" />
-                </Table.Td>
-                <Table.Td></Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
-                <Table.Td>
-                  <Text size="sm">Tax:</Text>
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" value="0.00" variant="filled" />
-                </Table.Td>
-                <Table.Td></Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
-                <Table.Td>
-                  <Text size="sm">Discount:</Text>
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" value="60000.00" variant="filled" />
-                </Table.Td>
-                <Table.Td></Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td colSpan={5}></Table.Td>
-                <Table.Td>
-                  <Text size="sm">Net Total:</Text>
-                </Table.Td>
-                <Table.Td>
-                  <TextInput size="xs" value="240000.00" variant="filled" />
-                </Table.Td>
-                <Table.Td></Table.Td>
-              </Table.Tr>
-            </Table>
-          </Card>
-        </Grid.Col>
-        <Grid.Col span={12}>
-          <Button style={{ float: 'right' }} onClick={open}>
-            Go to Payments
-          </Button>
-        </Grid.Col>
-      </Grid>
+            </Table.Thead>
+            <Table.Tbody>
+              {modalData.length > 0 ? (
+                modalData
+              ) : (
+                <Table.Tr>
+                  <Table.Td colSpan={10}>
+                    <Text color="dimmed" align="center">
+                      No data found
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
+          </Table>
+          <Pagination
+            total={Math.ceil(filteredCustomers.length / customersPerPage)}
+            value={activeModalPage}
+            onChange={handleModalPageChange}
+            mt={10}
+            style={{ display: 'flex', justifyContent: 'flex-end' }}
+            size="xs"
+          />
+        </div>
+      </Modal>
     </>
   );
 }
 
-export default AddEditWarehouseOrder;
+export default AddWarehouseCustomerOrders;
