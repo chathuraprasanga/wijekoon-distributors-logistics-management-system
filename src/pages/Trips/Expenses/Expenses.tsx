@@ -1,4 +1,4 @@
-import { fetchExpenses, setExpense } from '@/redux/slices/tripsSlice';
+import { fetchExpenses, setExpense, setTrip } from '@/redux/slices/tripsSlice';
 import { RootState } from '@/redux/store';
 import {
   Grid,
@@ -10,6 +10,8 @@ import {
   TextInput,
   Table,
   Menu,
+  Modal,
+  Pagination,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconDots, IconSearch } from '@tabler/icons-react';
@@ -17,14 +19,17 @@ import { element } from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import Trips from '../Trips';
 
 function Expenses() {
   const [activePage, setPage] = useState(1);
+  const [activeModalPage, setModalPage] = useState(1);
   const dispatch = useDispatch();
   const status = useSelector((state: RootState) => state.trips.status);
   const expenses = useSelector((state: RootState) => state.trips.expenses);
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
+  const trips = useSelector((state: RootState) => state.trips.trips);
 
   useEffect(() => {
     dispatch(fetchExpenses());
@@ -60,6 +65,30 @@ function Expenses() {
     navigate('/admin/expenses/add-edit');
   };
 
+  // pagination for modal
+  const tripsPerPage = 5;
+  const handleModalPageChange = (newPage: any) => {
+    setModalPage(newPage);
+  };
+  const startModal = (activeModalPage - 1) * tripsPerPage;
+  const endModal = startModal + tripsPerPage;
+
+  // modal Search
+  const [modalSearchSegment, setModalSearchSegment] = useState('Trip ID');
+  const [modalSearchTerm, setModalSearchTerm] = useState('');
+  const filteredTrips = trips.filter((trip: any) => {
+    const value = modalSearchSegment === 'Driver' ? trip.driver.name : trip.tripId;
+    return value.toLowerCase().includes(modalSearchTerm.toLowerCase());
+  });
+
+  const displayedTrips = filteredTrips.slice(startModal, endModal);
+
+  const handleSelect = (trip) => {
+    dispatch(setTrip(trip));
+    navigate('/admin/expenses/add-edit');
+    dispatch(setExpense(null));
+  };
+
   const tds = displayedExpenses.map((data) => (
     <>
       <Table.Tr key={data._id}>
@@ -92,17 +121,93 @@ function Expenses() {
     </>
   ));
 
+  const modalData = displayedTrips.map((element, index) => (
+    <Table.Tr key={element._id}>
+      <Table.Td>{element.tripId}</Table.Td>
+      <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
+      <Table.Td>{element.vehicle.number}</Table.Td>
+      <Table.Td>{element.driver.name}</Table.Td>
+      <Table.Td>{element.purpose}</Table.Td>
+      <Table.Td>{element.purpose}</Table.Td>
+      <Table.Td>{element.purpose}</Table.Td>
+      <Table.Td>
+        <Button size="xs" onClick={() => handleSelect(element)}>
+          Select
+        </Button>
+      </Table.Td>
+    </Table.Tr>
+  ));
+
   return (
     <>
+      <Modal opened={opened} onClose={close} withCloseButton={false} size="70%">
+        <Text size="md" style={{ fontWeight: 'bold' }}>
+          Select Customer to Create Customer Order Request
+        </Text>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <SegmentedControl
+            size="xs"
+            color="violet"
+            data={['Driver', 'Trip ID']}
+            defaultValue="Email"
+            onChange={setModalSearchSegment}
+          />
+          <TextInput
+            ml={10}
+            size="xs"
+            placeholder="Search"
+            onChange={(event) => setModalSearchTerm(event.currentTarget.value)}
+            rightSection={<IconSearch size="20" color="gray" />}
+          />
+        </div>
+        <div>
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Trip ID</Table.Th>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Vehicle</Table.Th>
+                <Table.Th>Driver</Table.Th>
+                <Table.Th>Products</Table.Th>
+                <Table.Th>Quantity</Table.Th>
+                <Table.Th>Purpose</Table.Th>
+                <Table.Th>Action</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {modalData.length > 0 ? (
+                modalData
+              ) : (
+                <Table.Tr>
+                  <Table.Td colSpan={10}>
+                    <Text color="dimmed" align="center">
+                      No data found
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
+          </Table>
+          <Pagination
+            total={Math.ceil(filteredTrips.length / tripsPerPage)}
+            value={activeModalPage}
+            onChange={handleModalPageChange}
+            mt={10}
+            style={{ display: 'flex', justifyContent: 'flex-end' }}
+            size="xs"
+          />
+        </div>
+      </Modal>
+
       <Grid>
         <Grid.Col span={12}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Expenses</Text>
             </div>
-            <Link to="/admin/expenses/add-edit">
-              <Button size="sm">Add Expenses</Button>
-            </Link>
+            {/* <Link to="/admin/expenses/add-edit"> */}
+            <Button size="sm" onClick={open}>Add Expenses</Button>
+            {/* </Link> */}
           </div>
         </Grid.Col>
       </Grid>

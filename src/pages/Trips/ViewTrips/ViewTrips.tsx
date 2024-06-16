@@ -15,9 +15,9 @@ function ViewTrips() {
   const trip = useSelector((state: RootState) => state.trips.trip);
 
   const handleUpdate = async () => {
-    const status = trip.status === 'ACTIVE' ? 'COMPLETED' : 'CANCELLED';
+    const status = trip.status === 'ACTIVE' ? 'COMPLETED' : 'ACTIVE';
 
-    const payload = { status, date: value, _id: trip._id };
+    const payload = { status, _id: trip._id, date: value || trip.date };
     try {
       await dispatch(updateTrip(payload)).unwrap();
       Notifications.show({
