@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Card, Grid, Select, Text, Divider } from '@mantine/core';
+import { Card, Grid, Select, Text, Divider, GridCol } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { BarChart } from '@mantine/charts';
 import React, { useEffect, useState } from 'react';
@@ -23,21 +23,24 @@ function Dashboard() {
   console.log(selectedWarehouse);
 
   const warehouseDetails = summaryDetails.warehouseDetails;
+  const monthlySales = summaryDetails.monthlyNetTotal;
 
   useEffect(() => {
     dispatch(fetchSummaryDetails());
   }, [dispatch]);
 
-  const handleWarehouseChange = (value: any) => {
-    setSelectedWarehouse(value);
-  };
+  // const handleWarehouseChange = (value: any) => {
+  //   setSelectedWarehouse(value);
+  // };
 
-  const data = [
-    { month: 'January', DirectSales: 1200, WarehoseSales: 900 },
-    { month: 'February', DirectSales: 1900, WarehoseSales: 1200 },
-    { month: 'March', DirectSales: 400, WarehoseSales: 1000 },
-    { month: 'April', DirectSales: 1000, WarehoseSales: 200 },
-  ];
+  // const data = [
+  //   { month: 'January', DirectSales: 1200, WarehoseSales: 900 },
+  //   { month: 'February', DirectSales: 1900, WarehoseSales: 1200 },
+  //   { month: 'March', DirectSales: 400, WarehoseSales: 1000 },
+  //   { month: 'April', DirectSales: 1000, WarehoseSales: 200 },
+  // ];
+
+  console.log(warehouseDetails);
 
   return (
     <>
@@ -59,7 +62,7 @@ function Dashboard() {
             <Grid.Col span={12}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Text style={{ alignContent: 'center' }}>Financial Values</Text>
-                <MonthPickerInput
+                {/* <MonthPickerInput
                   style={{
                     width: 290,
                     textAlign: 'right',
@@ -67,7 +70,7 @@ function Dashboard() {
                   placeholder="Pick a month"
                   clearable
                   size="xs"
-                />
+                /> */}
               </div>
             </Grid.Col>
           </Grid>
@@ -217,71 +220,36 @@ function Dashboard() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Text style={{ alignContent: 'center' }}>Stocks</Text>
-              <Select
+              {/* <Select
                 style={{ width: 290 }}
                 placeholder="Select a Warehouse"
-                data={warehouseDetails.map((wh: any) => `${wh.warehouseId} - ${wh.city}`)}
+                data={warehouseDetails?.map((wh: any) => `${wh.warehouseId} - ${wh.city}`)}
                 defaultValue=""
                 onChange={handleWarehouseChange}
                 size="xs"
-              />
+              /> */}
             </div>
             <Grid>
-
               <Grid.Col span={6} style={{ display: 'flex' }}>
-                <Grid.Col span={6}>
-                  <Card shadow="sm" padding="lg" radius="md" withBorder>
-                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
-                      <Text size="sm" style={{ fontWeight: 'bold' }}>
-                        KSL-20
-                      </Text>
-                      <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        455
-                      </Text>
-                    </div>
-                  </Card>
-                </Grid.Col>
-
-                <Grid.Col span={6}>
-                  <Card shadow="sm" padding="lg" radius="md" withBorder>
-                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
-                      <Text size="sm" style={{ fontWeight: 'bold' }}>
-                        KSC-25
-                      </Text>
-                      <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        400
-                      </Text>
-                    </div>
-                  </Card>
-                </Grid.Col>
-
-                <Grid.Col span={6}>
-                  <Card shadow="sm" padding="lg" radius="md" withBorder>
-                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
-                      <Text size="sm" style={{ fontWeight: 'bold' }}>
-                        KTM-30
-                      </Text>
-                      <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        155
-                      </Text>
-                    </div>
-                  </Card>
-                </Grid.Col>
-
-                <Grid.Col span={6}>
-                  <Card shadow="sm" padding="lg" radius="md" withBorder>
-                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
-                      <Text size="sm" style={{ fontWeight: 'bold' }}>
-                        KDF-30
-                      </Text>
-                      <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
-                        55
-                      </Text>
-                    </div>
-                  </Card>
-                </Grid.Col>
+                {warehouseDetails?.map((item: any) => (
+                  <Grid.Col span={6} style={{ display: 'flex' }}>
+                    <Grid.Col span={12}>
+                      <Card shadow="sm" padding="lg" radius="md" withBorder>
+                        <div
+                          style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}
+                        >
+                          <Text size="sm" style={{ fontWeight: 'bold' }}>
+                            {item.code}
+                          </Text>
+                          <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
+                            {item.totalQuantity}
+                          </Text>
+                        </div>
+                      </Card>
+                    </Grid.Col>
+                  </Grid.Col>
+                ))}
               </Grid.Col>
-
             </Grid>
           </div>
         </Grid.Col>
@@ -296,7 +264,7 @@ function Dashboard() {
                   <Text size="xl" style={{ fontWeight: 'bolder', color: '#5E1588' }}>
                     Total Sales
                   </Text>
-                  <MonthPickerInput
+                  {/* <MonthPickerInput
                     style={{
                       width: 150,
                       textAlign: 'right',
@@ -305,12 +273,12 @@ function Dashboard() {
                     clearable
                     size="xs"
                     maxLevel="year"
-                  />
+                  /> */}
                 </div>
 
                 <BarChart
                   h={390}
-                  data={data}
+                  data={monthlySales}
                   dataKey="month"
                   series={[
                     { name: 'DirectSales', color: 'violet.6' },
