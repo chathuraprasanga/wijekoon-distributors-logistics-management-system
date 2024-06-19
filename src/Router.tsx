@@ -36,7 +36,6 @@ import Warehouses from './pages/Assets/Warehouses';
 import ViewWarehouse from './pages/Assets/ViewWarehouse/ViewWarehouse';
 import StockReceiveWarehouse from './pages/Assets/StockReeiveWarehouse/StockReceiveWarehouse';
 import StockDispatchWarehouse from './pages/Assets/StockDispatchWarehouse/StockDispatchWarehouse';
-import AddEditWarehouseOrder from './pages/Assets/AddEditWarehouseOrder/AddEditWarehouseOrder';
 import Vehicles from './pages/Assets/Vehicles/Vehicles';
 import AddEditVehicles from './pages/Assets/AddEditVehicles/AddEditVehicles';
 import ViewVehicles from './pages/Assets/ViewVehicles/ViewVehicles';
@@ -57,13 +56,64 @@ import ViewCheques from './pages/Cheques/ViewCheques/ViewCheques';
 import AddEditCheques from './pages/Cheques/AddEditCheques/AddEditCheques';
 import AddEditWarehouse from './pages/Assets/AddEditWarehouse/AddEditWarehouse';
 import ViewSuppliersOrders from './pages/Supplier/ViewSupplierOrder/ViewSupplierOrder';
-import Home from './pages/CustomerPortal/home';
 import AddWarehouseCustomerOrders from './pages/Assets/AddEditWarehouseOrder/AddEditWarehouseOrder';
+import CustomerPortal from './pages/CustomerPortal/home';
+import HomeNew from './pages/CustomerPortal/pages/Home';
+import CustomerProducts from './pages/CustomerPortal/pages/Products';
+import AboutUs from './pages/CustomerPortal/pages/AboutUs';
+import ContactUs from './pages/CustomerPortal/pages/ContactUs';
+import CustomerLogin from './pages/CustomerPortal/pages/CustomerLogin';
+import CustomerSignUp from './pages/CustomerPortal/pages/CustomerSignUp';
+import { element } from 'prop-types';
+import { CustomerLayout } from './pages/CustomerPortal/Layout/CustomerLayout';
+import CustomerDashboard from './pages/CustomerPortal/pages/CustomerDashboard';
+import CustomerForgotPassword from './pages/CustomerPortal/pages/CustomerForgotPassword';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
+    element: <CustomerPortal />,
+    children: [
+      {
+        path: '',
+        element: <HomeNew/>
+      },
+      {
+        path: 'products',
+        element: <CustomerProducts/>
+      },
+      {
+        path: 'about-us',
+        element: <AboutUs/>
+      },
+      {
+        path: 'contact-us',
+        element: <ContactUs/>
+      },
+     
+    ]
+  },
+  {
+    path: 'customer-login',
+    element: <CustomerLogin/>
+  },
+  {
+    path: 'customer-signup',
+    element: <CustomerSignUp/>
+  },
+  {
+    path: 'customer-forgot-password',
+    element: <CustomerForgotPassword/>
+  },
+  {
+    path: '/customer',
+    element: <CustomerLayout/>,
+    children: [
+      {
+      path: "dashboard",
+      element: <CustomerDashboard/>,
+      }
+    ],
   },
   {
     path: '/admin-login',
