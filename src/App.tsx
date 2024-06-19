@@ -15,6 +15,7 @@ import '@mantine/dropzone/styles.css';
 import '@mantine/code-highlight/styles.css';
 import '@mantine/charts/styles.css';
 import '@mantine/notifications/styles.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { RootState } from './redux/store';
 // ...

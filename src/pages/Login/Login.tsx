@@ -16,7 +16,7 @@ function Login() {
   const navigate = useNavigate();
   const error = useSelector((state: RootState) => state.auth.error);
   const status = useSelector((state: RootState) => state.auth.status);
-  console.log(error);
+  // console.log(error);
 
   const loginForm = useForm({
     initialValues: {

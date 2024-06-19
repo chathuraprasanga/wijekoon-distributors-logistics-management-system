@@ -7,6 +7,7 @@ import chequesSlice from './slices/chequesSlice';
 import tripsSlice from './slices/tripsSlice';
 import assetsSlice from './slices/assetsSlice';
 import dashboardSlice from './slices/dashboardSlice';
+import customerPortalSlice from './slices/customerPortalSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     assets: assetsSlice,
     auth: authSlice,
     dashboard: dashboardSlice,
+    customerPortal: customerPortalSlice,
   },
 });
 
