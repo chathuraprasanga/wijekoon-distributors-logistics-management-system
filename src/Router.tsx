@@ -68,6 +68,13 @@ import { element } from 'prop-types';
 import { CustomerLayout } from './pages/CustomerPortal/Layout/CustomerLayout';
 import CustomerDashboard from './pages/CustomerPortal/pages/CustomerDashboard';
 import CustomerForgotPassword from './pages/CustomerPortal/pages/CustomerForgotPassword';
+import CustomerRequest from './pages/CustomerPortal/pages/CustomerRequest';
+import CustomerOrdersCP from './pages/CustomerPortal/pages/CustomerOrdersCP';
+import CustomerOrderRequestsCP from './pages/CustomerPortal/pages/CustomerOrderRequestsCP';
+import CustomerPaymentsCP from './pages/CustomerPortal/pages/CustomerPaymentsCP';
+import CustomerCheques from './pages/CustomerPortal/pages/CustomerCheques';
+import { NotFoundImage } from './components/NothingFoundImage/NothingFoundImag';
+import { NothingFoundBackground } from './components/404/NothingFoundBackground';
 
 const router = createBrowserRouter([
   {
@@ -76,43 +83,66 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',
-        element: <HomeNew/>
+        element: <HomeNew />,
       },
       {
         path: 'products',
-        element: <CustomerProducts/>
+        element: <CustomerProducts />,
       },
       {
         path: 'about-us',
-        element: <AboutUs/>
+        element: <AboutUs />,
       },
       {
         path: 'contact-us',
-        element: <ContactUs/>
+        element: <ContactUs />,
       },
-     
-    ]
+    ],
   },
   {
     path: 'customer-login',
-    element: <CustomerLogin/>
+    element: <CustomerLogin />,
   },
   {
     path: 'customer-signup',
-    element: <CustomerSignUp/>
+    element: <CustomerSignUp />,
   },
   {
     path: 'customer-forgot-password',
-    element: <CustomerForgotPassword/>
+    element: <CustomerForgotPassword />,
   },
   {
     path: '/customer',
-    element: <CustomerLayout/>,
+    element: <CustomerLayout />,
     children: [
       {
-      path: "dashboard",
-      element: <CustomerDashboard/>,
-      }
+        path: 'dashboard',
+        element: <CustomerDashboard />,
+      },
+      {
+        path: 'request',
+        element: <CustomerRequest />,
+      },
+      {
+        path: 'customer-requests',
+        element: <CustomerOrderRequestsCP />,
+      },
+      {
+        path: 'orders',
+        element: <CustomerOrdersCP />,
+      },
+      {
+        path: 'payments',
+        element: <CustomerPaymentsCP />,
+      },
+      {
+        path: 'cheques',
+        element: <CustomerCheques />,
+      },
+      {
+        path: '*',
+        element: <NotFoundImage />
+      },
     ],
   },
   {
@@ -349,7 +379,7 @@ const router = createBrowserRouter([
       // },
       {
         path: '*',
-        element: <HomePage />,
+        element: <NothingFoundBackground />,
       },
     ],
   },

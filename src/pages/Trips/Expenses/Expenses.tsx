@@ -77,7 +77,7 @@ function Expenses() {
   const [modalSearchSegment, setModalSearchSegment] = useState('Trip ID');
   const [modalSearchTerm, setModalSearchTerm] = useState('');
   const filteredTrips = trips.filter((trip: any) => {
-    const value = modalSearchSegment === 'Driver' ? trip.driver.name : trip.tripId;
+    const value = modalSearchSegment === 'Driver' ? trip.driver?.name : trip.tripId;
     return value.toLowerCase().includes(modalSearchTerm.toLowerCase());
   });
 
@@ -95,7 +95,7 @@ function Expenses() {
         <Table.Td>{data.tripId.tripId}</Table.Td>
         <Table.Td>{data.tripId.createdAt.split('T')[0]}</Table.Td>
         <Table.Td>{data?.tripId?.vehicle?.number || 'N/A'}</Table.Td>
-        <Table.Td>{data?.tripId?.driver.name}</Table.Td>
+        <Table.Td>{data?.tripId?.driver?.name || 'N/A'}</Table.Td>
         <Table.Td style={{ textTransform: 'capitalize' }}>
           {data?.tripId?.supplierOrder?.supplierOrderRequest?.purpose}
         </Table.Td>
@@ -125,8 +125,8 @@ function Expenses() {
     <Table.Tr key={element._id}>
       <Table.Td>{element.tripId}</Table.Td>
       <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
-      <Table.Td>{element.vehicle.number}</Table.Td>
-      <Table.Td>{element.driver.name}</Table.Td>
+      <Table.Td>{element.vehicle?.number}</Table.Td>
+      <Table.Td>{element.driver?.name}</Table.Td>
       <Table.Td>{element.purpose}</Table.Td>
       <Table.Td>{element.purpose}</Table.Td>
       <Table.Td>{element.purpose}</Table.Td>
@@ -149,7 +149,7 @@ function Expenses() {
             size="xs"
             color="violet"
             data={['Driver', 'Trip ID']}
-            defaultValue="Email"
+            defaultValue="Trip ID"
             onChange={setModalSearchSegment}
           />
           <TextInput
@@ -161,7 +161,7 @@ function Expenses() {
           />
         </div>
         <div>
-          <Table>
+          <Table striped>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Trip ID</Table.Th>

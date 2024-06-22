@@ -70,19 +70,22 @@ function Cheques() {
         <Table.Td>{item?.depositDate?.split('T')[0]}</Table.Td>
         <Table.Td>
           <Badge
-            color={
-              item.status === 'PENDING'
-                ? 'yellow'
-                : item.status === 'DEPOSITED'
-                  ? 'green'
-                  : item.status === 'ACCEPTED'
-                    ? 'blue'
-                    : item.status === 'REJECTED'
-                      ? 'red'
-                      : item.status === 'RETURNED'
-                        ? 'violet'
-                        : 'gray'
-            }
+            color={(() => {
+              switch (item.status) {
+                case 'PENDING':
+                  return 'yellow';
+                case 'DEPOSITED':
+                  return 'green';
+                case 'ACCEPTED':
+                  return 'blue';
+                case 'REJECTED':
+                  return 'red';
+                case 'RETURNED':
+                  return 'violet';
+                default:
+                  return 'gray';
+              }
+            })()}
             radius="sm"
             size="xs"
           >
