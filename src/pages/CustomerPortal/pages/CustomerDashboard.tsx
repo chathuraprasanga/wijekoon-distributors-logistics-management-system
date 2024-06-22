@@ -1,7 +1,13 @@
 import React from 'react';
+import { StatsGroup } from '../components/stats/StatsGroup';
 
 function CustomerDashboard() {
-  return <div>CustomerDashboard</div>;
+  return (
+    <>
+      <StatsGroup />
+      <div>Dashboard</div>
+    </>
+  );
 }
 
 export default CustomerDashboard;

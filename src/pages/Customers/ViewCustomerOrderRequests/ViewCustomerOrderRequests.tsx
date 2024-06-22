@@ -1,31 +1,91 @@
-import { Badge, Button, Card, Grid, Table, Text } from '@mantine/core';
-import { IconArrowLeft } from '@tabler/icons-react';
-import React from 'react';
+import { Badge, Button, Card, Grid, Group, Modal, Table, Text, rem } from '@mantine/core';
+import { IconArrowLeft, IconCheck, IconX } from '@tabler/icons-react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ModalsProvider, modals } from '@mantine/modals';
+import { ModalsProvider, modals, openConfirmModal } from '@mantine/modals';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { setCustomerOrderRequest, setCustomerPayment } from '@/redux/slices/customerSlice';
+import {
+  fetchCustomerOrderRequests,
+  fetchCustomers,
+  setCustomerOrderRequest,
+  setCustomerPayment,
+  updateCustomerOrderRequest,
+} from '@/redux/slices/customerSlice';
+import { Notifications } from '@mantine/notifications';
 
 function ViewCustomerOrderRequests() {
+  const [opened, setOpened] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [modalType, setModalType] = useState('');
 
   const selectedRequest = useSelector((state: RootState) => state.customers.customerOrderRequest);
   console.log(selectedRequest);
-
-  const openCancelRequest = () =>
-    modals.openConfirmModal({
-      title: 'Cancel Order Request',
-      children: <Text size="sm">Please confirm to cancel this customer order request</Text>,
-      confirmProps: { color: 'red' },
-      labels: { confirm: 'Confirm', cancel: 'Cancel' },
-    });
 
   const handleCreateOrder = () => {
     dispatch(setCustomerOrderRequest(selectedRequest));
     dispatch(setCustomerPayment(null));
     navigate('/admin/customers/add-orders');
+  };
+
+  const handleCancelOrderRequest = async () => {
+    const payload = { ...selectedRequest, status: 'CANCELLED', id: selectedRequest._id };
+    try {
+      await dispatch(updateCustomerOrderRequest(payload)).unwrap();
+      dispatch(fetchCustomerOrderRequests());
+      setOpened(false);
+      Notifications.show({
+        title: 'Successful',
+        message: 'Customer order request status updated successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      navigate('/admin/customers/order-requests');
+    } catch (e: any) {
+      setOpened(false);
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error updating the customer order request',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
+    // Handle the cancellation of the order request
+  };
+
+  const handleConfirmOrderRequest = async () => {
+    // Handle the confirmation of the order request
+    const payload = { ...selectedRequest, status: 'CONFIRMED', id: selectedRequest._id };
+
+    try {
+      await dispatch(updateCustomerOrderRequest(payload)).unwrap();
+      dispatch(fetchCustomerOrderRequests());
+      setOpened(false);
+      Notifications.show({
+        title: 'Successful',
+        message: 'Customer order request status updated successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      navigate('/admin/customers/order-requests');
+    } catch (e: any) {
+      setOpened(false);
+      Notifications.show({
+        title: 'Error',
+        message: 'There was an error updating the customer order request',
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
+  };
+
+  const openCancelRequest = () => {
+    setModalType('cancel');
+    setOpened(true);
+  };
+
+  const openConfirmRequest = () => {
+    setModalType('confirm');
+    setOpened(true);
   };
 
   return (
@@ -180,7 +240,7 @@ function ViewCustomerOrderRequests() {
                 <Button color="red" onClick={openCancelRequest}>
                   Cancel Request
                 </Button>
-                <Button ml={10} color="violet">
+                <Button ml={10} color="violet" onClick={openConfirmRequest}>
                   Confirm Request
                 </Button>
               </div>
@@ -195,6 +255,29 @@ function ViewCustomerOrderRequests() {
           </Grid.Col>
         </Grid>
       </ModalsProvider>
+
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title={modalType === 'cancel' ? 'Cancel Order Request' : 'Confirm Order Request'}
+      >
+        <Text size="sm">
+          {modalType === 'cancel'
+            ? 'Please confirm to cancel this customer order request'
+            : 'Please confirm to confirm this customer order request'}
+        </Text>
+        <Group position="right" mt="md">
+          <Button variant="outline" onClick={() => setOpened(false)}>
+            Cancel
+          </Button>
+          <Button
+            color={modalType === 'cancel' ? 'red' : 'green'}
+            onClick={modalType === 'cancel' ? handleCancelOrderRequest : handleConfirmOrderRequest}
+          >
+            Confirm
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 }

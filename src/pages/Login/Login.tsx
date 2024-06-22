@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Notifications } from '@mantine/notifications';
 import { Card, Center, TextInput, Text, rem, PasswordInput, Button } from '@mantine/core';
 import { IconCheck, IconCopyright, IconUser, IconX } from '@tabler/icons-react';
@@ -16,7 +16,15 @@ function Login() {
   const navigate = useNavigate();
   const error = useSelector((state: RootState) => state.auth.error);
   const status = useSelector((state: RootState) => state.auth.status);
+  const user = useSelector((state: RootState) => state.auth.user);
   // console.log(error);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/admin/dashboard');
+    }
+  }, [user, navigate]);
+
 
   const loginForm = useForm({
     initialValues: {

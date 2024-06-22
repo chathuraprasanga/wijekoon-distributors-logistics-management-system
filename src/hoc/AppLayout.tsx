@@ -1,11 +1,22 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { AppShell, Burger, Group, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { UserButton } from './UserButton';
 import NavBarTesting from './NavBarTesting';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 export function AppLayout() {
   const [opened, { toggle }] = useDisclosure();
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  useEffect(() => {
+    if (!user) {
+      window.location.replace('/login')
+    }
+  }, [user, navigate]);
 
   return (
     <AppShell
@@ -35,6 +46,7 @@ export function AppLayout() {
                 paddingRight: 5,
                 paddingLeft: 5,
                 paddingBottom: 2,
+                fontSize:24
               }}
             >
               WIJEKOON DISTRIBUTORS

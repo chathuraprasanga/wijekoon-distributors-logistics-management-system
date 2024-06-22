@@ -1,6 +1,8 @@
+import { RootState } from '@/redux/store';
 import { Button, Text, Image, Card, Grid, Group } from '@mantine/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Badge, Carousel } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 function HomeNew() {
@@ -127,7 +129,7 @@ function HomeNew() {
               src="https://firebasestorage.googleapis.com/v0/b/wijekoon-distributors.appspot.com/o/Landing%20Page%2FKeshara%203.jpg?alt=media&token=8aa012fd-38e3-44ae-b7d2-5d97f3776f8b"
             />
           </div>
-          
+
           <div>
             <h3>Wijekoon Distributors</h3>
             <p>
