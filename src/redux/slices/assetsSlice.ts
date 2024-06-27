@@ -47,7 +47,7 @@ export const createWarehouse = createAsyncThunk(
 export const updateWarehouse = createAsyncThunk(
   'assets/updateWarehouse',
   async (warehouse: any) => {
-    const response = await axios.put(`http://localhost:3000/warehouse/${warehouse.id}`, warehouse);
+    const response = await axios.put(`http://localhost:3000/warehouse/${warehouse._id}`, warehouse);
     return response.data;
   }
 );

@@ -18,8 +18,8 @@ const data = [
     links: [
       { label: 'Ask Questions', link: '#' },
       { label: 'Admin login', link: 'http://localhost:5173/admin-login' },
-      { label: 'Privacy Policy', link: '#' },
-      { label: 'Terms of Use', link: '#' },
+      { label: 'Privacy Policy', link: '/privacy-policy' },
+      { label: 'Terms of Use', link: '/terms-of-use' },
     ],
   },
   {

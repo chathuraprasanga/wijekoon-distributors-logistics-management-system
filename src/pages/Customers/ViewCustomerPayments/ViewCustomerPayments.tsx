@@ -1,3 +1,4 @@
+import { RootState } from '@/redux/store';
 import { Button, Card, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
@@ -8,7 +9,28 @@ function ViewCustomerPayments() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const selectedPayment = useSelector((state: RootState) => state.customers.customerPayment);
-  console.log(selectedPayment);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   const customer = selectedPayment?.customerOrder?.customerOrderRequest?.customer;
   const order = selectedPayment?.customerOrder;

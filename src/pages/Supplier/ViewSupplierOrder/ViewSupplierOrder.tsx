@@ -11,6 +11,28 @@ function ViewSuppliersOrders() {
   const selectedOrder = useSelector((state: RootState) => state.suppliers.supplierOrder);
   console.log(selectedOrder);
 
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
+
   const supplier = selectedOrder?.supplierOrderRequest?.supplier;
   const order = selectedOrder?.supplierOrderRequest?.order;
 
@@ -79,9 +101,7 @@ function ViewSuppliersOrders() {
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Driver:
                 </Table.Td>
-                <Table.Td width="35%">
-                {selectedOrder?.tripDetails?.driver?.name}
-                </Table.Td>
+                <Table.Td width="35%">{selectedOrder?.tripDetails?.driver?.name}</Table.Td>
               </Table.Tr>
               <Table.Tr>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
@@ -108,7 +128,9 @@ function ViewSuppliersOrders() {
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>
                   Total Payment:
                 </Table.Td>
-                <Table.Td width="35%">{selectedOrder?.supplierOrderRequest?.netTotal?.toFixed(2)}</Table.Td>
+                <Table.Td width="35%">
+                  {selectedOrder?.supplierOrderRequest?.netTotal?.toFixed(2)}
+                </Table.Td>
               </Table.Tr>
               <Table.Tr>
                 <Table.Td width="15%" style={{ fontWeight: 'bold' }}>

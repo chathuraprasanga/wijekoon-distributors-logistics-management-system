@@ -25,6 +25,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '@/redux/store';
+// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function SupplierOrders() {
   const [activeModelPage, setModelPage] = useState(1);
@@ -35,6 +36,28 @@ function SupplierOrders() {
   const error = useSelector((state: RootState) => state.suppliers.error);
   const orders = useSelector((state: RootState) => state.suppliers.supplierOrders);
   const orderRequests = useSelector((state: RootState) => state.suppliers.supplierOrderRequests);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchSupplierOrders());
@@ -125,7 +148,9 @@ function SupplierOrders() {
 
             <Menu.Dropdown>
               {/* <Link to="/admin/suppliers/view-orders" style={{ textDecoration: 'none' }}> */}
-              <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+              {hasPrivilege('VIEW_SUPPLIER_ORDERS') && (
+                <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+              )}
               {/* </Link> */}
             </Menu.Dropdown>
           </Menu>
@@ -237,11 +262,11 @@ function SupplierOrders() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Supplier Order </Text>
             </div>
-            {/* <Link to="/admin/Suppliers/add-orders"> */}
-            <Button size="sm" onClick={open}>
-              Create Supplier Order
-            </Button>
-            {/* </Link> */}
+            {hasPrivilege('ADD_SUPPLIER_ORDERS') && (
+              <Button size="sm" onClick={open}>
+                Create Supplier Order
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

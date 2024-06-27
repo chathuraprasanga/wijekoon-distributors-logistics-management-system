@@ -28,6 +28,7 @@ import {
   setCustomer,
 } from '@/redux/slices/customerSlice';
 import { AppDispatch, RootState } from '@/redux/store';
+// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function Customers() {
   const [opened, setOpened] = useState(false);
@@ -36,6 +37,28 @@ function Customers() {
   const dispatch: AppDispatch = useDispatch();
   const customers = useSelector((state: RootState) => state.customers.customers);
   const status = useSelector((state: RootState) => state.customers.status);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   // for pagination
   const [activePage, setPage] = useState(1);
@@ -132,11 +155,17 @@ function Customers() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item onClick={() => handleViewEdit(element, 'view')}>View</Menu.Item>
-            <Menu.Item onClick={() => handleViewEdit(element, 'edit')}>Edit</Menu.Item>
-            <Menu.Item onClick={() => handleViewEdit(element, 'delete')} color="red">
-              Delete
-            </Menu.Item>
+            {hasPrivilege('VIEW_CUSTOMERS') && (
+              <Menu.Item onClick={() => handleViewEdit(element, 'view')}>View</Menu.Item>
+            )}
+            {hasPrivilege('EDIT_CUSTOMERS') && (
+              <Menu.Item onClick={() => handleViewEdit(element, 'edit')}>Edit</Menu.Item>
+            )}
+            {hasPrivilege('DELETE_CUSTOMERS') && (
+              <Menu.Item onClick={() => handleViewEdit(element, 'delete')} color="red">
+                Delete
+              </Menu.Item>
+            )}
           </Menu.Dropdown>
         </Menu>
       </Table.Td>
@@ -163,9 +192,11 @@ function Customers() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Customers</Text>
             </div>
-            <Button size="sm" onClick={handleAddCustomer}>
-              Create Customer
-            </Button>
+            {hasPrivilege('ADD_CUSTOMERS') && (
+              <Button size="sm" onClick={handleAddCustomer}>
+                Create Customer
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

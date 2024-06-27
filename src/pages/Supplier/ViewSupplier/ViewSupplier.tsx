@@ -1,3 +1,4 @@
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 import { RootState } from '@/redux/store';
 import { ActionIcon, Badge, Button, Card, Divider, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft, IconMailForward } from '@tabler/icons-react';
@@ -9,6 +10,28 @@ function ViewSupplier() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const supplier = useSelector((state: RootState) => state.suppliers.supplier);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   return (
     <>
@@ -100,9 +123,11 @@ function ViewSupplier() {
 
         <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between' }}>
           <div></div>
-          <Link to="/admin/suppliers/add-edit">
-            <Button>Edit Record</Button>
-          </Link>
+          {hasPrivilege('EDIT_SUPPLIERS') && (
+            <Link to="/admin/suppliers/add-edit">
+              <Button>Edit Record</Button>
+            </Link>
+          )}
         </div>
 
         <Divider my="md" />

@@ -27,6 +27,7 @@ import {
   setCustomerOrder,
 } from '@/redux/slices/customerSlice';
 import { RootState } from '@/redux/store';
+// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function CustomerOrders() {
   const [activePage, setPage] = useState(1);
@@ -41,6 +42,28 @@ function CustomerOrders() {
     (state: RootState) => state.customers.confirmedCustomerOredrRequests
   );
   const customerOrders = useSelector((state: RootState) => state.customers.customerOrders);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
@@ -133,9 +156,9 @@ function CustomerOrders() {
             </Menu.Target>
 
             <Menu.Dropdown>
-              {/* <Link to="/admin/customers/view-orders" style={{ textDecoration: 'none' }}> */}
-              <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
-              {/* </Link> */}
+              {hasPrivilege('VIEW_CUSTOMER_ORDERS') && (
+                <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+              )}
             </Menu.Dropdown>
           </Menu>
         </Table.Td>
@@ -166,11 +189,9 @@ function CustomerOrders() {
         <Table.Td>{element?.order.map((item: any) => parseInt(item.quantity))}</Table.Td>
         <Table.Td>{element?.netTotal?.toFixed(2)}</Table.Td>
         <Table.Td>
-          {/* <Link to="/admin/customers/add-orders"> */}
           <Button size="xs" onClick={() => handleSelect(element)}>
             Select
           </Button>
-          {/* </Link> */}
         </Table.Td>
       </Table.Tr>
     </>
@@ -241,11 +262,11 @@ function CustomerOrders() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Customer Order </Text>
             </div>
-            {/* <Link to="/admin/customers/add-orders"> */}
-            <Button size="sm" onClick={open}>
-              Create Customer Order
-            </Button>
-            {/* </Link> */}
+            {hasPrivilege('ADD_CUSTOMER_ORDERS') && (
+              <Button size="sm" onClick={open}>
+                Create Customer Order
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

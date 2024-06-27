@@ -12,6 +12,7 @@ import {
 } from '@/redux/slices/customerSlice';
 import { RootState } from '@/redux/store';
 import { setTrip } from '@/redux/slices/tripsSlice';
+import { hasAnyPrivilege, hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function ViewWarehouse() {
   const navigate = useNavigate();
@@ -19,6 +20,28 @@ function ViewWarehouse() {
   const selectedWarehouse = useSelector((state: RootState) => state.assets.warehouse);
   const error = useSelector((state: RootState) => state.assets.error);
   const status = useSelector((state: RootState) => state.assets.status);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   console.log(selectedWarehouse);
   const stockDetails = selectedWarehouse?.stockDetails;
@@ -146,9 +169,11 @@ function ViewWarehouse() {
               <Text fw="bold">Stock Details</Text>
               <div>
                 {/* <Link to="/admin/assets/warehouses/stock-receive"> */}
-                <Button size="xs" onClick={handleStockReceive}>
-                  Stock Receive
-                </Button>
+                {hasPrivilege('EDIT_WAREHOUSES') && (
+                  <Button size="xs" onClick={handleStockReceive}>
+                    Stock Receive
+                  </Button>
+                )}
                 {/* </Link> */}
                 <Link to="/admin/assets/warehouses/stock-dispatch">
                   <Button size="xs" ml={10} disabled>
@@ -173,6 +198,7 @@ function ViewWarehouse() {
         <Grid.Col span={12}>
           <div>
             {/* <Link to="/admin/assets/warehouses/add-edit-orders"> */}
+            {hasAnyPrivilege(['ADD_CUSTOMER_ORDERS', 'EDIT_WAREHOUSES'])}
             <Button style={{ float: 'right' }} onClick={handleCreateOrder}>
               Create Order
             </Button>

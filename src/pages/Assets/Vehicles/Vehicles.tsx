@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { deleteVehicle, fetchVehicles, setVehicle } from '@/redux/slices/assetsSlice';
 import { RootState } from '@/redux/store';
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function Vehicles() {
   const [opened, setOpened] = useState(false);
@@ -32,6 +33,28 @@ function Vehicles() {
   const vehicles = useSelector((state: RootState) => state.assets.vehicles);
   const status = useSelector((state: RootState) => state.assets.status);
   const error = useSelector((state: RootState) => state.assets.error);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     disptach(fetchVehicles());
@@ -66,7 +89,7 @@ function Vehicles() {
     } else {
       disptach(setVehicle(vehicle));
       if (action === 'view') {
-        navigate('/admin/vehicles/add-edit');
+        navigate('/admin/vehicles/view');
       } else if (action === 'edit') {
         navigate('/admin/vehicles/add-edit');
       }
@@ -119,11 +142,17 @@ function Vehicles() {
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Menu.Item onClick={() => handleViewEdit(element, 'view')}>View</Menu.Item>
-              <Menu.Item onClick={() => handleViewEdit(element, 'edit')}>Edit</Menu.Item>
-              <Menu.Item onClick={() => handleViewEdit(element, 'delete')} color="red">
-                Delete
-              </Menu.Item>
+              {hasPrivilege('VIEW_VEHICLES') && (
+                <Menu.Item onClick={() => handleViewEdit(element, 'view')}>View</Menu.Item>
+              )}
+              {hasPrivilege('EDIT_VEHICLES') && (
+                <Menu.Item onClick={() => handleViewEdit(element, 'edit')}>Edit</Menu.Item>
+              )}
+              {hasPrivilege('DELETE_VEHICLES') && (
+                <Menu.Item onClick={() => handleViewEdit(element, 'delete')} color="red">
+                  Delete
+                </Menu.Item>
+              )}
             </Menu.Dropdown>
           </Menu>
         </Table.Td>
@@ -151,11 +180,11 @@ function Vehicles() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Vehicles</Text>
             </div>
-            {/* <Link to="/admin/vehicles/add-edit"> */}
-            <Button size="sm" onClick={handleVehicleAddBtn}>
-              Add Vehicle
-            </Button>
-            {/* </Link> */}
+            {hasPrivilege('ADD_VEHICLES') && (
+              <Button size="sm" onClick={handleVehicleAddBtn}>
+                Add Vehicle
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

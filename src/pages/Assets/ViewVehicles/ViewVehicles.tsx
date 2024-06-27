@@ -1,9 +1,36 @@
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
+import { RootState } from '@/redux/store';
 import { Badge, Button, Card, Grid, Table, Text } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 function ViewVehicles() {
+  const vehicle = useSelector((state: RootState) => state.assets.vehicle);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
+
   return (
     <>
       <Grid>
@@ -33,7 +60,7 @@ function ViewVehicles() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="30%">
-                  <Text size="sm">Vehicle ID:</Text>
+                  <Text size="sm">{vehicle?.vehicleId}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -43,7 +70,7 @@ function ViewVehicles() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="30%">
-                  <Text size="sm">NW LC-3801</Text>
+                  <Text size="sm">{vehicle?.number}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -53,7 +80,7 @@ function ViewVehicles() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="30%">
-                  <Text size="sm">Mitshubisi</Text>
+                  <Text size="sm">{vehicle?.brand}</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -63,7 +90,7 @@ function ViewVehicles() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="30%">
-                  <Text size="sm">8500KG</Text>
+                  <Text size="sm">{vehicle?.capacity} KG</Text>
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
@@ -74,8 +101,8 @@ function ViewVehicles() {
                 </Table.Td>
                 <Table.Td width="30%">
                   <Text size="sm">
-                    <Badge color="green" radius="sm">
-                      ACTIVE
+                    <Badge color={vehicle.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                      {vehicle?.status}
                     </Badge>
                   </Text>
                 </Table.Td>
@@ -85,7 +112,11 @@ function ViewVehicles() {
         </Grid.Col>
         <Grid.Col>
           <div>
-            <Link to="/admin/vehicles/add-edit"><Button style={{ float: 'right' }}>Update</Button></Link>
+            {hasPrivilege('EDIT_VEHICLES') && (
+              <Link to="/admin/vehicles/add-edit">
+                <Button style={{ float: 'right' }}>Update</Button>
+              </Link>
+            )}
           </div>
         </Grid.Col>
       </Grid>

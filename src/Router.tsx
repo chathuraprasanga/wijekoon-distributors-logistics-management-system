@@ -75,6 +75,8 @@ import CustomerPaymentsCP from './pages/CustomerPortal/pages/CustomerPaymentsCP'
 import CustomerCheques from './pages/CustomerPortal/pages/CustomerCheques';
 import { NotFoundImage } from './components/NothingFoundImage/NothingFoundImag';
 import { NothingFoundBackground } from './components/404/NothingFoundBackground';
+import PrivacyPolicy from './pages/CustomerPortal/pages/PrivacyPolicy';
+import TermsOfUse from './pages/CustomerPortal/pages/TermsOfUse';
 
 const router = createBrowserRouter([
   {
@@ -96,6 +98,14 @@ const router = createBrowserRouter([
       {
         path: 'contact-us',
         element: <ContactUs />,
+      },
+      {
+        path: 'privacy-policy',
+        element: <PrivacyPolicy />,
+      },
+      {
+        path: 'terms-of-use',
+        element: <TermsOfUse />,
       },
     ],
   },

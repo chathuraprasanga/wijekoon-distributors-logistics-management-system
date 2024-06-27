@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchSupplierPayments, setSupplierPayment } from '@/redux/slices/supplierSlice';
 import { RootState } from '@/redux/store';
+import { hasAnyPrivilege, hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function SupplierPayments() {
   const [activePage, setPage] = useState(1);
@@ -24,6 +25,28 @@ function SupplierPayments() {
   const status = useSelector((state: RootState) => state.customers.status);
   const error = useSelector((state: RootState) => state.customers.error);
   const payments = useSelector((state: RootState) => state.suppliers.supplierPayments);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchSupplierPayments());
@@ -56,7 +79,7 @@ function SupplierPayments() {
     navigate('/admin/suppliers/view-payments');
   };
 
-  const handlePayment = (data:any) => {
+  const handlePayment = (data: any) => {
     dispatch(setSupplierPayment(data));
     navigate('/admin/suppliers/view-payments');
   };
@@ -93,17 +116,19 @@ function SupplierPayments() {
               <IconDots style={{ cursor: 'pointer' }} />
             </Menu.Target>
 
-            <Menu.Dropdown>
-              {element.status === 'PAID' ? (
-                // <Link to="/admin/suppliers/view-payments" style={{ textDecoration: 'none' }}>
-                <Menu.Item onClick={() => handleView(element)}>View Payment</Menu.Item>
-              ) : (
-                // </Link>
-                // <Link to="/admin/suppliers/view-payments" style={{ textDecoration: 'none' }}>
-                <Menu.Item onClick={() => handlePayment(element)}>Make Payment</Menu.Item>
-                // </Link>
-              )}
-            </Menu.Dropdown>
+            {hasAnyPrivilege(['VIEW_SUPPLIER_PAYMENTS', 'EDIT_SUPPLIER_PAYMENTS']) && (
+              <Menu.Dropdown>
+                {element.status === 'PAID' ? (
+                  // <Link to="/admin/suppliers/view-payments" style={{ textDecoration: 'none' }}>
+                  <Menu.Item onClick={() => handleView(element)}>View Payment</Menu.Item>
+                ) : (
+                  // </Link>
+                  // <Link to="/admin/suppliers/view-payments" style={{ textDecoration: 'none' }}>
+                  <Menu.Item onClick={() => handlePayment(element)}>Make Payment</Menu.Item>
+                  // </Link>
+                )}
+              </Menu.Dropdown>
+            )}
           </Menu>
         </Table.Td>
       </Table.Tr>

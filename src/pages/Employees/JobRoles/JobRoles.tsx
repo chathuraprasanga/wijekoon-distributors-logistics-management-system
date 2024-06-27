@@ -24,6 +24,7 @@ import {
   setJobRole,
 } from '@/redux/slices/employeeSlice';
 import { RootState, AppDispatch } from '@/redux/store';
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 interface JobRole {
   _id: string;
@@ -39,6 +40,28 @@ const JobRoles: React.FC = () => {
   const [activePage, setPage] = useState(1);
   const [jobRoleToDelete, setJobRoleToDelete] = useState<JobRole | null>(null);
   const [opened, setOpened] = useState(false);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   const userDetailsString = localStorage.getItem('user');
   const userDetails = JSON.parse(userDetailsString);
@@ -115,23 +138,27 @@ const JobRoles: React.FC = () => {
       <Table.Td width="50%">{element.permissions?.length ?? 0} Permissions</Table.Td>
       <Table.Td width="20%">
         <div>
-          <Button
-            size="xs"
-            color="violet"
-            onClick={() => handleEditBtn(element)}
-            disabled={role !== 'Super Admin' || element.name === 'Super Admin'}
-          >
-            Edit
-          </Button>
-          <Button
-            ml={10}
-            size="xs"
-            color="red"
-            disabled={role !== 'Super Admin' || element.name === 'Super Admin'}
-            onClick={() => handleDeleteBtn(element)}
-          >
-            Delete
-          </Button>
+          {hasPrivilege('EDIT_JOB_ROLES') && (
+            <Button
+              size="xs"
+              color="violet"
+              onClick={() => handleEditBtn(element)}
+              disabled={role !== 'Super Admin' || element.name === 'Super Admin'}
+            >
+              Edit
+            </Button>
+          )}
+          {hasPrivilege('DELETE_JOB_ROLES') && (
+            <Button
+              ml={10}
+              size="xs"
+              color="red"
+              disabled={role !== 'Super Admin' || element.name === 'Super Admin'}
+              onClick={() => handleDeleteBtn(element)}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       </Table.Td>
     </Table.Tr>
@@ -153,9 +180,11 @@ const JobRoles: React.FC = () => {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Job Roles</Text>
             </div>
-            <Button size="sm" onClick={handleCreateJobBtn}>
-              Create Job Roles
-            </Button>
+            {hasPrivilege('ADD_JOB_ROLES') && (
+              <Button size="sm" onClick={handleCreateJobBtn}>
+                Create Job Roles
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col>

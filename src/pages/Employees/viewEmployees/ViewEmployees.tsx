@@ -4,13 +4,36 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { RootState } from '@/redux/store';
 import { fetchJobRoles, setEmployee } from '@/redux/slices/employeeSlice';
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function ViewEmployees() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const selectedEmployee = useSelector((state: RootState) => state.employees.employee);
 
-  const handleUpdate = (employee:any) => {
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
+
+  const handleUpdate = (employee: any) => {
     dispatch(setEmployee(employee));
     dispatch(fetchJobRoles());
     navigate('/admin/employees/add-edit');
@@ -140,9 +163,11 @@ function ViewEmployees() {
         </Table>
       </Card>
       <div style={{ marginTop: 10 }}>
-        <Button style={{ float: 'right' }} onClick={() => handleUpdate(selectedEmployee)}>
-          Update Record
-        </Button>
+        {hasPrivilege('EDIT_EMPLOYEES') && selectedEmployee.jobRole.name !== 'Super Admin' && (
+          <Button style={{ float: 'right' }} onClick={() => handleUpdate(selectedEmployee)}>
+            Update Record
+          </Button>
+        )}
       </div>
     </>
   );

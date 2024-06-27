@@ -1,3 +1,4 @@
+// import { hasAnyPrivilege, hasPrivilege } from '@/helpers/utils/permissionHandler';
 import { fetchExpenses } from '@/redux/slices/tripsSlice';
 import { RootState } from '@/redux/store';
 import { Button, Card, Grid, Table, Text } from '@mantine/core';
@@ -9,6 +10,28 @@ import { Link } from 'react-router-dom';
 function ViewExpenses() {
   const dispatch = useDispatch();
   const expense = useSelector((state: RootState) => state.trips.expense);
+
+   // due to the permission handler is not works
+   const permissionsString = localStorage.getItem('permissions');
+   const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+ 
+   const hasPrivilege = (permission: string) => {
+     try {
+       return permissions.includes(permission);
+     } catch (error) {
+       console.error('Error checking privilege:', error);
+       return false;
+     }
+   };
+ 
+   const hasAnyPrivilege = (permissionArray: string[]) => {
+     try {
+       return permissionArray.some((permission) => permissions.includes(permission));
+     } catch (error) {
+       console.error('Error checking privileges:', error);
+       return false;
+     }
+   };
 
   useEffect(() => {
     dispatch(fetchExpenses);
@@ -63,7 +86,7 @@ function ViewExpenses() {
                   </Text>
                 </Table.Td>
                 <Table.Td width="35%">
-                  <Text size="sm">{expense.tripId.driver.name}</Text>
+                  <Text size="sm">{expense.tripId.driver?.name || 'N/A'}</Text>
                 </Table.Td>
                 <Table.Td width="15%">
                   <Text size="sm" fw="bold">
@@ -120,9 +143,11 @@ function ViewExpenses() {
         </Grid.Col>
         <Grid.Col>
           <div>
-            <Link to="/admin/expenses/add-edit">
-              <Button style={{ float: 'right' }}>Edit Records</Button>
-            </Link>
+            {hasPrivilege('EDIT_EXPENSES') && (
+              <Link to="/admin/expenses/add-edit">
+                <Button style={{ float: 'right' }}>Edit Records</Button>
+              </Link>
+            )}
           </div>
         </Grid.Col>
       </Grid>
