@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTrips, setTrip, updateTrip } from '@/redux/slices/tripsSlice';
 import { RootState } from '@/redux/store';
 import { fetchSupplierOrders } from '@/redux/slices/supplierSlice';
+// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function Trips() {
   const [activePage, setPage] = useState(1);
@@ -33,6 +34,28 @@ function Trips() {
   const trips = useSelector((state: RootState) => state.trips.trips);
   const [opened, setOpened] = useState(false);
   const navigate = useNavigate();
+
+   // due to the permission handler is not works
+   const permissionsString = localStorage.getItem('permissions');
+   const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+ 
+   const hasPrivilege = (permission: string) => {
+     try {
+       return permissions.includes(permission);
+     } catch (error) {
+       console.error('Error checking privilege:', error);
+       return false;
+     }
+   };
+ 
+   const hasAnyPrivilege = (permissionArray: string[]) => {
+     try {
+       return permissionArray.some((permission) => permissions.includes(permission));
+     } catch (error) {
+       console.error('Error checking privileges:', error);
+       return false;
+     }
+   };
 
   const tripsPerPage = 10;
   const handlePageChange = (newPage: any) => {
@@ -127,9 +150,9 @@ function Trips() {
     <>
       <Table.Tr key={element._id}>
         <Table.Td>{element.tripId}</Table.Td>
-        <Table.Td>{element.date?.split('T')[0]}</Table.Td>
-        <Table.Td>{element.vehicle?.number}</Table.Td>
-        <Table.Td>{element.driver?.name}</Table.Td>
+        <Table.Td>{element.date?.split('T')[0] || 'N/A'}</Table.Td>
+        <Table.Td>{element.vehicle?.number || 'N/A'}</Table.Td>
+        <Table.Td>{element.driver?.name || 'N/A'}</Table.Td>
         <Table.Td>{element.supplierOrder?.supplierOrderRequest?.order.length}</Table.Td>
         <Table.Td>{element.supplierOrder?.supplierOrderRequest?.totalQuantity}</Table.Td>
         <Table.Td style={{ textTransform: 'capitalize' }}>
@@ -158,12 +181,14 @@ function Trips() {
 
             <Menu.Dropdown>
               {/* <Link to="/admin/trips/view" style={{ textDecoration: 'none' }}> */}
-              <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+              {hasPrivilege('VIEW_TRIPS') && (
+                <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+              )}
               {/* </Link> */}
               {/* <Link to="/admin/trips/add-edit" style={{ textDecoration: 'none' }}> */}
               {/* <Menu.Item>Edit</Menu.Item> */}
               {/* </Link> */}
-              {element.status === 'ACTIVE' && (
+              {element.status === 'ACTIVE' && hasPrivilege('EDIT_TRIPS') && (
                 <Menu.Item color="red" onClick={() => handleCancel(element)}>
                   Cancel
                 </Menu.Item>

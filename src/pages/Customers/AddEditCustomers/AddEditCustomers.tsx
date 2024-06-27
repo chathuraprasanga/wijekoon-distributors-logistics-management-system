@@ -1,14 +1,4 @@
-import {
-  Button,
-  Card,
-  Grid,
-  Select,
-  Table,
-  Text,
-  TextInput,
-  Textarea,
-  rem,
-} from '@mantine/core';
+import { Button, Card, Grid, Select, Table, Text, TextInput, Textarea, rem } from '@mantine/core';
 import { isNotEmpty, useForm } from '@mantine/form';
 import { Notifications } from '@mantine/notifications';
 import { IconArrowLeft, IconCheck, IconX } from '@tabler/icons-react';
@@ -22,6 +12,28 @@ function AddEditCustomers() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const selectedCustomer = useSelector((state: RootState) => state.customers.customer);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   const customerAddEditForm = useForm({
     initialValues: {
@@ -215,13 +227,13 @@ function AddEditCustomers() {
                 <Table.Td>
                   {selectedCustomer && (
                     <>
-                    <Select
-                      color="violet"
-                      size="xs"
-                      radius="sm"
-                      data={['ACTIVE', 'DEACTIVE']}
-                      {...customerAddEditForm.getInputProps('status')}
-                    />
+                      <Select
+                        color="violet"
+                        size="xs"
+                        radius="sm"
+                        data={['ACTIVE', 'DEACTIVE']}
+                        {...customerAddEditForm.getInputProps('status')}
+                      />
                     </>
                   )}
                 </Table.Td>

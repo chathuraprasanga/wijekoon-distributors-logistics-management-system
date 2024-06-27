@@ -20,6 +20,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import Trips from '../Trips';
+// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function Expenses() {
   const [activePage, setPage] = useState(1);
@@ -30,6 +31,28 @@ function Expenses() {
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const trips = useSelector((state: RootState) => state.trips.trips);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchExpenses());
@@ -108,10 +131,14 @@ function Expenses() {
 
             <Menu.Dropdown>
               {/* <Link to="/admin/expenses/view" style={{ textDecoration: 'none' }}> */}
-              <Menu.Item onClick={() => handleView(data)}>View</Menu.Item>
+              {hasPrivilege('VIEW_EXPENSES') && (
+                <Menu.Item onClick={() => handleView(data)}>View</Menu.Item>
+              )}
               {/* </Link> */}
               {/* <Link to="/admin/expenses/add-edit" style={{ textDecoration: 'none' }}> */}
-              <Menu.Item onClick={() => handleEdit(data)}>Edit</Menu.Item>
+              {hasPrivilege('EDIT_EXPENSES') && (
+                <Menu.Item onClick={() => handleEdit(data)}>Edit</Menu.Item>
+              )}
               {/* </Link> */}
               {/* <Menu.Item color="red">Delete</Menu.Item> */}
             </Menu.Dropdown>
@@ -206,7 +233,11 @@ function Expenses() {
               <Text style={{ fontWeight: 'bold' }}>Expenses</Text>
             </div>
             {/* <Link to="/admin/expenses/add-edit"> */}
-            <Button size="sm" onClick={open}>Add Expenses</Button>
+            {hasPrivilege('ADD_EXPENSES') && (
+              <Button size="sm" onClick={open}>
+                Add Expenses
+              </Button>
+            )}
             {/* </Link> */}
           </div>
         </Grid.Col>

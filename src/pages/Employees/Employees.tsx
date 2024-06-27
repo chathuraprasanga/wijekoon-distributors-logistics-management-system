@@ -27,6 +27,7 @@ import {
   setEmployee,
 } from '@/redux/slices/employeeSlice';
 import { AppDispatch, RootState } from '@/redux/store';
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function Employees() {
   const [opened, setOpened] = useState(false);
@@ -34,6 +35,28 @@ function Employees() {
   const [activePage, setActivePage] = useState(1);
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   const employees = useSelector((state: RootState) => state.employees.employees);
   const status = useSelector((state: RootState) => state.employees.status);
@@ -104,11 +127,17 @@ function Employees() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item onClick={() => handleEditBtn(element, 'view')}>View</Menu.Item>
-            <Menu.Item onClick={() => handleEditBtn(element, 'edit')}>Edit</Menu.Item>
-            <Menu.Item color="red" onClick={() => handleEditBtn(element, 'delete')}>
-              Delete
-            </Menu.Item>
+            {hasPrivilege('VIEW_EMPLOYEES') && (
+              <Menu.Item onClick={() => handleEditBtn(element, 'view')}>View</Menu.Item>
+            )}
+            {hasPrivilege('EDIT_EMPLOYEES') && (
+              <Menu.Item onClick={() => handleEditBtn(element, 'edit')}>Edit</Menu.Item>
+            )}
+            {hasPrivilege('DELETE_EMPLOYEES') && element.jobRole.name !== 'Super Admin' && (
+              <Menu.Item color="red" onClick={() => handleEditBtn(element, 'delete')}>
+                Delete
+              </Menu.Item>
+            )}
           </Menu.Dropdown>
         </Menu>
       </Table.Td>
@@ -141,9 +170,11 @@ function Employees() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Employees</Text>
             </div>
-            <Button size="sm" onClick={handleCreateBtn}>
-              Create Employees
-            </Button>
+            {hasPrivilege('ADD_EMPLOYEES') && (
+              <Button size="sm" onClick={handleCreateBtn}>
+                Create Employees
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

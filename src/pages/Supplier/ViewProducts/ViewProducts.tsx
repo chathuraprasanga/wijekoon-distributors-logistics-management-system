@@ -1,3 +1,4 @@
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 import { RootState } from '@/redux/store';
 import {
   Grid,
@@ -21,6 +22,28 @@ function ViewProducts() {
   const dispatch = useDispatch();
   const selectedProduct = useSelector((state: RootState) => state.suppliers.product);
   console.log(selectedProduct);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   const handleEditProduct = () => {
     navigate('/admin/suppliers/add-edit-products');
@@ -130,9 +153,9 @@ function ViewProducts() {
 
         <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between' }}>
           <div></div>
-          {/* <Link to="/admin/suppliers/add-edit-products"> */}
-          <Button onClick={handleEditProduct}>Edit Product</Button>
-          {/* </Link> */}
+          {hasPrivilege('EDIT_PRODUCTS') && (
+            <Button onClick={handleEditProduct}>Edit Product</Button>
+          )}
         </div>
 
         <Divider my="md" />

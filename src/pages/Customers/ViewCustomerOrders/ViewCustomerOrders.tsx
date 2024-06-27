@@ -4,12 +4,33 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { RootState } from '@/redux/store';
-import { fetchCustomerPayments } from '@/redux/slices/customerSlice';
 
 function ViewCustomerOrders() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const selectedOrder = useSelector((state: RootState) => state.customers.customerOrder);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   const customer = selectedOrder?.customerOrderRequest?.customer;
   const order = selectedOrder?.customerOrderRequest?.order;

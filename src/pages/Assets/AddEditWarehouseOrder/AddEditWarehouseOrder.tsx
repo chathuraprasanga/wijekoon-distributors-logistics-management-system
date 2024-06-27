@@ -29,6 +29,7 @@ import {
   setCustomerPayment,
 } from '@/redux/slices/customerSlice';
 import WarehousePaymentModal from './warehousePaymen/WarehousePaymentModal';
+import { hasAnyPrivilege } from '@/helpers/utils/permissionHandler';
 
 interface RowData {
   product: string;
@@ -59,6 +60,28 @@ function AddWarehouseCustomerOrders() {
   const customers = useSelector((state: RootState) => state.customers.customers);
   const customer = useSelector((state: RootState) => state.customers.customer);
   const warehouse = useSelector((state: RootState) => state.assets.warehouse);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -329,6 +352,7 @@ function AddWarehouseCustomerOrders() {
                   <Table.Td>{customer?.fullName || '-'}</Table.Td>
                   <Table.Td width={150} style={{ fontWeight: 'bold', float: 'right' }}>
                     <div style={{ display: 'flex', float: 'right' }}>
+                      {hasAnyPrivilege(['ADD_CUSTOMERS', 'VIEW_CUSTOMERS'])}
                       <Button size="xs" onClick={openSecondModal}>
                         {!customer ? 'Select' : 'Change'} Customer
                       </Button>

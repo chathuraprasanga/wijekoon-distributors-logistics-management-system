@@ -1,3 +1,4 @@
+// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 import { fetchCheques, setCheque } from '@/redux/slices/chequesSlice';
 import { RootState } from '@/redux/store';
 import {
@@ -24,7 +25,28 @@ function Cheques() {
   const status = useSelector((state: RootState) => state.cheques.status);
   const error = useSelector((state: RootState) => state.cheques.error);
   const cheques = useSelector((state: RootState) => state.cheques.cheques);
-  console.log(cheques);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchCheques());
@@ -49,7 +71,7 @@ function Cheques() {
   const filteredCheques = cheques.filter((cheque: any) => {
     const value =
       searchSegment === 'Cheque Number' ? cheque.chequeNumber : cheque.customer.fullName;
-    return value.toLowerCase().includes(searchTerm.toLowerCase());
+    return value?.toLowerCase().includes(searchTerm?.toLowerCase());
   });
 
   const displayedCheques = filteredCheques.slice(start, end);
@@ -74,14 +96,12 @@ function Cheques() {
               switch (item.status) {
                 case 'PENDING':
                   return 'yellow';
-                case 'DEPOSITED':
+                case 'DEPOSITTED':
                   return 'green';
                 case 'ACCEPTED':
                   return 'blue';
-                case 'REJECTED':
-                  return 'red';
                 case 'RETURNED':
-                  return 'violet';
+                  return 'red';
                 default:
                   return 'gray';
               }
@@ -100,7 +120,9 @@ function Cheques() {
 
             <Menu.Dropdown>
               {/* <Link to="/admin/cheques/view" style={{ textDecoration: 'none' }}> */}
-              <Menu.Item onClick={() => handleViewEdit(item)}>View</Menu.Item>
+              {hasPrivilege('VIEW_CHEQUES') && (
+                <Menu.Item onClick={() => handleViewEdit(item)}>View</Menu.Item>
+              )}
               {/* </Link> */}
               {/* <Link to="/admin/cheques/add-edit" style={{ textDecoration: 'none' }}>
                 <Menu.Item>Edit</Menu.Item>

@@ -3,7 +3,7 @@ import { Button, Text, Image, Card, Grid, Group } from '@mantine/core';
 import React, { useEffect } from 'react';
 import { Badge, Carousel } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function HomeNew() {
   const navigate = useNavigate();
@@ -205,9 +205,11 @@ function HomeNew() {
                 date we have maintained the super quality of our powered lime product.
               </Text>
 
-              <Button color="blue" fullWidth mt="md" radius="md">
-                Go to Products
-              </Button>
+              <Link to="/products">
+                <Button color="blue" fullWidth mt="md" radius="md">
+                  Go to Products
+                </Button>
+              </Link>
             </Card>
           </Grid.Col>
           <Grid.Col span={3}>
@@ -232,9 +234,11 @@ function HomeNew() {
                 amongst imported and other local brands of skim coat.
               </Text>
 
-              <Button color="blue" fullWidth mt="md" radius="md">
-                Go to Products
-              </Button>
+              <Link to="/products">
+                <Button color="blue" fullWidth mt="md" radius="md">
+                  Go to Products
+                </Button>
+              </Link>
             </Card>
           </Grid.Col>
           <Grid.Col span={3}>
@@ -258,9 +262,11 @@ function HomeNew() {
                 raw materials of the highest quality.
               </Text>
 
-              <Button color="blue" fullWidth mt="md" radius="md">
-                Go to Products
-              </Button>
+              <Link to="/products">
+                <Button color="blue" fullWidth mt="md" radius="md">
+                  Go to Products
+                </Button>
+              </Link>
             </Card>
           </Grid.Col>
           <Grid.Col span={3}>
@@ -286,9 +292,11 @@ function HomeNew() {
                 to its effectiveness.
               </Text>
 
-              <Button color="blue" fullWidth mt="md" radius="md">
-                Go to Products
-              </Button>
+              <Link to="/products">
+                <Button color="blue" fullWidth mt="md" radius="md">
+                  Go to Products
+                </Button>
+              </Link>
             </Card>
           </Grid.Col>
         </Grid>

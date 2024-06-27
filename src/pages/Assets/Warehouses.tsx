@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchWarehouses, setWarehouse, updateWarehouse } from '@/redux/slices/assetsSlice';
 import { RootState } from '@/redux/store';
+import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function Warehouses() {
   const [opened, setOpened] = useState(false);
@@ -32,6 +33,28 @@ function Warehouses() {
   const warehouses = useSelector((state: RootState) => state.assets.warehouses);
   const status = useSelector((state: RootState) => state.assets.status);
   const error = useSelector((state: RootState) => state.assets.error);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     disptach(fetchWarehouses());
@@ -122,14 +145,17 @@ function Warehouses() {
               <IconDots style={{ cursor: 'pointer' }} />
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Item onClick={() => handleViewEdit(element, 'view')}>View</Menu.Item>
-              {/* <Menu.Item onClick={() => handleViewEdit(element, 'edit')}>Edit</Menu.Item> */}
-              <Menu.Item
-                onClick={() => handleViewEdit(element, 'deactivate')}
-                color={element?.status === 'ACTIVE' ? 'red' : 'green'}
-              >
-                {element?.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-              </Menu.Item>
+              {hasPrivilege('VIEW_WAREHOUSES') && (
+                <Menu.Item onClick={() => handleViewEdit(element, 'view')}>View</Menu.Item>
+              )}
+              {hasPrivilege('EDIT_WAREHOUSES') && (
+                <Menu.Item
+                  onClick={() => handleViewEdit(element, 'deactivate')}
+                  color={element?.status === 'ACTIVE' ? 'red' : 'green'}
+                >
+                  {element?.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
+                </Menu.Item>
+              )}
             </Menu.Dropdown>
           </Menu>
         </Table.Td>
@@ -157,11 +183,11 @@ function Warehouses() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Warehouse</Text>
             </div>
-            {/* <Link to="/admin/assets/add-edit-warehouses"> */}
-            <Button size="sm" onClick={handleAddWarehouseAddBtn}>
-              Add Warehouse
-            </Button>
-            {/* </Link> */}
+            {hasPrivilege('ADD_WAREHOUSES') && (
+              <Button size="sm" onClick={handleAddWarehouseAddBtn}>
+                Add Warehouse
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

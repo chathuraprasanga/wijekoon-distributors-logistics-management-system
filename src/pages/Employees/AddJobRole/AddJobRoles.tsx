@@ -24,8 +24,30 @@ function AddJobRoles() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const selectedJobRole = useSelector((state: RootState) => state.employees.jobRole);
-  const permissions = useSelector((state: RootState) => state.employees.permissions);
+  const permissionsList = useSelector((state: RootState) => state.employees.permissions);
   const status = useSelector((state: RootState) => state.employees.status);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   // const [jobRoleName, setJobRoleName] = useState<string>(selectedJobRole?.name || '');
   const [activePermissions, setActivePermissions] = useState<string[]>(
@@ -115,7 +137,7 @@ function AddJobRoles() {
     jobRoleAddEditForm.setFieldValue('permissions', activePermissions);
   }, [activePermissions]);
 
-  const tds = permissions.map((permission: Permission) => (
+  const tds = permissionsList.map((permission: Permission) => (
     <Table.Tr key={permission._id}>
       <Table.Td width="30%">
         <Text size="sm">{permission.module}</Text>

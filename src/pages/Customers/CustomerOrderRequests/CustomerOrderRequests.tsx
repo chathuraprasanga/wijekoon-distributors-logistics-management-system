@@ -25,6 +25,7 @@ import {
   setCustomerOrderRequest,
 } from '@/redux/slices/customerSlice';
 import { fetchProducts } from '@/redux/slices/supplierSlice';
+// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function CustomerOrderRequests() {
   const [activePage, setPage] = useState(1);
@@ -37,6 +38,28 @@ function CustomerOrderRequests() {
   );
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   // pagination for main
   const requestsPerPage = 10;
@@ -147,8 +170,12 @@ function CustomerOrderRequests() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
-            <Menu.Item onClick={() => handleEdit(element)}>Edit</Menu.Item>
+            {hasPrivilege('VIEW_CUSTOMER_ORDER_REQUESTS') && (
+              <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+            )}
+            {hasPrivilege('EDIT_CUSTOMER_ORDER_REQUESTS') && (
+              <Menu.Item onClick={() => handleEdit(element)}>Edit</Menu.Item>
+            )}
           </Menu.Dropdown>
         </Menu>
       </Table.Td>
@@ -248,9 +275,11 @@ function CustomerOrderRequests() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Customer Order Requests</Text>
             </div>
-            <Button size="sm" onClick={open}>
-              Create Customer Order Requests
-            </Button>
+            {hasPrivilege('ADD_CUSTOMER_ORDER_REQUESTS') && (
+              <Button size="sm" onClick={open}>
+                Create Customer Order Requests
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

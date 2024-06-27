@@ -25,6 +25,7 @@ import {
   setSupplierOrderRequest,
   fetchProducts,
 } from '@/redux/slices/supplierSlice';
+import { hasAnyPrivilege, hasPrivilege } from '@/helpers/utils/permissionHandler';
 
 function SupplierOrderRequests() {
   const [activePage, setPage] = useState(1);
@@ -37,6 +38,28 @@ function SupplierOrderRequests() {
   );
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   // pagination for main
   const requestsPerPage = 10;
@@ -149,8 +172,10 @@ function SupplierOrderRequests() {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
-            {element.status === 'PENDING' && (
+            {hasPrivilege('VIEW_SUPPLIER_ORDER_REQUESTS') && (
+              <Menu.Item onClick={() => handleView(element)}>View</Menu.Item>
+            )}
+            {element.status === 'PENDING' && hasPrivilege('EDIT_SUPPLIER_ORDER_REQUESTS') && (
               <Menu.Item onClick={() => handleEdit(element)}>Edit</Menu.Item>
             )}
           </Menu.Dropdown>
@@ -252,9 +277,11 @@ function SupplierOrderRequests() {
             <div style={{ display: 'flex', alignContent: 'center' }}>
               <Text style={{ fontWeight: 'bold' }}>Supplier Order Requests</Text>
             </div>
-            <Button size="sm" onClick={open}>
-              Create Supplier Order Requests
-            </Button>
+            {hasPrivilege('ADD_SUPPLIER_ORDER_REQUESTS') && (
+              <Button size="sm" onClick={open}>
+                Create Supplier Order Requests
+              </Button>
+            )}
           </div>
         </Grid.Col>
         <Grid.Col span={12}>

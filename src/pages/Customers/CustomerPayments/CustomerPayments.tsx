@@ -20,6 +20,7 @@ import {
   setUpdateCustomerPayment,
 } from '@/redux/slices/customerSlice';
 import { RootState } from '@/redux/store';
+import { hasAnyPrivilege } from '@/helpers/utils/permissionHandler';
 
 function CustomerPayments() {
   const [activePage, setPage] = useState(1);
@@ -28,6 +29,28 @@ function CustomerPayments() {
   const status = useSelector((state: RootState) => state.customers.status);
   const error = useSelector((state: RootState) => state.customers.error);
   const customerPayments = useSelector((state: RootState) => state.customers.customerPayments);
+
+  // due to the permission handler is not works
+  const permissionsString = localStorage.getItem('permissions');
+  const permissions = permissionsString ? JSON.parse(permissionsString) : [];
+
+  const hasPrivilege = (permission: string) => {
+    try {
+      return permissions.includes(permission);
+    } catch (error) {
+      console.error('Error checking privilege:', error);
+      return false;
+    }
+  };
+
+  const hasAnyPrivilege = (permissionArray: string[]) => {
+    try {
+      return permissionArray.some((permission) => permissions.includes(permission));
+    } catch (error) {
+      console.error('Error checking privileges:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchCustomerPayments());
@@ -98,17 +121,15 @@ function CustomerPayments() {
               <IconDots style={{ cursor: 'pointer' }} />
             </Menu.Target>
 
-            <Menu.Dropdown>
-              {element.status === 'PAID' ? (
-                // <Link to="/admin/customers/view-payments" style={{ textDecoration: 'none' }}>
-                <Menu.Item onClick={() => handleViewPayment(element)}>View Payment</Menu.Item>
-              ) : (
-                // {/* </Link> */}
-                // <Link to="/admin/customers/add-payments" style={{ textDecoration: 'none' }}>
-                <Menu.Item onClick={() => handleNewPayment(element)}>Make Payment</Menu.Item>
-                // </Link>
-              )}
-            </Menu.Dropdown>
+            {hasAnyPrivilege(['VIEW_CUSTOMER_PAYMENTS', 'EDIT_CUSTOMER_PAYMENTS']) && (
+              <Menu.Dropdown>
+                {element.status === 'PAID' ? (
+                  <Menu.Item onClick={() => handleViewPayment(element)}>View Payment</Menu.Item>
+                ) : (
+                  <Menu.Item onClick={() => handleNewPayment(element)}>Make Payment</Menu.Item>
+                )}
+              </Menu.Dropdown>
+            )}
           </Menu>
         </Table.Td>
       </Table.Tr>

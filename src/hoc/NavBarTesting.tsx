@@ -1,5 +1,4 @@
-import { hasAnyPrivilege, hasPrivilege } from '@/helpers/utils/permissionHandler';
-import { NavLink } from '@mantine/core';
+import { Divider, NavLink } from '@mantine/core';
 import {
   IconBuilding,
   IconCash,
@@ -10,19 +9,25 @@ import {
   IconUser,
   IconUserScan,
 } from '@tabler/icons-react';
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-function NavBarTesting() {
-  const dispatch = useDispatch();
-  const [activePath, setActivePath] = useState(window.location.pathname);
+const NavBarTesting = React.memo(() => {
   const location = useLocation();
-  const userDetails = localStorage.getItem('permissions');
+  const [activePath, setActivePath] = useState(location.pathname);
+  const permissions = localStorage.getItem('permissions');
 
   useEffect(() => {
     setActivePath(location.pathname);
-  }, [location.pathname, dispatch]);
+  }, [location.pathname]);
+
+  function hasPermission(permission: any) {
+    return permissions.includes(permission);
+  }
+
+  function hasAnyPermission(inputPermissions: any) {
+    return inputPermissions.some((permission: any) => permissions.includes(permission));
+  }
 
   const customerActivePaths = [
     '/admin/customers',
@@ -43,7 +48,7 @@ function NavBarTesting() {
     '/admin',
   ];
 
-  const suppleirActivePaths = [
+  const supplierActivePaths = [
     '/admin/suppliers',
     '/admin/suppliers/add-edit',
     '/admin/suppliers/view',
@@ -110,18 +115,14 @@ function NavBarTesting() {
   ];
 
   const customers = ['ADD_CUSTOMERS', 'EDIT_CUSTOMERS', 'VIEW_CUSTOMERS', 'DELETE_CUSTOMERS'];
-
   const customerOrderRequests = [
     'ADD_CUSTOMER_ORDER_REQUESTS',
     'EDIT_CUSTOMER_ORDER_REQUESTS',
     'VIEW_CUSTOMER_ORDER_REQUESTS',
   ];
-
   const customerOrders = ['ADD_CUSTOMER_ORDERS', 'VIEW_CUSTOMER_ORDERS'];
-
   const customerPayments = ['EDIT_CUSTOMER_PAYMENTS', 'VIEW_CUSTOMER_PAYMENTS'];
 
-  // Combine all arrays into one
   const allCustomerPermissions = [
     ...customers,
     ...customerOrderRequests,
@@ -130,18 +131,14 @@ function NavBarTesting() {
   ];
 
   const suppliers = ['ADD_SUPPLIERS', 'EDIT_SUPPLIERS', 'VIEW_SUPPLIERS', 'DELETE_SUPPLIERS'];
-
   const products = ['ADD_PRODUCTS', 'EDIT_PRODUCTS', 'VIEW_PRODUCTS', 'DELETE_PRODUCTS'];
-
   const supplierOrderRequests = [
     'ADD_SUPPLIER_ORDER_REQUESTS',
     'EDIT_SUPPLIER_ORDER_REQUESTS',
     'VIEW_SUPPLIER_ORDER_REQUESTS',
     'DELETE_SUPPLIER_ORDER_REQUESTS',
   ];
-
   const supplierOrders = ['ADD_SUPPLIER_ORDERS', 'VIEW_SUPPLIER_ORDERS'];
-
   const supplierPayments = ['EDIT_SUPPLIER_PAYMENTS', 'VIEW_SUPPLIER_PAYMENTS'];
 
   const allSupplierPermissions = [
@@ -153,360 +150,280 @@ function NavBarTesting() {
   ];
 
   const warehouses = ['ADD_WAREHOUSES', 'EDIT_WAREHOUSES', 'VIEW_WAREHOUSES'];
-
   const vehicles = ['ADD_VEHICLES', 'EDIT_VEHICLES', 'VIEW_VEHICLES', 'DELETE_VEHICLES'];
-
   const allAssetsPermissions = [...warehouses, ...vehicles];
 
   const employees = ['ADD_EMPLOYEES', 'EDIT_EMPLOYEES', 'VIEW_EMPLOYEES', 'DELETE_EMPLOYEES'];
-
   const jobRoles = ['ADD_JOB_ROLES', 'EDIT_JOB_ROLES', 'DELETE_JOB_ROLES'];
-
   const allEmployeesPermissions = [...employees, ...jobRoles];
 
   const trips = ['VIEW_TRIPS'];
-
   const expenses = ['ADD_EXPENSES', 'EDIT_EXPENSES', 'VIEW_EXPENSES'];
-
   const allTripsPermissions = [...trips, ...expenses];
 
   const cheques = ['EDIT_CHEQUES'];
-
   const allChequesPermissions = [...cheques];
 
-  return (
-    <>
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          padding: 10,
-          // backgroundColor: '#5E1588',
-          fontWeight: 'bold',
-          color: 'black',
-        }}
-      >
-        <Link to="/admin/dashboard" style={{ textDecoration: 'none' }}>
-          <NavLink
-            style={{ borderRadius: 5 }}
-            label="Dashboard"
-            leftSection={<IconDashboard size="1rem" stroke={1.5} />}
-            color="violet"
-            variant="filled"
-            active={activePath === '/admin/dashboard' || activePath === '/admin'}
-          />
-        </Link>
-
-        {hasAnyPrivilege(allCustomerPermissions) && (
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <NavLink
-              style={{ borderRadius: 5 }}
-              label="Customers"
-              leftSection={<IconUser size="1rem" stroke={1.5} />}
-              variant="filled"
-              color="violet"
-              childrenOffset={28}
-              active={customerActivePaths.includes(activePath)}
-            >
-              {hasAnyPrivilege(customers) && (
-                <Link to="/admin/customers" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Customers"
-                    variant="light"
-                    active={
-                      activePath === '/admin/customers' ||
-                      activePath === '/admin/customers/add-edit' ||
-                      activePath === '/admin/customers/view'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(customerOrderRequests) && (
-                <Link to="/admin/customers/order-requests" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Customer Order Requests"
-                    active={
-                      activePath === '/admin/customers/order-requests' ||
-                      activePath === '/admin/customers/add-order-requests' ||
-                      activePath === '/admin/customers/edit-order-requests' ||
-                      activePath === '/admin/customers/view-order-requests'
-                    }
-                  />
-                </Link>
-              )}
-
-              {hasAnyPrivilege(customerOrders) && (
-                <Link to="/admin/customers/orders" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Customer Orders"
-                    active={
-                      activePath === '/admin/customers/orders' ||
-                      activePath === '/admin/customers/add-orders' ||
-                      activePath === '/admin/customers/edit-orders' ||
-                      activePath === '/admin/customers/view-orders'
-                    }
-                  />
-                </Link>
-              )}
-
-              {hasAnyPrivilege(customerPayments) && (
-                <Link to="/admin/customers/payments" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Customer Payments"
-                    active={
-                      activePath === '/admin/customers/payments' ||
-                      activePath === '/admin/customers/add-payments' ||
-                      activePath === '/admin/customers/edit-payments' ||
-                      activePath === '/admin/customers/view-payments'
-                    }
-                  />
-                </Link>
-              )}
-            </NavLink>
-          </Link>
-        )}
-
-        {hasAnyPrivilege(allSupplierPermissions) && (
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <NavLink
-              style={{ borderRadius: 5 }}
-              label="Suppliers"
-              leftSection={<IconShoppingCart size="1rem" stroke={1.5} />}
-              variant="filled"
-              color="violet"
-              childrenOffset={28}
-              active={suppleirActivePaths.includes(activePath)}
-            >
-              {hasAnyPrivilege(suppliers) && (
-                <Link to="/admin/suppliers" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Suppliers"
-                    active={
-                      activePath === '/admin/suppliers' ||
-                      activePath === '/admin/suppliers/add-edit' ||
-                      activePath === '/admin/suppliers/view'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(products) && (
-                <Link to="/admin/suppliers/products" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Products"
-                    active={
-                      activePath === '/admin/suppliers/products' ||
-                      activePath === '/admin/suppliers/add-edit-products' ||
-                      activePath === '/admin/suppliers/view-products'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(supplierOrderRequests) && (
-                <Link to="/admin/suppliers/order-requests" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Supplier Order Requests"
-                    active={
-                      activePath === '/admin/suppliers/order-requests' ||
-                      activePath === '/admin/suppliers/add-order-requests' ||
-                      activePath === '/admin/suppliers/edit-order-requests' ||
-                      activePath === '/admin/suppliers/view-order-requests'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(supplierOrders) && (
-                <Link to="/admin/suppliers/orders" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Supplier Orders"
-                    active={
-                      activePath === '/admin/suppliers/orders' ||
-                      activePath === '/admin/suppliers/add-orders' ||
-                      activePath === '/admin/suppliers/edit-orders' ||
-                      activePath === '/admin/suppliers/view-orders'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(supplierPayments) && (
-                <Link to="/admin/suppliers/payments" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Supplier Payments"
-                    active={
-                      activePath === '/admin/suppliers/payments' ||
-                      activePath === '/admin/suppliers/add-payments' ||
-                      activePath === '/admin/suppliers/edit-payments' ||
-                      activePath === '/admin/suppliers/view-payments'
-                    }
-                  />
-                </Link>
-              )}
-            </NavLink>
-          </Link>
-        )}
-
-        {hasAnyPrivilege(allAssetsPermissions) && (
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <NavLink
-              style={{ borderRadius: 5 }}
-              label="Assets"
-              leftSection={<IconBuilding size="1rem" stroke={1.5} />}
-              variant="filled"
-              color="violet"
-              childrenOffset={28}
-              active={assetsActivePaths.includes(activePath)}
-            >
-              {hasAnyPrivilege(warehouses) && (
-                <Link to="/admin/assets/warehouses" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Warehouses"
-                    active={
-                      activePath === '/admin/assets/warehouses' ||
-                      activePath === '/admin/assets/view-warehouses' ||
-                      activePath === '/admin/assets/warehouses/stock-receive' ||
-                      activePath === '/admin/assets/warehouses/stock-dispatch' ||
-                      activePath === '/admin/assets/warehouses/add-edit-orders'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(vehicles) && (
-                <Link to="/admin/vehicles" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Vehicles"
-                    active={
-                      activePath === '/admin/vehicles' ||
-                      activePath === '/admin/vehicles/add-edit' ||
-                      activePath === '/admin/vehicles/view'
-                    }
-                  />
-                </Link>
-              )}
-            </NavLink>
-          </Link>
-        )}
-
-        {hasAnyPrivilege(allEmployeesPermissions) && (
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <NavLink
-              style={{ borderRadius: 5 }}
-              label="Employees"
-              leftSection={<IconUserScan size="1rem" stroke={1.5} />}
-              variant="filled"
-              color="violet"
-              childrenOffset={28}
-              active={employeesActivePaths.includes(activePath)}
-            >
-              {hasAnyPrivilege(employees) && (
-                <Link to="/admin/employees" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Employees"
-                    active={
-                      activePath === '/admin/employees' ||
-                      activePath === '/admin/employees/add-edit' ||
-                      activePath === '/admin/employees/view'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(jobRoles) && (
-                <Link to="/admin/jobRoles" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Job Roles"
-                    active={
-                      activePath === '/admin/jobRoles' ||
-                      activePath === '/admin/jobRoles/add-edit' ||
-                      activePath === '/admin/jobRoles/view'
-                    }
-                  />
-                </Link>
-              )}
-            </NavLink>
-          </Link>
-        )}
-
-        {hasAnyPrivilege(allTripsPermissions) && (
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <NavLink
-              style={{ borderRadius: 5 }}
-              label="Trips"
-              leftSection={<IconTruck size="1rem" stroke={1.5} />}
-              variant="filled"
-              color="violet"
-              active={tripsActivePaths.includes(activePath)}
-              childrenOffset={28}
-            >
-              {hasAnyPrivilege(trips) && (
-                <Link to="/admin/trips" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Trips"
-                    active={
-                      activePath === '/admin/trips' ||
-                      activePath === '/admin/trips/add-edit' ||
-                      activePath === '/admin/trips/view'
-                    }
-                  />
-                </Link>
-              )}
-              {hasAnyPrivilege(expenses) && (
-                <Link to="/admin/expenses" style={{ textDecoration: 'none' }}>
-                  <NavLink
-                    style={{ borderRadius: 5 }}
-                    label="Expenses"
-                    active={
-                      activePath === '/admin/expenses/add-edit' ||
-                      activePath === '/admin/expenses/view' ||
-                      activePath === '/admin/expenses'
-                    }
-                  />
-                </Link>
-              )}
-            </NavLink>
-          </Link>
-        )}
-
-        {hasAnyPrivilege(allChequesPermissions) && (
-          <Link to="/admin/cheques" style={{ textDecoration: 'none' }}>
-            <NavLink
-              style={{ borderRadius: 5 }}
-              label="Cheques"
-              color="violet"
-              leftSection={<IconCash size="1rem" stroke={1.5} />}
-              variant="filled"
-              active={chequesActivePaths.includes(activePath)}
-            />
-          </Link>
-        )}
-        <div>
-          <hr style={{ color: 'gray' }} />
-          <div>
-            <Link to="/admin/settings" style={{ textDecoration: 'none' }}>
-              <NavLink
-                style={{ borderRadius: 5 }}
-                label="Settings"
-                color="violet"
-                leftSection={<IconSettings size="1rem" stroke={1.5} />}
-                variant="filled"
-              />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </>
+  const renderNavLink = useCallback(
+    (to: any, label: any, icon: any, activePaths: any, children: any) => (
+      <Link to={to} style={{ textDecoration: 'none' }}>
+        <NavLink
+          style={{ borderRadius: 5 }}
+          label={label}
+          leftSection={icon}
+          color="violet"
+          variant="filled"
+          childrenOffset={28}
+          active={activePaths.includes(activePath)}
+        >
+          {children}
+        </NavLink>
+      </Link>
+    ),
+    [activePath]
   );
-}
+
+  return (
+    <div style={{ width: '100%', height: '100%', padding: 10, fontWeight: 'bold', color: 'black' }}>
+      {renderNavLink(
+        '/admin/dashboard',
+        'Dashboard',
+        <IconDashboard size="1rem" stroke={1.5} />,
+        ['/admin/dashboard', '/admin'],
+        null
+      )}
+
+      {hasAnyPermission(allCustomerPermissions) &&
+        renderNavLink(
+          '/',
+          'Customers',
+          <IconUser size="1rem" stroke={1.5} />,
+          customerActivePaths,
+          <>
+            {hasAnyPermission(customers) &&
+              renderNavLink(
+                '/admin/customers',
+                'Customers',
+                null,
+                ['/admin/customers', '/admin/customers/add-edit', '/admin/customers/view'],
+                null
+              )}
+            {hasAnyPermission(customerOrderRequests) &&
+              renderNavLink(
+                '/admin/customers/order-requests',
+                'Customer Order Requests',
+                null,
+                [
+                  '/admin/customers/order-requests',
+                  '/admin/customers/add-order-requests',
+                  '/admin/customers/edit-order-requests',
+                  '/admin/customers/view-order-requests',
+                ],
+                null
+              )}
+            {hasAnyPermission(customerOrders) &&
+              renderNavLink(
+                '/admin/customers/orders',
+                'Customer Orders',
+                null,
+                [
+                  '/admin/customers/orders',
+                  '/admin/customers/add-orders',
+                  '/admin/customers/edit-orders',
+                  '/admin/customers/view-orders',
+                ],
+                null
+              )}
+            {hasAnyPermission(customerPayments) &&
+              renderNavLink(
+                '/admin/customers/payments',
+                'Customer Payments',
+                null,
+                [
+                  '/admin/customers/payments',
+                  '/admin/customers/add-payments',
+                  '/admin/customers/edit-payments',
+                  '/admin/customers/view-payments',
+                ],
+                null
+              )}
+          </>
+        )}
+
+      {hasAnyPermission(allSupplierPermissions) &&
+        renderNavLink(
+          '/',
+          'Suppliers',
+          <IconShoppingCart size="1rem" stroke={1.5} />,
+          supplierActivePaths,
+          <>
+            {hasAnyPermission(suppliers) &&
+              renderNavLink(
+                '/admin/suppliers',
+                'Suppliers',
+                null,
+                ['/admin/suppliers', '/admin/suppliers/add-edit', '/admin/suppliers/view'],
+                null
+              )}
+            {hasAnyPermission(products) &&
+              renderNavLink(
+                '/admin/suppliers/products',
+                'Products',
+                null,
+                [
+                  '/admin/suppliers/products',
+                  '/admin/suppliers/add-edit-products',
+                  '/admin/suppliers/view-products',
+                ],
+                null
+              )}
+            {hasAnyPermission(supplierOrderRequests) &&
+              renderNavLink(
+                '/admin/suppliers/order-requests',
+                'Supplier Order Requests',
+                null,
+                [
+                  '/admin/suppliers/order-requests',
+                  '/admin/suppliers/add-order-requests',
+                  '/admin/suppliers/edit-order-requests',
+                  '/admin/suppliers/view-order-requests',
+                ],
+                null
+              )}
+            {hasAnyPermission(supplierOrders) &&
+              renderNavLink(
+                '/admin/suppliers/orders',
+                'Supplier Orders',
+                null,
+                [
+                  '/admin/suppliers/orders',
+                  '/admin/suppliers/add-orders',
+                  '/admin/suppliers/edit-orders',
+                  '/admin/suppliers/view-orders',
+                ],
+                null
+              )}
+            {hasAnyPermission(supplierPayments) &&
+              renderNavLink(
+                '/admin/suppliers/payments',
+                'Supplier Payments',
+                null,
+                [
+                  '/admin/suppliers/payments',
+                  '/admin/suppliers/add-payments',
+                  '/admin/suppliers/edit-payments',
+                  '/admin/suppliers/view-payments',
+                ],
+                null
+              )}
+          </>
+        )}
+
+      {hasAnyPermission(allAssetsPermissions) &&
+        renderNavLink(
+          '/',
+          'Assets',
+          <IconBuilding size="1rem" stroke={1.5} />,
+          assetsActivePaths,
+          <>
+            {hasAnyPermission(warehouses) &&
+              renderNavLink(
+                '/admin/assets/warehouses',
+                'Warehouses',
+                null,
+                [
+                  '/admin/assets/warehouses',
+                  '/admin/assets/add-edit-warehouses',
+                  '/admin/assets/view-warehouses',
+                  '/admin/assets/warehouses/stock-receive',
+                  '/admin/assets/warehouses/stock-dispatch',
+                  '/admin/assets/warehouses/add-edit-orders',
+                ],
+                null
+              )}
+            {hasAnyPermission(vehicles) &&
+              renderNavLink(
+                '/admin/vehicles',
+                'Vehicles',
+                null,
+                ['/admin/vehicles', '/admin/vehicles/add-edit', '/admin/vehicles/view'],
+                null
+              )}
+          </>
+        )}
+
+      {hasAnyPermission(allEmployeesPermissions) &&
+        renderNavLink(
+          '/',
+          'Employees',
+          <IconUserScan size="1rem" stroke={1.5} />,
+          employeesActivePaths,
+          <>
+            {hasAnyPermission(employees) &&
+              renderNavLink(
+                '/admin/employees',
+                'Employees',
+                null,
+                ['/admin/employees', '/admin/employees/add-edit', '/admin/employees/view'],
+                null
+              )}
+            {hasAnyPermission(jobRoles) &&
+              renderNavLink(
+                '/admin/jobRoles',
+                'Job Roles',
+                null,
+                ['/admin/jobRoles', '/admin/jobRoles/add-edit', '/admin/jobRoles/view'],
+                null
+              )}
+          </>
+        )}
+
+      {hasAnyPermission(allTripsPermissions) &&
+        renderNavLink(
+          '/',
+          'Trips',
+          <IconTruck size="1rem" stroke={1.5} />,
+          tripsActivePaths,
+          <>
+            {hasAnyPermission(trips) &&
+              renderNavLink(
+                '/admin/trips',
+                'Trips',
+                null,
+                ['/admin/trips', '/admin/trips/add-edit', '/admin/trips/view'],
+                null
+              )}
+            {hasAnyPermission(expenses) &&
+              renderNavLink(
+                '/admin/expenses',
+                'Expenses',
+                null,
+                ['/admin/expenses', '/admin/expenses/add-edit', '/admin/expenses/view'],
+                null
+              )}
+          </>
+        )}
+
+      {hasAnyPermission(allChequesPermissions) &&
+        renderNavLink(
+          '/admin/cheques',
+          'Cheques',
+          <IconCash size="1rem" stroke={1.5} />,
+          chequesActivePaths,
+          null
+        )}
+
+      <Divider></Divider>
+
+      {renderNavLink(
+        '/admin/settings',
+        'Settings',
+        <IconSettings size="1rem" stroke={1.5} />,
+        ['/admin/settings', '/admin'],
+        null
+      )}
+    </div>
+  );
+});
 
 export default NavBarTesting;
