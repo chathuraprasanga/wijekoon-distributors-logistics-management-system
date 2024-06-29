@@ -154,7 +154,7 @@ function ViewWarehouse() {
                 </Table.Td>
                 <Table.Td width="35%">
                   <Text size="sm">
-                    <Badge size="sm" radius="sm" color="green">
+                    <Badge size="xs" radius="xs" color="green">
                       {selectedWarehouse?.status}
                     </Badge>
                   </Text>

@@ -110,7 +110,7 @@ function Vehicles() {
       setOpened(false);
       Notifications.show({
         title: 'Error',
-        message: 'There was an error deleting the vehicle',
+        message: e.message,
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });

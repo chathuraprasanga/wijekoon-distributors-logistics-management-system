@@ -75,6 +75,10 @@ export function CustomerLayout() {
     navigate('/');
   };
 
+  const handleSettings = () => {
+    navigate('/customer/settings');
+  };
+
   return (
     <>
       <div className={classes.header}>
@@ -119,6 +123,7 @@ export function CustomerLayout() {
                   leftSection={
                     <IconSettings style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
                   }
+                  onClick={handleSettings}
                 >
                   Account settings
                 </Menu.Item>

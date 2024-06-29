@@ -43,290 +43,402 @@ const initialState: SuppliersState = {
 
 const accessToken = localStorage.getItem('accessToken');
 
-export const fetchSuppliers = createAsyncThunk('suppliers/fetchSuppliers', async () => {
-  const response = await axios.get('http://localhost:3000/suppliers', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchSuppliers = createAsyncThunk(
+  'suppliers/fetchSuppliers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/suppliers', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const createSupplier = createAsyncThunk(
   'suppliers/createSupplier',
-  async (supplier: any) => {
-    const response = await axios.post('http://localhost:3000/supplier', supplier, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (supplier: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/supplier', supplier, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateSupplier = createAsyncThunk(
   'suppliers/updateSupplier',
-  async (supplier: any) => {
-    const response = await axios.put(`http://localhost:3000/supplier/${supplier.id}`, supplier.data, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (supplier: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/supplier/${supplier.id}`,
+        supplier.data,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteSupplier = createAsyncThunk(
   'suppliers/deleteSupplier',
-  async (supplierId: string) => {
-    await axios.delete(`http://localhost:3000/supplier/${supplierId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return supplierId;
+  async (supplierId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/supplier/${supplierId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return supplierId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
-    const response = await axios.get('http://localhost:3000/products', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  });
-  
-  export const createProduct = createAsyncThunk(
-    'products/createProduct',
-    async (product: any) => {
+export const fetchProducts = createAsyncThunk(
+  'products/fetchProducts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/products', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const createProduct = createAsyncThunk(
+  'products/createProduct',
+  async (product: any, { rejectWithValue }) => {
+    try {
       const response = await axios.post('http://localhost:3000/product', product, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
       return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  );
-  
-  export const updateProduct = createAsyncThunk(
-    'products/updateProducts',
-    async (product: any) => {
-      const response = await axios.put(`http://localhost:3000/product/${product.id}`, product.data, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+  }
+);
+
+export const updateProduct = createAsyncThunk(
+  'products/updateProducts',
+  async (product: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/product/${product.id}`,
+        product.data,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  );
-  
-  export const deleteProduct = createAsyncThunk(
-    'products/deleteProducts',
-    async (productId: string) => {
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  'products/deleteProducts',
+  async (productId: string, { rejectWithValue }) => {
+    try {
       await axios.delete(`http://localhost:3000/product/${productId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
       return productId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
-  );
+  }
+);
 
 export const fetchSupplierOrderRequests = createAsyncThunk(
   'suppliers/fetchSupplierOrderRequests',
-  async () => {
-    const response = await axios.get('http://localhost:3000/supplierOrderRequests', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/supplierOrderRequests', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchConfirmedSupplierOrderRequests = createAsyncThunk(
   'suppliers/fetchConfirmedSupplierOrderRequests',
-  async () => {
-    const response = await axios.get('http://localhost:3000/supplierOrderRequests/confirmed', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/supplierOrderRequests/confirmed', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const createSupplierOrderRequest = createAsyncThunk(
   'suppliers/createSupplierOrderRequest',
-  async (supplierOrderRequest: any) => {
-    const response = await axios.post(
-      'http://localhost:3000/supplierOrderRequest',
-      supplierOrderRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (supplierOrderRequest: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/supplierOrderRequest',
+        supplierOrderRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateSupplierOrderRequest = createAsyncThunk(
   'suppliers/updateSupplierOrderRequest',
-  async (supplierOrderRequest: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/supplierOrderRequest/${supplierOrderRequest.id}`,
-      supplierOrderRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (supplierOrderRequest: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/supplierOrderRequest/${supplierOrderRequest.id}`,
+        supplierOrderRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateSupplierOrderRequestStatus = createAsyncThunk(
   'suppliers/updateSupplierOrderRequestStatus',
-  async (supplierOrderRequest: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/supplierOrderRequest/status/${supplierOrderRequest.id}`,
-      supplierOrderRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (supplierOrderRequest: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/supplierOrderRequest/status/${supplierOrderRequest.id}`,
+        supplierOrderRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const getSupplierOrderRequestById = createAsyncThunk(
   'suppliers/getSupplierOrderRequestById',
-  async (supplierOrderRequestId: string) => {
-    const response = await axios.get(`http://localhost:3000/supplierOrderRequest/${supplierOrderRequestId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (supplierOrderRequestId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/supplierOrderRequest/${supplierOrderRequestId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteSupplierOrderRequest = createAsyncThunk(
   'suppliers/deleteSupplierOrderRequest',
-  async (supplierOrderRequestId: string) => {
-    await axios.delete(`http://localhost:3000/supplierOrderRequests/${supplierOrderRequestId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return supplierOrderRequestId;
+  async (supplierOrderRequestId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/supplierOrderRequests/${supplierOrderRequestId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return supplierOrderRequestId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const fetchSupplierOrders = createAsyncThunk('suppliers/fetchSupplierOrders', async () => {
-  const response = await axios.get('http://localhost:3000/supplierOrders', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchSupplierOrders = createAsyncThunk(
+  'suppliers/fetchSupplierOrders',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/supplierOrders', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const createSupplierOrder = createAsyncThunk(
   'suppliers/createSupplierOrder',
-  async (supplierOrder: any) => {
-    const response = await axios.post('http://localhost:3000/supplierOrder', supplierOrder, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (supplierOrder: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/supplierOrder', supplierOrder, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateSupplierOrder = createAsyncThunk(
   'suppliers/updateSupplierOrder',
-  async (supplierOrder: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/supplierOrders/${supplierOrder.id}`,
-      supplierOrder,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (supplierOrder: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/supplierOrders/${supplierOrder.id}`,
+        supplierOrder,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteSupplierOrder = createAsyncThunk(
   'suppliers/deleteSupplierOrder',
-  async (supplierOrderId: string) => {
-    await axios.delete(`http://localhost:3000/supplierOrders/${supplierOrderId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return supplierOrderId;
+  async (supplierOrderId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/supplierOrders/${supplierOrderId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return supplierOrderId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchSupplierPayments = createAsyncThunk(
   'suppliers/fetchSupplierPayments',
-  async () => {
-    const response = await axios.get('http://localhost:3000/supplierPayments', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/supplierPayments', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const createSupplierPayment = createAsyncThunk(
   'suppliers/createSupplierPayment',
-  async (supplierPayment: any) => {
-    const response = await axios.post('http://localhost:3000/supplierPayments', supplierPayment, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (supplierPayment: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/supplierPayments', supplierPayment, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateSupplierPayment = createAsyncThunk(
   'suppliers/updateSupplierPayment',
-  async (supplierPayment: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/supplierPayment/${supplierPayment._id}`,
-      supplierPayment,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (supplierPayment: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/supplierPayment/${supplierPayment._id}`,
+        supplierPayment,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteSupplierPayment = createAsyncThunk(
   'suppliers/deleteSupplierPayment',
-  async (supplierPaymentId: string) => {
-    await axios.delete(`http://localhost:3000/supplierPayments/${supplierPaymentId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return supplierPaymentId;
+  async (supplierPaymentId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/supplierPayments/${supplierPaymentId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return supplierPaymentId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
@@ -338,7 +450,7 @@ const supplierSlice = createSlice({
       state.supplier = action.payload;
     },
     setProduct: (state, action) => {
-        state.product = action.payload;
+      state.product = action.payload;
     },
     setSupplierOrderRequest: (state, action) => {
       state.supplierOrderRequest = action.payload;
@@ -524,9 +636,7 @@ const supplierSlice = createSlice({
       })
       .addCase(updateSupplierOrder.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        const index = state.supplierOrders.findIndex(
-          (order) => order.id === action.payload.id
-        );
+        const index = state.supplierOrders.findIndex((order) => order.id === action.payload.id);
         if (index !== -1) {
           state.supplierOrders[index] = action.payload;
         }
@@ -540,9 +650,7 @@ const supplierSlice = createSlice({
       })
       .addCase(deleteSupplierOrder.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.supplierOrders = state.supplierOrders.filter(
-          (order) => order.id !== action.payload
-        );
+        state.supplierOrders = state.supplierOrders.filter((order) => order.id !== action.payload);
       })
       .addCase(deleteSupplierOrder.rejected, (state, action) => {
         state.status = 'failed';
@@ -636,11 +744,16 @@ const supplierSlice = createSlice({
       .addCase(fetchConfirmedSupplierOrderRequests.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch supplier order requests';
-      })
+      });
   },
 });
 
-export const { setSupplier, setSupplierOrderRequest, setSupplierOrder, setSupplierPayment, setProduct } =
-  supplierSlice.actions;
+export const {
+  setSupplier,
+  setSupplierOrderRequest,
+  setSupplierOrder,
+  setSupplierPayment,
+  setProduct,
+} = supplierSlice.actions;
 
 export default supplierSlice.reducer;

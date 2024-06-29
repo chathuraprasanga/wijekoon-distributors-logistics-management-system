@@ -331,6 +331,7 @@ function AddSupplierOrders() {
                     onChange={setValue}
                     label="Trip Date"
                     placeholder="Date input"
+                    minDate={new Date()}
                   />
                 </Grid.Col>
                 <Grid.Col span={4}>

@@ -129,7 +129,7 @@ function Customers() {
       setOpened(false);
       Notifications.show({
         title: 'Error',
-        message: 'There was an error deleting the customer',
+        message: e.message,
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });

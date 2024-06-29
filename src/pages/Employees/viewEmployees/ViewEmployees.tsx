@@ -154,7 +154,11 @@ function ViewEmployees() {
             </Table.Td>
             <Table.Td width="100%" display="flex" style={{ justifyContent: 'space-between' }}>
               <Text size="sm">
-                <Badge color={selectedEmployee?.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                <Badge
+                  color={selectedEmployee?.status === 'ACTIVE' ? 'green' : 'red'}
+                  radius="xs"
+                  size="xs"
+                >
                   {selectedEmployee?.status}
                 </Badge>
               </Text>

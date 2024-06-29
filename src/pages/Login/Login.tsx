@@ -49,7 +49,7 @@ function Login() {
     } catch (e: any) {
       Notifications.show({
         title: 'Error',
-        message: 'There was an error login. Contact System Admin',
+        message: e.message,
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });

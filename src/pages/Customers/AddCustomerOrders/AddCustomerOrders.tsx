@@ -80,7 +80,7 @@ function AddCustomerOrders() {
         quantity: '',
         discount: '',
         tax: '',
-        lineTotal: (0).toFixed(2),
+        lineTotal: (0)?.toFixed(2),
       },
     ]);
   };
@@ -122,18 +122,18 @@ function AddCustomerOrders() {
   };
 
   const handleProductChange = (code: string, index: number) => {
-    const product = products.find((p) => p.code === code);
+    const product = products.find((p) => p?.code === code);
     if (product) {
       const updatedRows = rows?.map((row, rowIndex) =>
         rowIndex === index
           ? {
               ...row,
               product: product?._id,
-              productCode: product.code,
-              productName: product.name,
-              productSize: product.size,
-              unitPrice: product.sellingPrice,
-              lineTotal: (0).toFixed(2), // Set initial line total to 0.0
+              productCode: product?.code,
+              productName: product?.name,
+              productSize: product?.size,
+              unitPrice: product?.sellingPrice,
+              lineTotal: (0)?.toFixed(2), // Set initial line total to 0.0
             }
           : row
       );
@@ -184,12 +184,12 @@ function AddCustomerOrders() {
       setRows(
         selectedRequest.order?.map((item: any) => ({
           product: item.product?._id,
-          productCode: item.product.code,
-          productName: item.product.name,
-          productSize: item.product.size?.toString(),
-          unitPrice: item.product.sellingPrice?.toString(),
+          productCode: item.product?.code,
+          productName: item.product?.name,
+          productSize: item.product?.size?.toString(),
+          unitPrice: item.product?.sellingPrice?.toString(),
           quantity: item.quantity?.toString(),
-          discount: item.lineDiscount?.toString(),
+          discount: item?.lineDiscount?.toString(),
           tax: item.lineTax?.toString(),
           lineTotal: item.lineTotal?.toString(),
         }))
@@ -209,10 +209,10 @@ function AddCustomerOrders() {
       formData.customerOrderRequest = selectedRequest._id;
       formData.status = paymentData.status;
       formData.order = rows;
-      formData.subTotal = calculateTotal('lineTotal').toFixed(2);
-      formData.totalDiscount = calculateTotal('discount').toFixed(2);
-      formData.totalTax = calculateTotal('tax').toFixed(2);
-      formData.netTotal = calculateTotal('lineTotal').toFixed(2);
+      formData.subTotal = calculateTotal('lineTotal')?.toFixed(2);
+      formData.totalDiscount = calculateTotal('discount')?.toFixed(2);
+      formData.totalTax = calculateTotal('tax')?.toFixed(2);
+      formData.netTotal = calculateTotal('lineTotal')?.toFixed(2);
       formData.paymentData = paymentData;
 
       await dispatch(createCustomerOrder(formData)).unwrap();
@@ -270,7 +270,7 @@ function AddCustomerOrders() {
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Name:
                   </Table.Td>
-                  <Table.Td>{selectedRequest.customer.fullName}</Table.Td>
+                  <Table.Td>{selectedRequest.customer?.fullName}</Table.Td>
                   <Table.Td>
                     {/* <DatePickerInput
                       rightSection={<IconCalendar />}
@@ -286,20 +286,20 @@ function AddCustomerOrders() {
                     Phone:
                   </Table.Td>
                   <Table.Td>
-                    {selectedRequest.customer.phone} | {selectedRequest.customer.phoneSecondary}
+                    {selectedRequest.customer?.phone} | {selectedRequest.customer?.phoneSecondary}
                   </Table.Td>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Email:
                   </Table.Td>
-                  <Table.Td>{selectedRequest.customer.email}</Table.Td>
+                  <Table.Td>{selectedRequest.customer?.email}</Table.Td>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Td width={150} style={{ fontWeight: 'bold' }}>
                     Address:
                   </Table.Td>
-                  <Table.Td>{selectedRequest.customer.address}</Table.Td>
+                  <Table.Td>{selectedRequest.customer?.address}</Table.Td>
                 </Table.Tr>
               </Table>
             </Card>
@@ -325,8 +325,8 @@ function AddCustomerOrders() {
                         size="xs"
                         placeholder="Select Product"
                         data={products?.map((product) => ({
-                          value: product.code,
-                          label: product.code,
+                          value: product?.code,
+                          label: product?.code,
                         }))}
                         value={row.productCode}
                         onChange={(code) => handleProductChange(code, index)}

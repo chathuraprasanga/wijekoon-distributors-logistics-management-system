@@ -24,55 +24,94 @@ const initialState: ChequeState = {
 const accessToken = localStorage.getItem('accessToken');
 
 // Async thunks for backend interactions
-export const fetchCheques = createAsyncThunk('cheques/fetchCheques', async () => {
-  const response = await axios.get('http://localhost:3000/cheques', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
-
-export const fetchPendingCheques = createAsyncThunk('cheques/fetchPendingCheques', async () => {
-  const response = await axios.get('http://localhost:3000/cheques/pending', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
-
-export const createCheque = createAsyncThunk('cheques/createCheques', async (cheque: any) => {
-  const response = await axios.post('http://localhost:3000/cheque', cheque);
-  return response.data;
-});
-
-export const updateCheque = createAsyncThunk('cheques/updateCheques', async (cheque: any) => {
-  const response = await axios.put(`http://localhost:3000/cheque/${cheque.id}`, cheque);
-  return response.data;
-});
-
-export const getPagedCheques = createAsyncThunk(
-  'cheques/getPagedCheques',
-  async ({ page, pageSize }: { page: number; pageSize: number }) => {
-    const response = await axios.get('http://localhost:3000/cheques', {
-      params: { _page: page, _limit: pageSize },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+export const fetchCheques = createAsyncThunk(
+  'cheques/fetchCheques',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/cheques', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const getChequeById = createAsyncThunk('cheques/getChequeById', async (chequeId: string) => {
-  const response = await axios.get(`http://localhost:3000/cheques/${chequeId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchPendingCheques = createAsyncThunk(
+  'cheques/fetchPendingCheques',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/cheques/pending', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const createCheque = createAsyncThunk(
+  'cheques/createCheques',
+  async (cheque: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/cheque', cheque);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const updateCheque = createAsyncThunk(
+  'cheques/updateCheques',
+  async (cheque: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/cheque/${cheque.id}`, cheque);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const getPagedCheques = createAsyncThunk(
+  'cheques/getPagedCheques',
+  async ({ page, pageSize }: { page: number; pageSize: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/cheques', {
+        params: { _page: page, _limit: pageSize },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const getChequeById = createAsyncThunk(
+  'cheques/getChequeById',
+  async (chequeId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/cheques/${chequeId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 const chequeSlice: any = createSlice({
   name: 'cheques',

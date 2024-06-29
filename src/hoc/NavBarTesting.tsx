@@ -114,6 +114,12 @@ const NavBarTesting = React.memo(() => {
     '/admin',
   ];
 
+  const settingsActivePaths = [
+    '/admin/settings',
+    '/admin/settings/profile',
+    '/admin',
+  ];
+
   const customers = ['ADD_CUSTOMERS', 'EDIT_CUSTOMERS', 'VIEW_CUSTOMERS', 'DELETE_CUSTOMERS'];
   const customerOrderRequests = [
     'ADD_CUSTOMER_ORDER_REQUESTS',
@@ -419,7 +425,7 @@ const NavBarTesting = React.memo(() => {
         '/admin/settings',
         'Settings',
         <IconSettings size="1rem" stroke={1.5} />,
-        ['/admin/settings', '/admin'],
+        settingsActivePaths,
         null
       )}
     </div>

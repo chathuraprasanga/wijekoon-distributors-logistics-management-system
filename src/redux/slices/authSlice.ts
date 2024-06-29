@@ -55,12 +55,9 @@ export const login = createAsyncThunk(
       });
       return response.data;
     } catch (error: any) {
-      // Check if the error is due to invalid credentials or other issues
       if (error.response && error.response.status === 401) {
-        // If the error is specifically about invalid credentials, throw an error
         throw new Error('Invalid credentials');
       } else {
-        // For other types of errors, use rejectWithValue to specify the error message
         return rejectWithValue(error.response?.data || 'Something went wrong');
       }
     }
@@ -83,14 +80,28 @@ export const forgotPassword = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      // Check if the error is due to invalid email or other issues
       if (error.response && error.response.status === 400) {
-        // If the error is specifically about an invalid email, throw an error
         throw new Error('Email not found');
       } else {
-        // For other types of errors, use rejectWithValue to specify the error message
         return rejectWithValue(error.response?.data || 'Something went wrong');
       }
+    }
+  }
+);
+
+export const changeUserPassword = createAsyncThunk(
+  'users/changePassword',
+  async ({ userId, email, currentPassword, newPassword }: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`http://localhost:3000/change-password`, {
+        newPassword,
+        userId,
+        email,
+        currentPassword,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
     }
   }
 );
@@ -167,6 +178,18 @@ const authSlice = createSlice({
       .addCase(forgotPassword.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Forgot Password failed';
+      })
+      .addCase(changeUserPassword.pending, (state, action) => {
+        state.status = 'loading';
+      })
+      .addCase(changeUserPassword.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.message = action.payload.message;
+      })
+
+      .addCase(changeUserPassword.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Change Password failed';
       });
   },
 });

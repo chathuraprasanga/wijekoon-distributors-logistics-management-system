@@ -22,7 +22,7 @@ const PaymentModal = ({ customerOrder, totalPayable, opened, onClose }) => {
   const [payments, setPayments] = useState<RowData[]>([
     // { method: 'Cash', bank: '', branch: '', chequeNumber: '', depositDate: null, amount: '' },
   ]);
-  const [outstanding, setOutstanding] = useState(totalPayable.toFixed(2));
+  const [outstanding, setOutstanding] = useState(totalPayable?.toFixed(2));
   const [dates, setDates] = useState<Date[]>([]);
   console.log(payments, outstanding, dates);
   const dispatch = useDispatch();

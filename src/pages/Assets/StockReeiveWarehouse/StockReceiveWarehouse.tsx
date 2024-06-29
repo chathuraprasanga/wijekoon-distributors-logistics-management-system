@@ -115,8 +115,9 @@ function StockReceiveWarehouse() {
     }
   };
 
-  const modalData = displayedTrips?.map((element, index) => (
-    <>
+  const modalData = displayedTrips
+    ?.filter((element) => element.status === 'ACTIVE')
+    .map((element) => (
       <Table.Tr key={element.tripId}>
         <Table.Td>{element?.tripId}</Table.Td>
         <Table.Td>{element?.createdAt?.split('T')[0]}</Table.Td>
@@ -125,16 +126,12 @@ function StockReceiveWarehouse() {
         <Table.Td>{element?.quantity}</Table.Td>
         <Table.Td>{element?.supplierOrder?.supplierOrderRequest?.totalSize} KG</Table.Td>
         <Table.Td>
-          {/* <Link to="/admin/customers/add-orders"> */}
           <Button size="xs" onClick={() => handleSelect(element)}>
             Select
           </Button>
-          {/* </Link> */}
         </Table.Td>
       </Table.Tr>
-    </>
-  ));
-  console.log(trip);
+    ));
 
   return (
     <>

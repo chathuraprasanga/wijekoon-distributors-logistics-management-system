@@ -179,8 +179,8 @@ function ViewCustomerOrderRequests() {
                   </Table.Td>
                   <Table.Td width="35%">
                     <Badge
-                      size="sm"
-                      radius="sm"
+                      size="xs"
+                      radius="xs"
                       color={(() => {
                         switch (selectedRequest.status) {
                           case 'PENDING':
@@ -222,14 +222,14 @@ function ViewCustomerOrderRequests() {
                 {selectedRequest.order.map((item: any, index: any) => (
                   <React.Fragment key={index}>
                     <Table.Tr>
-                      <Table.Td>{item.product.code}</Table.Td>
-                      <Table.Td>{item.product.name}</Table.Td>
-                      <Table.Td>{item.product.size} KG</Table.Td>
-                      <Table.Td>{item.product.sellingPrice.toFixed(2)}</Table.Td>
-                      <Table.Td>{item.quantity}</Table.Td>
-                      <Table.Td>{item.lineDiscount}%</Table.Td>
-                      <Table.Td>{item.lineTax}%</Table.Td>
-                      <Table.Td>{item.lineTotal.toFixed(2)}</Table.Td>
+                      <Table.Td>{item.product?.code}</Table.Td>
+                      <Table.Td>{item.product?.name}</Table.Td>
+                      <Table.Td>{item.product?.size} KG</Table.Td>
+                      <Table.Td>{item.product?.sellingPrice.toFixed(2)}</Table.Td>
+                      <Table.Td>{item?.quantity}</Table.Td>
+                      <Table.Td>{item?.lineDiscount}%</Table.Td>
+                      <Table.Td>{item?.lineTax}%</Table.Td>
+                      <Table.Td>{item?.lineTotal.toFixed(2)}</Table.Td>
                     </Table.Tr>
                   </React.Fragment>
                 ))}

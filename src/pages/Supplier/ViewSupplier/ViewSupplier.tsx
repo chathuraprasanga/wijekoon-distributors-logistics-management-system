@@ -97,7 +97,7 @@ function ViewSupplier() {
             </Table.Td>
             <Table.Td>
               <Text>
-                <Badge color={supplier.status === 'ACTIVE' ? 'green' : 'red'} radius="sm" size="xs">
+                <Badge color={supplier.status === 'ACTIVE' ? 'green' : 'red'} radius="xs" size="xs">
                   {supplier?.status}
                 </Badge>
               </Text>
