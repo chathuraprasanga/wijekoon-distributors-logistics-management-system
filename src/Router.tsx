@@ -77,6 +77,8 @@ import { NotFoundImage } from './components/NothingFoundImage/NothingFoundImag';
 import { NothingFoundBackground } from './components/404/NothingFoundBackground';
 import PrivacyPolicy from './pages/CustomerPortal/pages/PrivacyPolicy';
 import TermsOfUse from './pages/CustomerPortal/pages/TermsOfUse';
+import Profile from './pages/Settings/Profile/Profile';
+import CustomerSettings from './pages/CustomerPortal/pages/CustomerSettings';
 
 const router = createBrowserRouter([
   {
@@ -150,8 +152,12 @@ const router = createBrowserRouter([
         element: <CustomerCheques />,
       },
       {
+        path: 'settings',
+        element: <CustomerSettings />,
+      },
+      {
         path: '*',
-        element: <NotFoundImage />
+        element: <NotFoundImage />,
       },
     ],
   },
@@ -382,6 +388,10 @@ const router = createBrowserRouter([
       {
         path: 'settings',
         element: <Settings />,
+      },
+      {
+        path: 'settings/profile',
+        element: <Profile />,
       },
       // {
       //   path: 'customerOrder/addPayment',

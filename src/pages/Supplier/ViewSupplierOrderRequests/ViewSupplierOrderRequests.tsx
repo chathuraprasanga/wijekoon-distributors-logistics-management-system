@@ -182,7 +182,7 @@ function ViewSupplierOrderRequests() {
                   <Table.Td width="35%">
                     <Badge
                       size="xs"
-                      radius="sm"
+                      radius="xs"
                       color={(() => {
                         switch (selectedRequest?.status) {
                           case 'PENDING':

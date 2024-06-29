@@ -33,14 +33,12 @@ function ForgotPassword() {
   const handleSubmit = async (values: typeof forgotPasswordForm.values) => {
     try {
       await dispatch(forgotPassword(values)).unwrap();
-      if (error === null) {
-        Notifications.show({
-          title: 'Successful',
-          message: 'Check your Email',
-          icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-        });
-        navigate('/');
-      }
+      Notifications.show({
+        title: 'Successful',
+        message: 'Credentials Send, Check your Email',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      navigate('/admin-login');
     } catch (e: any) {
       Notifications.show({
         title: 'Error',
@@ -106,7 +104,7 @@ function ForgotPassword() {
             </Button>
 
             <p style={{ fontSize: 12 }}>
-              Go to login <Link to="/">click here</Link>
+              Go to login <Link to="/admin-login">click here</Link>
             </p>
           </Card>
         </form>

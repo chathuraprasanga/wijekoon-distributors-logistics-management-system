@@ -96,12 +96,16 @@ function ViewVehicles() {
               <Table.Tr>
                 <Table.Td width="20%">
                   <Text size="sm" fw="bold">
-                    status:
+                    Status:
                   </Text>
                 </Table.Td>
                 <Table.Td width="30%">
                   <Text size="sm">
-                    <Badge color={vehicle.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                    <Badge
+                      color={vehicle.status === 'ACTIVE' ? 'green' : 'red'}
+                      radius="xs"
+                      size="xs"
+                    >
                       {vehicle?.status}
                     </Badge>
                   </Text>

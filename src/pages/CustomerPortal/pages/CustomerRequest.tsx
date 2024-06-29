@@ -134,7 +134,7 @@ function CustomerRequest() {
     } catch (e: any) {
       Notifications.show({
         title: 'Error',
-        message: 'There was an error creating customer Request',
+        message: e.message,
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });

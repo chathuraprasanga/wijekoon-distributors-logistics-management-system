@@ -43,6 +43,7 @@ function CustomerLogin() {
       await dispatch(customerLogin(values)).unwrap();
       navigate('/customer/dashboard');
     } catch (e: any) {
+      console.log(e);
       Notifications.show({
         title: 'Error',
         message: e.message,

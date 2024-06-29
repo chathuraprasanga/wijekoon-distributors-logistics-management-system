@@ -105,7 +105,7 @@ const JobRoles: React.FC = () => {
       setOpened(false);
       Notifications.show({
         title: 'Error',
-        message: 'There was an error deleting the job role',
+        message: e.message,
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });

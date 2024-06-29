@@ -104,7 +104,11 @@ function ViewCustomers() {
             </Table.Td>
             <Table.Td>
               <Text>
-                <Badge color={customer?.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                <Badge
+                  color={customer?.status === 'ACTIVE' ? 'green' : 'red'}
+                  radius="xs"
+                  size="xs"
+                >
                   {customer?.status}
                 </Badge>
               </Text>

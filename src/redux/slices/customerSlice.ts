@@ -15,7 +15,7 @@ interface CustomersState {
   customerPayments: any[];
   pagedCustomerPayments: any[];
   customerPayment: any | null;
-  updateCustomerPayment: any| null;
+  updateCustomerPayment: any | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -40,222 +40,295 @@ const initialState: CustomersState = {
 };
 
 const accessToken = localStorage.getItem('accessToken');
-
-export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async () => {
-  const response = await axios.get('http://localhost:3000/customers', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchCustomers = createAsyncThunk(
+  'customers/fetchCustomers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/customers', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const createCustomer = createAsyncThunk(
   'customers/createCustomer',
-  async (customer: any) => {
-    const response = await axios.post('http://localhost:3000/customer', customer, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (customer: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/customer', customer, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateCustomer = createAsyncThunk(
   'customers/updateCustomer',
-  async (customer: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/customer/${customer.id}`,
-      customer.data,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (customer: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/customer/${customer.id}`,
+        customer.data,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteCustomer = createAsyncThunk(
   'customers/deleteCustomer',
-  async (customerId: string) => {
-    await axios.delete(`http://localhost:3000/customer/${customerId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return customerId;
+  async (customerId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/customer/${customerId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return customerId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchCustomerOrderRequests = createAsyncThunk(
   'customers/fetchCustomerOrderRequests',
-  async () => {
-    const response = await axios.get('http://localhost:3000/customerOrderRequests', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/customerOrderRequests', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchConfirmedCustomerOrderRequests = createAsyncThunk(
   'customers/fetchConfirmedCustomerOrderRequests',
-  async () => {
-    const response = await axios.get('http://localhost:3000/customerOrderRequestsConfiremed', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/customerOrderRequestsConfirmed', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const createCustomerOrderRequest = createAsyncThunk(
   'customers/createCustomerOrderRequest',
-  async (customerOrderRequest: any) => {
-    const response = await axios.post(
-      'http://localhost:3000/customerOrderRequest',
-      customerOrderRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (customerOrderRequest: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/customerOrderRequest',
+        customerOrderRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateCustomerOrderRequest = createAsyncThunk(
   'customers/updateCustomerOrderRequest',
-  async (customerOrderRequest: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/customerOrderRequest/${customerOrderRequest.id}`,
-      customerOrderRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (customerOrderRequest: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/customerOrderRequest/${customerOrderRequest.id}`,
+        customerOrderRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteCustomerOrderRequest = createAsyncThunk(
   'customers/deleteCustomerOrderRequest',
-  async (customerOrderRequestId: string) => {
-    await axios.delete(`http://localhost:3000/customerOrderRequest/${customerOrderRequestId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return customerOrderRequestId;
+  async (customerOrderRequestId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/customerOrderRequest/${customerOrderRequestId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return customerOrderRequestId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const fetchCustomerOrders = createAsyncThunk('customers/fetchCustomerOrders', async () => {
-  const response = await axios.get('http://localhost:3000/customerOrders', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchCustomerOrders = createAsyncThunk(
+  'customers/fetchCustomerOrders',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/customerOrders', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const createCustomerOrder = createAsyncThunk(
   'customers/createCustomerOrder',
-  async (customerOrder: any) => {
-    const response = await axios.post('http://localhost:3000/customerOrder', customerOrder, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (customerOrder: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/customerOrder', customerOrder, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateCustomerOrder = createAsyncThunk(
   'customers/updateCustomerOrder',
-  async (customerOrder: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/customerOrder/${customerOrder.id}`,
-      customerOrder,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (customerOrder: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/customerOrder/${customerOrder.id}`,
+        customerOrder,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteCustomerOrder = createAsyncThunk(
   'customers/deleteCustomerOrder',
-  async (customerOrderId: string) => {
-    await axios.delete(`http://localhost:3000/customerOrder/${customerOrderId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return customerOrderId;
+  async (customerOrderId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/customerOrder/${customerOrderId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return customerOrderId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchCustomerPayments = createAsyncThunk(
   'customers/fetchCustomerPayments',
-  async () => {
-    const response = await axios.get('http://localhost:3000/customerPayments', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/customerPayments', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const createCustomerPayment = createAsyncThunk(
   'customers/createCustomerPayment',
-  async (customerPayment: any) => {
-    const response = await axios.post('http://localhost:3000/customerPayments', customerPayment, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (customerPayment: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/customerPayments', customerPayment, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateCustomerPayment = createAsyncThunk(
   'customers/updateCustomerPayment',
-  async (customerPayment: any) => {
-    const response = await axios.put(
-      `http://localhost:3000/customerPayment/${customerPayment._id}`,
-      customerPayment,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (customerPayment: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/customerPayment/${customerPayment._id}`,
+        customerPayment,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteCustomerPayment = createAsyncThunk(
   'customers/deleteCustomerPayment',
-  async (customerPaymentId: string) => {
-    await axios.delete(`http://localhost:3000/customerPayments/${customerPaymentId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return customerPaymentId;
+  async (customerPaymentId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/customerPayments/${customerPaymentId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return customerPaymentId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
@@ -493,7 +566,12 @@ const customerSlice = createSlice({
   },
 });
 
-export const { setCustomer, setCustomerOrderRequest, setCustomerOrder, setCustomerPayment, setUpdateCustomerPayment } =
-  customerSlice.actions;
+export const {
+  setCustomer,
+  setCustomerOrderRequest,
+  setCustomerOrder,
+  setCustomerPayment,
+  setUpdateCustomerPayment,
+} = customerSlice.actions;
 
 export default customerSlice.reducer;

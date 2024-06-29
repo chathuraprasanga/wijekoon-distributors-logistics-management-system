@@ -78,92 +78,159 @@ const accessToken = localStorage.getItem('accessToken');
 
 export const createCustomerinCustomerPortal = createAsyncThunk(
   'customers/createCustomerInCustomerPortal',
-  async (customer: any) => {
-    const response = await axios.post('http://localhost:3000/customer', customer, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  }
-);
-
-export const fetchCustomerProducts = createAsyncThunk('products/fetchProducts', async () => {
-  const response = await axios.get('http://localhost:3000/products', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
-
-export const createCustomerOrderRequestCP = createAsyncThunk(
-  'customers/createCustomerOrderRequestCP',
-  async (customerOrderRequest: any) => {
-    const response = await axios.post(
-      'http://localhost:3000/customerOrderRequest',
-      customerOrderRequest,
-      {
+  async (customer: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/customer', customer, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      }
-    );
-    return response.data;
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const fetchCustomerProducts = createAsyncThunk(
+  'products/fetchProducts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/products', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const createCustomerOrderRequestCP = createAsyncThunk(
+  'customers/createCustomerOrderRequestCP',
+  async (customerOrderRequest: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/customerOrderRequest',
+        customerOrderRequest,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchCustomerOrderRequestsById = createAsyncThunk(
   'customerOrderRequests/fetchById',
-  async (customerId: string) => {
-    const response = await axios.get(
-      `http://localhost:3000/customerOrderRequestsById/${customerId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (customerId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/customerOrderRequestsById/${customerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchCustomerPaymentsById = createAsyncThunk(
   'customerPayments/fetchById',
-  async (customerId: string) => {
-    const response = await axios.get(`http://localhost:3000/customerPaymentsById/${customerId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (customerId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/customerPaymentsById/${customerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchCustomerOrdersById = createAsyncThunk(
   'customerOrders/fetchById',
-  async (customerId: string) => {
-    const response = await axios.get(`http://localhost:3000/customerOrdersById/${customerId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (customerId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/customerOrdersById/${customerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const changeCustomerPassword = createAsyncThunk(
+  'customer/changePassword',
+  async (
+    { customerId, email, currentPassword, newPassword }: any,
+    { getState, rejectWithValue }
+  ) => {
+    const state = getState() as { auth: { accessToken: string } };
+    const accessToken = state.auth.accessToken;
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/changePassword',
+        {
+          customerId,
+          email,
+          currentPassword,
+          newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const fetchCustomerChequesByCustomerId = createAsyncThunk(
   'customerCheques/fetchByCustomerId',
-  async (customerId: string) => {
-    const response = await axios.get(
-      `http://localhost:3000/customerChequesByCustomerId/${customerId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
+  async (customerId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/customerChequesByCustomerId/${customerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
@@ -297,6 +364,17 @@ const customerPortalSlice = createSlice({
       .addCase(fetchCustomerChequesByCustomerId.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch customer order requests';
+      })
+      .addCase(changeCustomerPassword.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(changeCustomerPassword.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.message = action.payload.message;
+      })
+      .addCase(changeCustomerPassword.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
       });
   },
 });

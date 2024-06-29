@@ -120,16 +120,16 @@ function AddEditCustomerOrderRequests() {
   };
 
   const handleProductChange = (code: string, index: number) => {
-    const product = products.find((p) => p.code === code);
+    const product = products.find((p) => p?.code === code);
     if (product) {
       const updatedRows = rows?.map((row, rowIndex) =>
         rowIndex === index
           ? {
               ...row,
               product: product?._id,
-              productCode: product.code,
-              productName: product.name,
-              productSize: product.size,
+              productCode: product?.code,
+              productName: product?.name,
+              productSize: product?.size,
               unitPrice: product.sellingPrice,
               lineTotal: (0).toFixed(2), // Set initial line total to 0.0
             }
@@ -253,10 +253,10 @@ function AddEditCustomerOrderRequests() {
       setRows(
         selectedCustomerOrderRequest.order?.map((item) => ({
           product: item.product?._id,
-          productCode: item.product.code,
-          productName: item.product.name,
-          productSize: item.product.size?.toString(),
-          unitPrice: item.product.sellingPrice?.toString(),
+          productCode: item.product?.code,
+          productName: item.product?.name,
+          productSize: item.product?.size?.toString(),
+          unitPrice: item.product?.sellingPrice?.toString(),
           quantity: item.quantity?.toString(),
           lineDiscount: item.lineDiscount?.toString(),
           lineTax: item.lineTax?.toString(),
@@ -312,6 +312,7 @@ function AddEditCustomerOrderRequests() {
                           rightSection={<IconCalendar />}
                           size="xs"
                           placeholder="Pick expected date"
+                          minDate={new Date()}
                           value={value}
                           onChange={setValue}
                         />
@@ -346,6 +347,7 @@ function AddEditCustomerOrderRequests() {
                           rightSection={<IconCalendar />}
                           size="xs"
                           placeholder="Pick expected date"
+                          minDate={new Date()}
                           value={
                             value ||
                             (selectedCustomerOrderRequest?.expectedDate
@@ -394,8 +396,8 @@ function AddEditCustomerOrderRequests() {
                         size="xs"
                         placeholder="Select Product"
                         data={products?.map((product) => ({
-                          value: product.code,
-                          label: product.code,
+                          value: product?.code,
+                          label: product?.code,
                         }))}
                         value={row.productCode}
                         onChange={(code) => handleProductChange(code, index)}

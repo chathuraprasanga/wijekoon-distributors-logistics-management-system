@@ -27,127 +27,197 @@ const initialState: AssetsState = {
 
 const accessToken = localStorage.getItem('accessToken');
 
-export const fetchWarehouses = createAsyncThunk('assets/fetchWarehouses', async () => {
-  const response = await axios.get('http://localhost:3000/warehouses', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchWarehouses = createAsyncThunk(
+  'assets/fetchWarehouses',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/warehouses', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const createWarehouse = createAsyncThunk(
   'assets/createWarehouse',
-  async (warehouse: any) => {
-    const response = await axios.post('http://localhost:3000/warehouse', warehouse);
-    return response.data;
+  async (warehouse: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/warehouse', warehouse);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateWarehouse = createAsyncThunk(
   'assets/updateWarehouse',
-  async (warehouse: any) => {
-    const response = await axios.put(`http://localhost:3000/warehouse/${warehouse._id}`, warehouse);
-    return response.data;
+  async (warehouse: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/warehouse/${warehouse.id}`, warehouse);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const getPagedWarehouses = createAsyncThunk(
   'assets/getPagedWarehouses',
-  async ({ page, pageSize }: { page: number; pageSize: number }) => {
-    const response = await axios.get('http://localhost:3000/warehouses', {
-      params: { _page: page, _limit: pageSize },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async ({ page, pageSize }: { page: number; pageSize: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/warehouses', {
+        params: { _page: page, _limit: pageSize },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const fetchVehicles = createAsyncThunk('assets/fetchVehicles', async () => {
-  const response = await axios.get('http://localhost:3000/vehicles', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchVehicles = createAsyncThunk(
+  'assets/fetchVehicles',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/vehicles', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
-export const fetchAllActiveLorries = createAsyncThunk('assets/fetchAllActiveLorries', async () => {
-  const response = await axios.get('http://localhost:3000/vehicles/active-lorries', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const fetchAllActiveLorries = createAsyncThunk(
+  'assets/fetchAllActiveLorries',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/vehicles/active-lorries', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
-export const createVehicle = createAsyncThunk('assets/createVehicle', async (vehicle: any) => {
-  const response = await axios.post('http://localhost:3000/vehicle', vehicle);
-  return response.data;
-});
+export const createVehicle = createAsyncThunk(
+  'assets/createVehicle',
+  async (vehicle: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/vehicle', vehicle);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
-export const updateVehicle = createAsyncThunk('assets/updateVehicle', async (vehicle: any) => {
-  const response = await axios.put(`http://localhost:3000/vehicle/${vehicle._id}`, vehicle);
-  return response.data;
-});
+export const updateVehicle = createAsyncThunk(
+  'assets/updateVehicle',
+  async (vehicle: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/vehicle/${vehicle._id}`, vehicle);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const getPagedVehicles = createAsyncThunk(
   'assets/getPagedVehicles',
-  async ({ page, pageSize }: { page: number; pageSize: number }) => {
-    const response = await axios.get('http://localhost:3000/vehicles', {
-      params: { _page: page, _limit: pageSize },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async ({ page, pageSize }: { page: number; pageSize: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/vehicles', {
+        params: { _page: page, _limit: pageSize },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteWarehouse = createAsyncThunk(
   'assets/deleteWarehouse',
-  async (warehouseId: string) => {
-    const response = await axios.delete(`http://localhost:3000/warehouse/${warehouseId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (warehouseId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/warehouse/${warehouseId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const deleteVehicle = createAsyncThunk('assets/deleteVehicle', async (vehicleId: string) => {
-  const response = await axios.delete(`http://localhost:3000/vehicle/${vehicleId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const deleteVehicle = createAsyncThunk(
+  'assets/deleteVehicle',
+  async (vehicleId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/vehicle/${vehicleId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const getWarehouseById = createAsyncThunk(
   'assets/getWarehouseById',
-  async (warehouseId: string) => {
-    const response = await axios.get(`http://localhost:3000/warehouse/${warehouseId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (warehouseId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/warehouse/${warehouseId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const getVehicleById = createAsyncThunk(
   'assets/getVehicleById',
-  async (vehicleId: string) => {
-    const response = await axios.get(`http://localhost:3000/vehicle/${vehicleId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (vehicleId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/vehicle/${vehicleId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 

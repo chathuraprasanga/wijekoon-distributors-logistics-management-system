@@ -32,107 +32,155 @@ const initialState: EmployeeState = {
 const accessToken = localStorage.getItem('accessToken');
 
 // Async thunks for backend interactions
-export const fetchEmployees = createAsyncThunk('employees/fetchEmployees', async () => {
-  const response = await axios.get('http://localhost:3000/employees', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
+export const fetchEmployees = createAsyncThunk('employees/fetchEmployees', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get('http://localhost:3000/employees', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || 'Something went wrong');
+  }
 });
 
-export const fetchDriverEmployees = createAsyncThunk('employees/fetchDriverEmployees', async () => {
-  const response = await axios.get('http://localhost:3000/employees/drivers', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
+export const fetchDriverEmployees = createAsyncThunk('employees/fetchDriverEmployees', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get('http://localhost:3000/employees/drivers', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const createEmployee = createAsyncThunk(
   'employees/createEmployee',
-  async (employee: any) => {
-    const response = await axios.post('http://localhost:3000/employee', employee);
-    return response.data;
+  async (employee: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/employee', employee);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const getPagedEmployees = createAsyncThunk(
   'employees/getPagedEmployees',
-  async ({ page, pageSize }: { page: number; pageSize: number }) => {
-    const response = await axios.get('http://localhost:3000/employees', {
-      params: { _page: page, _limit: pageSize },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async ({ page, pageSize }: { page: number; pageSize: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/employees', {
+        params: { _page: page, _limit: pageSize },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const deleteEmployee = createAsyncThunk(
   'employees/deleteEmployee',
-  async (employeeId: string) => {
-    await axios.delete(`http://localhost:3000/employee/${employeeId}`);
-    return employeeId;
+  async (employeeId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/employee/${employeeId}`);
+      return employeeId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
 export const updateEmployee = createAsyncThunk(
   'employees/updateEmployee',
-  async (employee: any) => {
-    const response = await axios.put(`http://localhost:3000/employee/${employee.id}`, employee, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+  async (employee: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/employee/${employee.id}`, employee, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const fetchJobRoles = createAsyncThunk('employees/fetchJobRoles', async () => {
-  const response = await axios.get('http://localhost:3000/jobRoles');
-  return response.data;
+export const fetchJobRoles = createAsyncThunk('employees/fetchJobRoles', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get('http://localhost:3000/jobRoles');
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || 'Something went wrong');
+  }
 });
 
-export const createJobRole = createAsyncThunk('employees/createJobRole', async (jobRole: any) => {
-  const response = await axios.post('http://localhost:3000/jobRole', jobRole);
-  return response.data;
+export const createJobRole = createAsyncThunk('employees/createJobRole', async (jobRole: any, { rejectWithValue }) => {
+  try {
+    const response = await axios.post('http://localhost:3000/jobRole', jobRole);
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const deleteJobRole = createAsyncThunk(
   'employees/deleteJobRole',
-  async (jobRoleId: string) => {
-    await axios.delete(`http://localhost:3000/jobRole/${jobRoleId}`);
-    return jobRoleId;
+  async (jobRoleId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`http://localhost:3000/jobRole/${jobRoleId}`);
+      return jobRoleId;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const updateJobRole = createAsyncThunk('employees/updateJobRole', async (jobRole: any) => {
-  const response = await axios.put(`http://localhost:3000/jobRole/${jobRole.id}`, jobRole, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
-
-export const fetchPermissions = createAsyncThunk('employees/fetchPermissions', async () => {
-  const response = await axios.get('http://localhost:3000/permissions');
-  return response.data;
-});
-
-export const getPagedJobRoles = createAsyncThunk(
-  'jobRoles/getPagedJobRoles',
-  async ({ page, pageSize }: { page: number; pageSize: number }) => {
-    const response = await axios.get('http://localhost:3000/jobRoles', {
-      params: { _page: page, _limit: pageSize },
+export const updateJobRole = createAsyncThunk('employees/updateJobRole', async (jobRole: any, { rejectWithValue }) => {
+  try {
+    const response = await axios.put(`http://localhost:3000/jobRole/${jobRole.id}`, jobRole, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || 'Something went wrong');
+  }
+});
+
+export const fetchPermissions = createAsyncThunk('employees/fetchPermissions', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get('http://localhost:3000/permissions');
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || 'Something went wrong');
+  }
+});
+
+export const getPagedJobRoles = createAsyncThunk(
+  'jobRoles/getPagedJobRoles',
+  async ({ page, pageSize }: { page: number; pageSize: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3000/jobRoles', {
+        params: { _page: page, _limit: pageSize },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
   }
 );
 

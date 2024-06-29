@@ -106,7 +106,7 @@ function Cheques() {
                   return 'gray';
               }
             })()}
-            radius="sm"
+            radius="xs"
             size="xs"
           >
             {item?.status}

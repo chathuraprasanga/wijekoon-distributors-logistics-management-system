@@ -334,6 +334,7 @@ function AddEditSupplierOrderRequests() {
                           placeholder="Pick expected date"
                           value={value}
                           onChange={setValue}
+                          minDate={new Date()}
                         />
                       </Table.Td>
                     </>
@@ -366,6 +367,7 @@ function AddEditSupplierOrderRequests() {
                           rightSection={<IconCalendar />}
                           size="xs"
                           placeholder="Pick expected date"
+                          minDate={new Date()}
                           value={
                             value ||
                             (selectedSupplierOrderRequest?.expectedDate

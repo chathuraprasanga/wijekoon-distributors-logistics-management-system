@@ -1,10 +1,9 @@
-// import { hasPrivilege } from '@/helpers/utils/permissionHandler';
 import { updateCheque } from '@/redux/slices/chequesSlice';
 import { RootState } from '@/redux/store';
-import { Badge, Button, Card, Grid, Table, Text, rem } from '@mantine/core';
+import { Badge, Button, Card, Grid, Group, Modal, Table, Text, rem } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { IconArrowLeft, IconCheck, IconX } from '@tabler/icons-react';
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -13,7 +12,10 @@ function ViewCheques() {
   const dispatch = useDispatch();
   const chequeData = useSelector((state: RootState) => state.cheques.cheque);
 
-  // due to the permission handler is not works
+  // Modal state
+  const [modalOpened, setModalOpened] = useState(false);
+  const [confirmAction, setConfirmAction] = useState('');
+
   const permissionsString = localStorage.getItem('permissions');
   const permissions = permissionsString ? JSON.parse(permissionsString) : [];
 
@@ -26,27 +28,18 @@ function ViewCheques() {
     }
   };
 
-  const hasAnyPrivilege = (permissionArray: string[]) => {
-    try {
-      return permissionArray.some((permission) => permissions.includes(permission));
-    } catch (error) {
-      console.error('Error checking privileges:', error);
-      return false;
-    }
-  };
-
   const customerData = chequeData.customer;
   const orderData = chequeData.order;
 
-  const handleDeposit = async () => {
+  const handleAction = async (action: string) => {
     const payload: any = {};
-    payload.status = 'DEPOSITTED';
+    payload.status = action;
     payload.id = chequeData._id;
     try {
       await dispatch(updateCheque(payload)).unwrap();
       Notifications.show({
         title: 'Successful',
-        message: 'Cheque Status Updated Successfully',
+        message: `Cheque Status Updated to Successfully`,
         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
       });
       navigate('/admin/cheques');
@@ -59,52 +52,12 @@ function ViewCheques() {
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });
     }
+    setModalOpened(false);
   };
 
-  const handleReturned = async () => {
-    const payload: any = {};
-    payload.status = 'RETURNED';
-    payload.id = chequeData._id;
-    try {
-      await dispatch(updateCheque(payload)).unwrap();
-      Notifications.show({
-        title: 'Successful',
-        message: 'Cheque Status Updated Successfully',
-        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-      });
-      navigate('/admin/cheques');
-    } catch (error) {
-      console.error('Error updating cheque:', error);
-      Notifications.show({
-        title: 'Error',
-        message: 'There was an error updating the Cheque',
-        color: 'red',
-        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
-      });
-    }
-  };
-
-  const handleAccept = async () => {
-    const payload: any = {};
-    payload.status = 'ACCEPTED';
-    payload.id = chequeData._id;
-    try {
-      await dispatch(updateCheque(payload)).unwrap();
-      Notifications.show({
-        title: 'Successful',
-        message: 'Cheque Status Updated Successfully',
-        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-      });
-      navigate('/admin/cheques');
-    } catch (error) {
-      console.error('Error updating cheque:', error);
-      Notifications.show({
-        title: 'Error',
-        message: 'There was an error updating the Cheque',
-        color: 'red',
-        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
-      });
-    }
+  const openModal = (action: string) => {
+    setConfirmAction(action);
+    setModalOpened(true);
   };
 
   return (
@@ -277,7 +230,7 @@ function ViewCheques() {
                             return 'gray';
                         }
                       })()}
-                      radius="sm"
+                      radius="xs"
                       size="xs"
                     >
                       {chequeData?.status}
@@ -292,24 +245,58 @@ function ViewCheques() {
           <Grid.Col>
             {chequeData.status === 'PENDING' && (
               <div style={{ float: 'right' }}>
-                <Button ml={10} color="violet" onClick={handleDeposit}>
-                  Depositted
+                <Button ml={10} color="violet" onClick={() => openModal('DEPOSITED')}>
+                  Deposit
                 </Button>
               </div>
             )}
-            {chequeData.status === 'DEPOSITTED' && (
+            {chequeData.status === 'DEPOSITED' && (
               <div style={{ float: 'right' }}>
-                <Button ml={10} color="red" onClick={handleReturned}>
+                <Button ml={10} color="red" onClick={() => openModal('RETURNED')}>
                   Returned
                 </Button>
-                <Button ml={10} onClick={handleAccept}>
+                <Button ml={10} onClick={() => openModal('ACCEPTED')}>
                   Accepted
+                </Button>
+              </div>
+            )}
+            {chequeData.status === 'RETURNED' && (
+              <div style={{ float: 'right' }}>
+                <Button ml={10} onClick={() => openModal('DEPOSITED')}>
+                  Redeposit
                 </Button>
               </div>
             )}
           </Grid.Col>
         )}
       </Grid>
+
+      <Modal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+        title={`Confirm ${confirmAction} Action`}
+      >
+        <Text>Are you sure you want to {confirmAction.toLowerCase()} this cheque?</Text>
+        <Group position="apart" mt="md">
+          <Button variant="outline" onClick={() => setOpened(false)}>
+            Cancel
+          </Button>
+          <Button
+            color={
+              confirmAction === 'DEPOSITED'
+                ? 'green'
+                : confirmAction === 'ACCEPTED'
+                  ? 'blue'
+                  : confirmAction === 'RETURNED'
+                    ? 'red'
+                    : 'blue'
+            }
+            onClick={() => handleAction(confirmAction)}
+          >
+            Confirm
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 }

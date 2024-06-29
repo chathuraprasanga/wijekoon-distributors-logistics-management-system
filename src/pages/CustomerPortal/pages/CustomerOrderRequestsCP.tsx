@@ -48,10 +48,12 @@ function CustomerOrderRequestsCP() {
   const rows = displayedRequest.map((element: any) => (
     <Table.Tr key={element._id}>
       <Table.Td>{element.orderId}</Table.Td>
-      <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
+      <Table.Td>{element.createdAt?.split('T')[0]}</Table.Td>
       <Table.Td>{element.order.length}</Table.Td>
-      <Table.Td>{element.order.reduce((total, item) => total + item.quantity, 0)}</Table.Td>
-      <Table.Td>{element.expectedDate.split('T')[0]}</Table.Td>
+      <Table.Td>
+        {element.order.reduce((total: any, item: any) => total + item.quantity, 0)}
+      </Table.Td>
+      <Table.Td>{element.expectedDate?.split('T')[0] || 'N/A'}</Table.Td>
       <Table.Td>
         <Badge
           color={(() => {

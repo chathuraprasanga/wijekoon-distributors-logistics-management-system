@@ -143,7 +143,7 @@ function ViewSuppliersOrders() {
                 <Table.Td width="35%">
                   <Badge
                     size="xs"
-                    radius="sm"
+                    radius="xs"
                     color={selectedOrder?.status === 'PAID' ? 'green' : 'red'}
                   >
                     {selectedOrder?.status}

@@ -123,7 +123,7 @@ function ViewTrips() {
                           ? 'blue'
                           : 'red'
                     }
-                    radius="sm"
+                    radius="xs"
                     size="xs"
                   >
                     {trip.status}

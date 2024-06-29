@@ -109,13 +109,13 @@ function Products() {
   const handleDeleteProduct = async (productId: string) => {
     try {
       await dispatch(deleteProduct(productId)).unwrap();
-      setOpened(false);
       dispatch(fetchProducts());
       Notifications.show({
         title: 'Successful',
         message: 'Product Deleted Successfully',
         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
       });
+      setOpened(false);
     } catch (e: any) {
       Notifications.show({
         title: 'Error',
@@ -123,6 +123,7 @@ function Products() {
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });
+      setOpened(false);
     }
   };
 

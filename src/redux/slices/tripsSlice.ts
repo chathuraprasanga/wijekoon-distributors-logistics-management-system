@@ -26,113 +26,171 @@ const initialState: TripState = {
 const accessToken = localStorage.getItem('accessToken');
 
 export const fetchTrips = createAsyncThunk('trips/fetchTrips', async () => {
-  const response = await axios.get('http://localhost:3000/trips', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
+  try {
+    const response = await axios.get('http://localhost:3000/trips', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const fetchCompletedTrips = createAsyncThunk('trips/fetchCompletedTrips', async () => {
-  const response = await axios.get('http://localhost:3000/trips/completed', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
+  try {
+    const response = await axios.get('http://localhost:3000/trips/completed', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const createTrip = createAsyncThunk('trips/createTrip', async (trip: any) => {
-  const response = await axios.post('http://localhost:3000/trip', trip);
-  return response.data;
+  try {
+    const response = await axios.post('http://localhost:3000/trip', trip);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const updateTrip = createAsyncThunk('trips/updateTrip', async (trip: any) => {
-  const response = await axios.put(`http://localhost:3000/trip/${trip._id}`, trip);
-  return response.data;
+  try {
+    const response = await axios.put(`http://localhost:3000/trip/${trip._id}`, trip);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const getPagedTrips = createAsyncThunk(
   'trips/getPagedTrips',
   async ({ page, pageSize }: { page: number; pageSize: number }) => {
-    const response = await axios.get('http://localhost:3000/trips', {
-      params: { _page: page, _limit: pageSize },
+    try {
+      const response = await axios.get('http://localhost:3000/trips', {
+        params: { _page: page, _limit: pageSize },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const getTripById = createAsyncThunk('trips/getTripById', async (tripId: string) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/trip/${tripId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
   }
-);
-
-export const getTripById = createAsyncThunk('trips/getTripById', async (tripId: string) => {
-  const response = await axios.get(`http://localhost:3000/trip/${tripId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
 });
 
 export const fetchExpenses = createAsyncThunk('trips/fetchExpenses', async () => {
-  const response = await axios.get('http://localhost:3000/expenses', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
+  try {
+    const response = await axios.get('http://localhost:3000/expenses', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const createExpense = createAsyncThunk('trips/createExpense', async (expense: any) => {
-  const response = await axios.post('http://localhost:3000/expense', expense);
-  return response.data;
+  try {
+    const response = await axios.post('http://localhost:3000/expense', expense);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const updateExpense = createAsyncThunk('trips/updateExpense', async (expense: any) => {
-  const response = await axios.put(`http://localhost:3000/expense/${expense.id}`, expense);
-  return response.data;
+  try {
+    const response = await axios.put(`http://localhost:3000/expense/${expense.id}`, expense);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
 });
 
 export const getPagedExpenses = createAsyncThunk(
   'trips/getPagedExpenses',
   async ({ page, pageSize }: { page: number; pageSize: number }) => {
-    const response = await axios.get('http://localhost:3000/expenses', {
-      params: { _page: page, _limit: pageSize },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
+    try {
+      const response = await axios.get('http://localhost:3000/expenses', {
+        params: { _page: page, _limit: pageSize },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data || 'Something went wrong');
+    }
   }
 );
 
-export const getExpenseById = createAsyncThunk('trips/getExpenseById', async (expenseId: string) => {
-  const response = await axios.get(`http://localhost:3000/expense/${expenseId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.data;
-});
+export const getExpenseById = createAsyncThunk(
+  'trips/getExpenseById',
+  async (expenseId: string) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/expense/${expenseId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 export const deleteTrip = createAsyncThunk('trips/deleteTrip', async (tripId: string) => {
+  try {
     const response = await axios.delete(`http://localhost:3000/trip/${tripId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;
-  });
-  
-  export const deleteExpense = createAsyncThunk('expenses/deleteExpense', async (expenseId: string) => {
-    const response = await axios.delete(`http://localhost:3000/expense/${expenseId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return response.data;
-  });
+  } catch (error: any) {
+    throw new Error(error.response?.data || 'Something went wrong');
+  }
+});
+
+export const deleteExpense = createAsyncThunk(
+  'expenses/deleteExpense',
+  async (expenseId: string) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/expense/${expenseId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data || 'Something went wrong');
+    }
+  }
+);
 
 const tripSlice = createSlice({
   name: 'trips',
@@ -167,97 +225,97 @@ const tripSlice = createSlice({
       })
       .addCase(getPagedTrips.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Failed to fetch paged trips'
-    })
-    .addCase(getTripById.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(getTripById.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.trip = action.payload;
-    })
-    .addCase(getTripById.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.error.message || 'Failed to fetch trip';
-    })
-    .addCase(createTrip.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(createTrip.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.trips.push(action.payload);
-    })
-    .addCase(createTrip.rejected, (state, action) => {
-      state.status = 'failed';
-    })
-    .addCase(updateTrip.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(updateTrip.fulfilled, (state, action) => {
-      const index = state.trips.findIndex((trip) => trip.id === action.payload.id);
-      if (index !== -1) {
-        state.trips[index] = action.payload;
-      }
-    })
-    .addCase(updateTrip.rejected, (state, action) => {
-      state.status = 'failed';
-    })
-    .addCase(fetchExpenses.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(fetchExpenses.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.expenses = action.payload;
-    })
-    .addCase(fetchExpenses.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.error.message || 'Failed to fetch expenses';
-    })
-    .addCase(getPagedExpenses.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(getPagedExpenses.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.pagedExpenses = action.payload;
-    })
-    .addCase(getPagedExpenses.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.error.message || 'Failed to fetch paged expenses';
-    })
-    .addCase(getExpenseById.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(getExpenseById.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.expense = action.payload;
-    })
-    .addCase(getExpenseById.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.error.message || 'Failed to fetch expense';
-    })
-    .addCase(createExpense.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(createExpense.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.expenses.push(action.payload);
-    })
-    .addCase(createExpense.rejected, (state, action) => {
-      state.status = 'failed';
-    })
-    .addCase(updateExpense.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(updateExpense.fulfilled, (state, action) => {
-      const index = state.expenses.findIndex((expense) => expense.id === action.payload.id);
-      if (index !== -1) {
-        state.expenses[index] = action.payload;
-      }
-    })
-    .addCase(updateExpense.rejected, (state, action) => {
-      state.status = 'failed';
-    })
-    .addCase(deleteTrip.pending, (state) => {
+        state.error = action.error.message || 'Failed to fetch paged trips';
+      })
+      .addCase(getTripById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getTripById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.trip = action.payload;
+      })
+      .addCase(getTripById.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch trip';
+      })
+      .addCase(createTrip.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(createTrip.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.trips.push(action.payload);
+      })
+      .addCase(createTrip.rejected, (state, action) => {
+        state.status = 'failed';
+      })
+      .addCase(updateTrip.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(updateTrip.fulfilled, (state, action) => {
+        const index = state.trips.findIndex((trip) => trip.id === action.payload.id);
+        if (index !== -1) {
+          state.trips[index] = action.payload;
+        }
+      })
+      .addCase(updateTrip.rejected, (state, action) => {
+        state.status = 'failed';
+      })
+      .addCase(fetchExpenses.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchExpenses.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.expenses = action.payload;
+      })
+      .addCase(fetchExpenses.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch expenses';
+      })
+      .addCase(getPagedExpenses.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getPagedExpenses.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.pagedExpenses = action.payload;
+      })
+      .addCase(getPagedExpenses.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch paged expenses';
+      })
+      .addCase(getExpenseById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getExpenseById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.expense = action.payload;
+      })
+      .addCase(getExpenseById.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch expense';
+      })
+      .addCase(createExpense.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(createExpense.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.expenses.push(action.payload);
+      })
+      .addCase(createExpense.rejected, (state, action) => {
+        state.status = 'failed';
+      })
+      .addCase(updateExpense.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(updateExpense.fulfilled, (state, action) => {
+        const index = state.expenses.findIndex((expense) => expense.id === action.payload.id);
+        if (index !== -1) {
+          state.expenses[index] = action.payload;
+        }
+      })
+      .addCase(updateExpense.rejected, (state, action) => {
+        state.status = 'failed';
+      })
+      .addCase(deleteTrip.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(deleteTrip.fulfilled, (state, action) => {
@@ -287,8 +345,8 @@ const tripSlice = createSlice({
       .addCase(fetchCompletedTrips.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch trips';
-      })
-},
+      });
+  },
 });
 
 export const { setTrip, setExpense } = tripSlice.actions;

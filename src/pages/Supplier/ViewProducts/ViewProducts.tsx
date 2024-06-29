@@ -122,7 +122,11 @@ function ViewProducts() {
             </Table.Td>
             <Table.Td>
               <Text>
-                <Badge color={selectedProduct.status === 'ACTIVE' ? 'green' : 'red'} radius="sm">
+                <Badge
+                  color={selectedProduct.status === 'ACTIVE' ? 'green' : 'red'}
+                  radius="xs"
+                  size="xs"
+                >
                   {selectedProduct?.status || 'N/A'}
                 </Badge>
               </Text>
