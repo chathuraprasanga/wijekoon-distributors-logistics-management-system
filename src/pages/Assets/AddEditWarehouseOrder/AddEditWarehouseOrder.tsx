@@ -14,7 +14,7 @@ import {
 } from '@mantine/core';
 import { IconArrowLeft, IconCheck, IconSearch, IconTrash, IconX } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
-import { Notifications } from '@mantine/notifications';
+import { Notifications, useNotifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,6 +60,7 @@ function AddWarehouseCustomerOrders() {
   const customers = useSelector((state: RootState) => state.customers.customers);
   const customer = useSelector((state: RootState) => state.customers.customer);
   const warehouse = useSelector((state: RootState) => state.assets.warehouse);
+  console.log(warehouse);
 
   // due to the permission handler is not works
   const permissionsString = localStorage.getItem('permissions');
@@ -137,7 +138,17 @@ function AddWarehouseCustomerOrders() {
         status: '',
       },
     },
-    validate: {},
+    validate: {
+      order: {
+        quantity: (value, values) => {
+          const product = filteredProducts.find((p) => p.product.code === values.order.product);
+          if (product && value > product.quantity) {
+            return `Quantity cannot exceed ${product.quantity}`;
+          }
+          return null;
+        },
+      },
+    },
   });
 
   const removeRow = (index: number) => {
@@ -316,6 +327,10 @@ function AddWarehouseCustomerOrders() {
     navigate('/admin/customers/add-edit');
   };
 
+  const filteredProducts = warehouse.stockDetails.filter(
+    (stockDetail: any) => stockDetail.quantity > 0
+  );
+
   return (
     <>
       <WarehousePaymentModal
@@ -408,9 +423,9 @@ function AddWarehouseCustomerOrders() {
                       <Select
                         size="xs"
                         placeholder="Select Product"
-                        data={products?.map((product) => ({
-                          value: product.code,
-                          label: product.code,
+                        data={filteredProducts.map((stockDetail: any) => ({
+                          value: stockDetail.product.code,
+                          label: stockDetail.product.code,
                         }))}
                         value={row.productCode}
                         onChange={(code) => handleProductChange(code, index)}
@@ -431,7 +446,25 @@ function AddWarehouseCustomerOrders() {
                         placeholder="Enter Quantity"
                         value={row.quantity}
                         defaultValue={0}
-                        onChange={(e) => handleChange(e.currentTarget.value, 'quantity', index)}
+                        onChange={(e) => {
+                          const enteredQuantity = e.currentTarget.value;
+                          const product = filteredProducts.find(
+                            (p:any) => p.product.code === row.productCode
+                          );
+                          const availableQuantity = product?.quantity || 0;
+
+                          if (enteredQuantity > availableQuantity) {
+                            Notifications.show({
+                              title: 'Quantity Exceeded',
+                              message: `The entered quantity exceeds the available quantity of ${availableQuantity}.`,
+                              color: 'red',
+                              icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                            });
+                          }
+
+                          const quantity = Math.min(enteredQuantity, availableQuantity);
+                          handleChange(quantity, 'quantity', index);
+                        }}
                       />
                     </Table.Td>
                     <Table.Td>

@@ -96,7 +96,7 @@ function Cheques() {
               switch (item.status) {
                 case 'PENDING':
                   return 'yellow';
-                case 'DEPOSITTED':
+                case 'DEPOSITED':
                   return 'green';
                 case 'ACCEPTED':
                   return 'blue';

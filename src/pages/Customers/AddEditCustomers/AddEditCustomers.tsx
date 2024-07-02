@@ -68,10 +68,10 @@ function AddEditCustomers() {
       });
       customerAddEditForm.reset(); // Reset the form state
       navigate('/admin/customers');
-    } catch (error) {
+    } catch (e: any) {
       Notifications.show({
         title: 'Error',
-        message: 'There was an error creating the customer',
+        message: e.message,
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });
@@ -89,10 +89,10 @@ function AddEditCustomers() {
       customerAddEditForm.reset(); // Reset the form state
       dispatch(fetchCustomers());
       navigate('/admin/customers');
-    } catch (error) {
+    } catch (error: any) {
       Notifications.show({
         title: 'Error',
-        message: 'There was an error updating the customer',
+        message: error.message,
         color: 'red',
         icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
       });

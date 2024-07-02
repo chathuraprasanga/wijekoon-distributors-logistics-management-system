@@ -1,4 +1,4 @@
-import { Button, Card, Grid, Table, Text, TextInput, rem } from '@mantine/core';
+import { Button, Card, Checkbox, Grid, MantineProvider, Paper, Table, Text, TextInput, createTheme, rem } from '@mantine/core';
 import { isNotEmpty, useForm } from '@mantine/form';
 import { Notifications } from '@mantine/notifications';
 import { IconArrowLeft, IconCheck, IconX } from '@tabler/icons-react';
@@ -12,6 +12,7 @@ import {
   fetchPermissions,
   updateJobRole,
 } from '@/redux/slices/employeeSlice';
+import { Row, Col } from 'react-bootstrap';
 
 interface Permission {
   _id: string;
@@ -25,6 +26,7 @@ function AddJobRoles() {
   const dispatch = useDispatch();
   const selectedJobRole = useSelector((state: RootState) => state.employees.jobRole);
   const permissionsList = useSelector((state: RootState) => state.employees.permissions);
+  console.log(permissionsList);
   const status = useSelector((state: RootState) => state.employees.status);
 
   // due to the permission handler is not works
@@ -137,23 +139,36 @@ function AddJobRoles() {
     jobRoleAddEditForm.setFieldValue('permissions', activePermissions);
   }, [activePermissions]);
 
-  const tds = permissionsList.map((permission: Permission) => (
-    <Table.Tr key={permission._id}>
-      <Table.Td width="30%">
-        <Text size="sm">{permission.module}</Text>
-      </Table.Td>
-      <Table.Td width="60%">{permission.description}</Table.Td>
-      <Table.Td width="10%">
-        <Button
-          color={activePermissions.includes(permission.code) ? 'red' : 'violet'}
-          size="xs"
-          onClick={() => handlePermissionClick(permission.code)}
-        >
-          {activePermissions.includes(permission.code) ? 'Remove' : 'Add'}
-        </Button>
-      </Table.Td>
-    </Table.Tr>
-  ));
+  // Group permissions by module
+  const groupedPermissions = permissionsList.reduce((acc, permission) => {
+    if (!acc[permission.module]) {
+      acc[permission.module] = [];
+    }
+    acc[permission.module].push(permission);
+    return acc;
+  }, {});
+
+  // const tds = permissionsList.map((permission: Permission) => (
+  //   <Table.Tr key={permission._id}>
+  //     <Table.Td width="30%">
+  //       <Text size="sm">{permission.module}</Text>
+  //     </Table.Td>
+  //     <Table.Td width="60%">{permission.description}</Table.Td>
+  //     <Table.Td width="10%">
+  //       <Button
+  //         color={activePermissions.includes(permission.code) ? 'red' : 'violet'}
+  //         size="xs"
+  //         onClick={() => handlePermissionClick(permission.code)}
+  //       >
+  //         {activePermissions.includes(permission.code) ? 'Remove' : 'Add'}
+  //       </Button>
+  //     </Table.Td>
+  //   </Table.Tr>
+  // ));
+
+  const theme = createTheme({
+    cursorType: 'pointer',
+  });
 
   return (
     <>
@@ -193,11 +208,48 @@ function AddJobRoles() {
                 <Table>
                   <Table.Tr>
                     <Table.Th>Module</Table.Th>
-                    <Table.Th>Description</Table.Th>
-                    <Table.Th>Action</Table.Th>
+                    {/* <Table.Th>Description</Table.Th> */}
+                    <Table.Th>Permissions</Table.Th>
                   </Table.Tr>
 
-                  <Table.Tbody>{tds}</Table.Tbody>
+                  <Table.Tbody>
+                    {Object.entries(groupedPermissions).map(([moduleName, permissions], index) => (
+                      <Table.Tr>
+                        <Table.Td>
+                          <Text>{moduleName}</Text>
+                        </Table.Td>
+
+                        <Table.Td>
+                          <div
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(2, 1fr)',
+                              gap: '10px',
+                            }}
+                          >
+                            {permissions.map((permission) => (
+                              <div
+                                key={permission._id}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'left',
+                                }}
+                              >
+                                <MantineProvider theme={theme}>
+                                <Checkbox
+                                  checked={activePermissions.includes(permission.code)}
+                                  onChange={() => handlePermissionClick(permission.code)}
+                                />
+                                </MantineProvider>
+                                <Text ml={10}>{permission.description}</Text>
+                              </div>
+                            ))}
+                          </div>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
                 </Table>
               </div>
             </Card>

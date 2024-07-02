@@ -219,7 +219,7 @@ function AddCustomerPayments() {
                     <Table.Td>{item.branch || 'N/A'}</Table.Td>
                     <Table.Td>{item.chequeNumber || 'N/A'}</Table.Td>
                     <Table.Td>
-                      {item.method === 'Cheque' ? item.depositeDate?.split('T')[0] : 'N/A'}
+                      {item.method === 'Cheque' ? item.depositDate?.split('T')[0] : 'N/A'}
                     </Table.Td>
                     <Table.Td>{item.amount}</Table.Td>
                   </Table.Tr>

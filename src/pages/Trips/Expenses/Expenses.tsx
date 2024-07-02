@@ -31,6 +31,7 @@ function Expenses() {
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const trips = useSelector((state: RootState) => state.trips.trips);
+  console.log(trips);
 
   // due to the permission handler is not works
   const permissionsString = localStorage.getItem('permissions');
@@ -148,22 +149,29 @@ function Expenses() {
     </>
   ));
 
-  const modalData = displayedTrips.map((element, index) => (
-    <Table.Tr key={element._id}>
-      <Table.Td>{element.tripId}</Table.Td>
-      <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
-      <Table.Td>{element.vehicle?.number}</Table.Td>
-      <Table.Td>{element.driver?.name}</Table.Td>
-      <Table.Td>{element.purpose}</Table.Td>
-      <Table.Td>{element.purpose}</Table.Td>
-      <Table.Td>{element.purpose}</Table.Td>
-      <Table.Td>
-        <Button size="xs" onClick={() => handleSelect(element)}>
-          Select
-        </Button>
-      </Table.Td>
-    </Table.Tr>
-  ));
+  const modalData = displayedTrips
+    .filter((element) => element.status === 'ACTIVE')
+    .map((element, index) => (
+      <Table.Tr key={element._id}>
+        <Table.Td>{element.tripId}</Table.Td>
+        <Table.Td>{element.createdAt.split('T')[0]}</Table.Td>
+        <Table.Td>{element.vehicle?.number}</Table.Td>
+        <Table.Td>{element.driver?.name}</Table.Td>
+        <Table.Td>{element.supplierOrder?.supplierOrderRequest?.order?.length || '-'}</Table.Td>
+        <Table.Td>
+          {element.supplierOrder?.supplierOrderRequest?.order.reduce(
+            (total: any, item: any) => total + item.quantity,
+            0
+          )}
+        </Table.Td>
+        <Table.Td style={{ textTransform: 'capitalize' }}>{element.purpose}</Table.Td>
+        <Table.Td>
+          <Button size="xs" onClick={() => handleSelect(element)}>
+            Select
+          </Button>
+        </Table.Td>
+      </Table.Tr>
+    ));
 
   return (
     <>

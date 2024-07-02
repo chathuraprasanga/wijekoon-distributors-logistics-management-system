@@ -61,7 +61,7 @@ function CustomerCheques() {
             switch (element.status) {
               case 'PENDING':
                 return 'yellow';
-              case 'DEPOSITTED':
+              case 'DEPOSITED':
                 return 'green';
               case 'ACCEPTED':
                 return 'blue';
@@ -173,7 +173,7 @@ function CustomerCheques() {
                   switch (selectedCheque.status) {
                     case 'PENDING':
                       return 'yellow';
-                    case 'DEPOSITTED':
+                    case 'DEPOSITED':
                       return 'green';
                     case 'ACCEPTED':
                       return 'blue';

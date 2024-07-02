@@ -220,7 +220,7 @@ function ViewCheques() {
                         switch (chequeData.status) {
                           case 'PENDING':
                             return 'yellow';
-                          case 'DEPOSITTED':
+                          case 'DEPOSITED':
                             return 'green';
                           case 'ACCEPTED':
                             return 'blue';

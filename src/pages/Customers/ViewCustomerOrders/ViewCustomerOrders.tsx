@@ -4,6 +4,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { RootState } from '@/redux/store';
+import GenerateInvoicePdf from './DownloadPdfFile';
 
 function ViewCustomerOrders() {
   const dispatch = useDispatch();
@@ -185,14 +186,14 @@ function ViewCustomerOrders() {
         </Grid.Col>
         <Grid.Col span={12}>
           <div>
-            {/* <Link to="/admin/customers/add-payments"> */}
+            {/* <GenerateInvoicePdf order={selectedOrder} /> */}
+
             <Button
               style={{ width: '15%', marginTop: 10, float: 'right' }}
               onClick={handleGoToPayments}
             >
               Go To Payments
             </Button>
-            {/* </Link> */}
           </div>
         </Grid.Col>
       </Grid>
