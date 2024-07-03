@@ -7,6 +7,7 @@ import {
   fetchCustomerOrderRequestsById,
   fetchCustomerOrdersById,
 } from '@/redux/slices/customerPortalSlice';
+import { generateInvoicePDF } from '@/pages/DownloadPdf/DownloadPdfFile';
 
 function CustomerOrdersCP() {
   const dispatch = useDispatch();
@@ -81,6 +82,7 @@ function CustomerOrdersCP() {
 
           <Menu.Dropdown>
             <Menu.Item onClick={() => handleViewClick(element)}>View</Menu.Item>
+            <Menu.Item onClick={() => generateInvoicePDF(element)}>Invoice</Menu.Item>
           </Menu.Dropdown>
         </Menu>
       </Table.Td>

@@ -4,7 +4,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { RootState } from '@/redux/store';
-import GenerateInvoicePdf from './DownloadPdfFile';
+import { generateInvoicePDF } from '@/pages/DownloadPdf/DownloadPdfFile';
 
 function ViewCustomerOrders() {
   const dispatch = useDispatch();
@@ -39,6 +39,10 @@ function ViewCustomerOrders() {
   const handleGoToPayments = () => {
     // dispatch(fetchCustomerPayments)
     navigate('/admin/customers/payments');
+  };
+
+  const handleDownloadPdf = async () => {
+    generateInvoicePDF(selectedOrder);
   };
 
   return (
@@ -186,7 +190,9 @@ function ViewCustomerOrders() {
         </Grid.Col>
         <Grid.Col span={12}>
           <div>
-            {/* <GenerateInvoicePdf order={selectedOrder} /> */}
+            <Button color="violet" onClick={handleDownloadPdf}>
+              Download PDF
+            </Button>
 
             <Button
               style={{ width: '15%', marginTop: 10, float: 'right' }}
