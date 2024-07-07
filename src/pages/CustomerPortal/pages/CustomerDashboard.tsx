@@ -5,7 +5,7 @@ function CustomerDashboard() {
   return (
     <>
       <StatsGroup />
-      <div>Dashboard</div>
+      {/* <div>Dashboard</div> */}
     </>
   );
 }

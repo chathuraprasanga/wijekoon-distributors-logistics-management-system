@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, Grid, Text, Button, Badge, Group, Image, ThemeIcon } from '@mantine/core';
-import { IconPhoto, IconUser, IconUserCog } from '@tabler/icons-react';
+import { IconMail, IconPhoto, IconUser, IconUserCog } from '@tabler/icons-react';
 import NotFoundImage from './404-image.png'; // Import your 404 image
 import { NothingFoundBackground } from '@/components/404/NothingFoundBackground';
 import { useSelector } from 'react-redux';
@@ -39,6 +39,10 @@ function Settings() {
     navigate('/admin/settings/profile');
   };
 
+  const navigateEmail = () => {
+    navigate('/admin/settings/emails');
+  };
+
   return (
     <>
       <Grid>
@@ -73,6 +77,27 @@ function Settings() {
             </Group>
           </Card>
         </Grid.Col>
+        {hasAnyPrivilege(['VIEW_EMAILS', 'DELETE_EMAILS']) && (
+          <Grid.Col span={3}>
+            <Card
+              style={{ cursor: 'pointer' }}
+              shadow="sm"
+              padding="lg"
+              radius="md"
+              withBorder
+              onClick={navigateEmail}
+            >
+              <Group justify="space-between" mt="md" mb="xs">
+                <ThemeIcon variant="light" color="blue">
+                  <IconMail style={{ width: '70%', height: '70%' }} />
+                </ThemeIcon>
+                <Text fw={500} style={{ textDecoration: 'none' }}>
+                  Email
+                </Text>
+              </Group>
+            </Card>
+          </Grid.Col>
+        )}
       </Grid>
     </>
   );

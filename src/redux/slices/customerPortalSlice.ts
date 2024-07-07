@@ -151,14 +151,11 @@ export const fetchCustomerPaymentsById = createAsyncThunk(
   'customerPayments/fetchById',
   async (customerId: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/customerPaymentsById/${customerId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:3000/customerPaymentsById/${customerId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -170,14 +167,11 @@ export const fetchCustomerOrdersById = createAsyncThunk(
   'customerOrders/fetchById',
   async (customerId: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/customerOrdersById/${customerId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:3000/customerOrdersById/${customerId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -227,6 +221,22 @@ export const fetchCustomerChequesByCustomerId = createAsyncThunk(
           },
         }
       );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Something went wrong');
+    }
+  }
+);
+
+export const sendEmail = createAsyncThunk(
+  'customers/sendEmails',
+  async (emailData: any, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3000/send-email', emailData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Something went wrong');
@@ -375,6 +385,16 @@ const customerPortalSlice = createSlice({
       .addCase(changeCustomerPassword.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
+      })
+      .addCase(sendEmail.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(sendEmail.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(sendEmail.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to create customer order request';
       });
   },
 });

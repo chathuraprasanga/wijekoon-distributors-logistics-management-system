@@ -1,7 +1,12 @@
-import { Title, SimpleGrid, TextInput, Textarea, Group, Image, Button } from '@mantine/core';
+import { createCustomerOrderRequestCP, sendEmail } from '@/redux/slices/customerPortalSlice';
+import { Title, SimpleGrid, TextInput, Textarea, Group, Image, Button, rem } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { Notifications } from '@mantine/notifications';
+import { IconCheck, IconX } from '@tabler/icons-react';
+import { useDispatch } from 'react-redux';
 
 function ContactUs() {
+  const dispatch = useDispatch();
   const form = useForm({
     initialValues: {
       name: '',
@@ -13,13 +18,29 @@ function ContactUs() {
       name: (value) => value.trim().length < 2,
       email: (value) => !/^\S+@\S+$/.test(value),
       subject: (value) => value.trim().length === 0,
+      message: (value) => value.trim().length < 2,
     },
   });
 
-  const handleSendMail = async (values:any) => {
-    console.log("Sending email...", values);
-    
-    form.reset();
+  const handleSendMail = async (values: any) => {
+    // console.log('Sending email...', values);
+    try {
+      await dispatch(sendEmail(values)).unwrap();
+      Notifications.show({
+        title: 'Successful',
+        message: 'Email Send Successfully',
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+      });
+      form.reset();
+      close();
+    } catch (e: any) {
+      Notifications.show({
+        title: 'Error',
+        message: e.message,
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
+    }
   };
 
   return (
@@ -33,7 +54,10 @@ function ContactUs() {
         />
       </div>
 
-      <form style={{ marginLeft: 300, marginRight: 300, marginBottom: -60 }} onSubmit={form.onSubmit(handleSendMail)}>
+      <form
+        style={{ marginLeft: 300, marginRight: 300, marginBottom: -60 }}
+        onSubmit={form.onSubmit(handleSendMail)}
+      >
         <Title
           order={2}
           size="h1"

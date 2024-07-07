@@ -8,6 +8,7 @@ import tripsSlice from './slices/tripsSlice';
 import assetsSlice from './slices/assetsSlice';
 import dashboardSlice from './slices/dashboardSlice';
 import customerPortalSlice from './slices/customerPortalSlice';
+import settingSlice from './slices/settingSlice';
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     auth: authSlice,
     dashboard: dashboardSlice,
     customerPortal: customerPortalSlice,
+    settings: settingSlice,
   },
 });
 

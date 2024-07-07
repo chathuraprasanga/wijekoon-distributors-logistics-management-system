@@ -49,6 +49,7 @@ function AddWarehouseCustomerOrders() {
   const [activeModalPage, setModalPage] = useState(1);
   const [value, setValue] = useState<Date | null>(null);
   const [rows, setRows] = useState<RowData[]>([]);
+  const [newRows, setNewRows] = useState<RowData[]>([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const status = useSelector((state: RootState) => state.customers.status);
@@ -60,7 +61,8 @@ function AddWarehouseCustomerOrders() {
   const customers = useSelector((state: RootState) => state.customers.customers);
   const customer = useSelector((state: RootState) => state.customers.customer);
   const warehouse = useSelector((state: RootState) => state.assets.warehouse);
-  console.log(warehouse);
+
+  // console.log(warehouse);
 
   // due to the permission handler is not works
   const permissionsString = localStorage.getItem('permissions');
@@ -155,23 +157,35 @@ function AddWarehouseCustomerOrders() {
     setRows(rows.filter((row, rowIndex) => rowIndex !== index));
   };
 
-  const handleProductChange = (code: string, index: number) => {
-    const product = products.find((p) => p.code === code);
-    if (product) {
-      const updatedRows = rows?.map((row, rowIndex) =>
-        rowIndex === index
-          ? {
-              ...row,
-              product: product?._id,
-              productCode: product.code,
-              productName: product.name,
-              productSize: product.size,
-              unitPrice: product.sellingPrice,
-              lineTotal: (0).toFixed(2), // Set initial line total to 0.0
-            }
-          : row
-      );
-      setRows(updatedRows);
+  const handleProductChange = (code: any, index: any) => {
+    // Check if the product code already exists in any of the rows
+    const duplicateCodeExists = rows.some((row) => row.productCode === code);
+
+    if (!duplicateCodeExists) {
+      const product = products.find((p) => p.code === code);
+      if (product) {
+        const updatedRows = rows.map((row, rowIndex) =>
+          rowIndex === index
+            ? {
+                ...row,
+                product: product._id,
+                productCode: product.code,
+                productName: product.name,
+                productSize: product.size,
+                unitPrice: product.sellingPrice,
+                lineTotal: (0).toFixed(2), // Set initial line total to 0.0
+              }
+            : row
+        );
+        setRows(updatedRows);
+      }
+    } else {
+      Notifications.show({
+        title: 'Already Exist',
+        message: `The entered product : ${code} is already exist.`,
+        color: 'red',
+        icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+      });
     }
   };
 
@@ -195,6 +209,7 @@ function AddWarehouseCustomerOrders() {
       }
       return row;
     });
+    // setNewRows(updatedRows);
     setRows(updatedRows);
   };
 
@@ -328,8 +343,12 @@ function AddWarehouseCustomerOrders() {
   };
 
   const filteredProducts = warehouse.stockDetails.filter(
-    (stockDetail: any) => stockDetail.quantity > 0
+    (stockDetail: any) =>
+      stockDetail.quantity >
+      0 /*&& !rows.some((row) => row.productCode === stockDetail.product.code) */
   );
+
+  // const newRow = rows;
 
   return (
     <>
@@ -421,12 +440,14 @@ function AddWarehouseCustomerOrders() {
                   <Table.Tr key={index}>
                     <Table.Td>
                       <Select
+                        key={index}
                         size="xs"
                         placeholder="Select Product"
                         data={filteredProducts.map((stockDetail: any) => ({
                           value: stockDetail.product.code,
                           label: stockDetail.product.code,
                         }))}
+                        // value={newRow[index].productCode}
                         value={row.productCode}
                         onChange={(code) => handleProductChange(code, index)}
                       />
@@ -449,7 +470,7 @@ function AddWarehouseCustomerOrders() {
                         onChange={(e) => {
                           const enteredQuantity = e.currentTarget.value;
                           const product = filteredProducts.find(
-                            (p:any) => p.product.code === row.productCode
+                            (p: any) => p.product.code === row.productCode
                           );
                           const availableQuantity = product?.quantity || 0;
 

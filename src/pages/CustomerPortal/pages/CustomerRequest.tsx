@@ -282,6 +282,7 @@ function CustomerRequest() {
                   style={{ width: 200 }}
                   label="Expected Date"
                   placeholder="Pick date"
+                  minDate={new Date()}
                   {...form.getInputProps('expectedDate')}
                   withAsterisk
                 />

@@ -1,7 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppLayout } from './hoc/AppLayout';
 import Login from './pages/Login/Login';
-import { HomePage } from './pages/Home.page';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Customers from './pages/Customers/Customers';
@@ -79,6 +78,8 @@ import PrivacyPolicy from './pages/CustomerPortal/pages/PrivacyPolicy';
 import TermsOfUse from './pages/CustomerPortal/pages/TermsOfUse';
 import Profile from './pages/Settings/Profile/Profile';
 import CustomerSettings from './pages/CustomerPortal/pages/CustomerSettings';
+import Email from './pages/Settings/Email/Email';
+import ViewEmail from './pages/Settings/Email/ViewEmail/ViewEmail';
 
 const router = createBrowserRouter([
   {
@@ -392,6 +393,14 @@ const router = createBrowserRouter([
       {
         path: 'settings/profile',
         element: <Profile />,
+      },
+      {
+        path: 'settings/emails',
+        element: <Email />,
+      },
+      {
+        path: 'settings/emails/view',
+        element: <ViewEmail />,
       },
       // {
       //   path: 'customerOrder/addPayment',
