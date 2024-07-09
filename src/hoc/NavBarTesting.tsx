@@ -22,11 +22,11 @@ const NavBarTesting = React.memo(() => {
   }, [location.pathname]);
 
   function hasPermission(permission: any) {
-    return permissions.includes(permission);
+    return permissions?.includes(permission);
   }
 
   function hasAnyPermission(inputPermissions: any) {
-    return inputPermissions.some((permission: any) => permissions.includes(permission));
+    return inputPermissions.some((permission: any) => permissions?.includes(permission));
   }
 
   const customerActivePaths = [
@@ -180,7 +180,7 @@ const NavBarTesting = React.memo(() => {
           color="violet"
           variant="filled"
           childrenOffset={28}
-          active={activePaths.includes(activePath)}
+          active={activePaths?.includes(activePath)}
         >
           {children}
         </NavLink>
